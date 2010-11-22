@@ -8,7 +8,7 @@ public class FindFace {
 	/**
 	 * Doi tuong dung de phan loai guong mat
 	 */
-	private FaceClassify faceClassify;
+	//private FaceClassify faceClassify;
 	
 	/**
 	 * Chieu rong nguyen thuy cua anh
@@ -25,8 +25,8 @@ public class FindFace {
 	 * @param fileSaveNetwork Duong dan luu network de load len
 	 */
 	public FindFace(String fileSaveNetwork) {
-		faceClassify = new FaceClassify();
-		faceClassify.loadNetwork(fileSaveNetwork);
+		//faceClassify = new FaceClassify();
+		//faceClassify.loadNetwork(fileSaveNetwork);
 	}
 	
 	/**
@@ -35,7 +35,7 @@ public class FindFace {
 	 * @param image Anh can lay face
 	 */
 	public void getFaceInImage(BufferedImage image) {
-		int width = image.getWidth();
+		/*int width = image.getWidth();
 		int height = image.getHeight();
 		for (int i = 0; i < height - Const.FACE_HEIGHT; i ++) {
 			for (int j = 0; j < width - Const.FACE_WIDTH; j ++) {
@@ -45,6 +45,7 @@ public class FindFace {
 				}
 			}
 		}
+		*/
 	}
 	
 	/**
