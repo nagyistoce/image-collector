@@ -167,5 +167,37 @@ public class ImageProcess {
 		return image;
 	}
 	
+	/**
+	 * Chuyen anh thanh array
+	 * @param image Anh can chuyen
+	 * @return Ket qua chuyen
+	 */
+	public static double[] imageToArryay(BufferedImage image) {
+		Matrix<Double> matrix = imageToMatrix(image);
+		double[] result = matrixToArray(matrix);
+		return result;
+	}
+	
+	/**
+	 * Chuan hoa gia tri nhap vao cho phu hop voi mang neural;
+	 * @return
+	 */
+	public static double[] adapArray(double[] input) {
+		int len = input.length;
+		double[] result = new double[len];
+		for (int i = 0; i < len; i ++) {
+			if (input[i] == 127) {
+				result[i] = 0;
+			}
+			else if (input[i] > 127) {
+				result[i] = (input[i] - 127) / 127; 
+			}
+			else {
+				result[i] = -input[i] / 127;
+			}
+		}
+		return result;
+	}
+	
 
 }
