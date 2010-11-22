@@ -16,21 +16,25 @@ public class Const {
      */
     public static final int FACE_WIDTH = 20;
 
-   
     /**
-     * Number of hidden neural 1
+     * Number of hidden neural
      */
-    public static final int FACE_CLASSIFY_NUMBER_OF_HIDDEN_NEURAL_1 = 700;
-
-    /**
-     * Number of hidden neural 2
-     */
-    public static final int FACE_CLASSIFY_NUMBER_OF_HIDDEN_NEURAL_2 = 700;
+    public static final int FACE_CLASSIFY_NUMBER_OF_HIDDEN_NEURAL = 800;
     
     /**
      * So luong neural output do de la 2 no se khong chay
      */
     public static final int FACE_CLASSIFY_NUMBER_OF_OUTPUT_NEURAL = 20;
+    
+    /**
+     * Luu gia tri bias
+     */
+    public static final int FACE_CLASSIFY_BIAS = 30;
+    
+    /**
+     * So luong layer cua network
+     */
+    public static final int NUMBER_OF_LAYER = 3;
     
     /**
      * Buoc nhay frame anh
