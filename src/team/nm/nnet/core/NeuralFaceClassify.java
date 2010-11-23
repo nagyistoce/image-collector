@@ -13,6 +13,10 @@ import team.nm.nnet.util.ImageProcess;
 
 public class NeuralFaceClassify implements Runnable {
 	/**
+	 * Luu duong dan de luu file weight
+	 */
+	private String filename = "";
+	/**
 	 * So luong input
 	 */
 	private final int NUMBER_OF_INPUT = Const.FACE_WIDTH * Const.FACE_HEIGHT; 															// 20;
@@ -93,9 +97,10 @@ public class NeuralFaceClassify implements Runnable {
 	 */
 	private Random random = new Random();
 
-	public NeuralFaceClassify() {
+	public NeuralFaceClassify(String filename) {
 		listDesireOutput = new ArrayList<int[]>();
 		listInputSignal = new ArrayList<double[]>();
+		this.filename = filename;
 	}
 
 	/**
@@ -285,6 +290,7 @@ public class NeuralFaceClassify implements Runnable {
 
 	@Override
 	public void run() {
+		System.out.println("Bat dau train");
 		initNeural();
 		initWeight();
 		double avgError = 0.0F;
@@ -303,7 +309,15 @@ public class NeuralFaceClassify implements Runnable {
 			if (avgError < ERROR_THRESHOLD) {
 				epoch = EPOCHS + 1;
 			}
+			int percent = (epoch * 100 / EPOCHS);
+			System.out.println("Percent: " + percent);
+			System.out.println("Epoch: " + epoch + "in: " + EPOCHS);
+			System.out.println("AVG Error: " + avgError);
 		}
+		System.out.println("Xong.");
+		System.out.println("Save weight to: " + filename);
+		saveWeight(filename);
+		System.out.println("Xong.");
 	}
 	
 	/**
