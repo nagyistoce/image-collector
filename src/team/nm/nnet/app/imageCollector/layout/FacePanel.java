@@ -20,7 +20,6 @@ public class FacePanel extends javax.swing.JPanel {
     }
     
     public void setFaceImage(Image faceImage) {
-    	this.faceImage = faceImage;
     	if((faceImage.getWidth(null) > Const.FACE_WIDTH) || (faceImage.getHeight(null)) > Const.FACE_HEIGHT) {
     	    BufferedImage bufferedImage = ImageUtils.toBufferedImage(faceImage);
             bufferedImage = ImageUtils.scale(bufferedImage, Const.FACE_WIDTH, Const.FACE_HEIGHT);
@@ -103,7 +102,6 @@ public class FacePanel extends javax.swing.JPanel {
     private javax.swing.JLabel lblFaceView;
     private javax.swing.JTextField txtFaceName;
     
-    private Image faceImage;
     private String facePath;
     private String faceName;
     private JPanel parent;

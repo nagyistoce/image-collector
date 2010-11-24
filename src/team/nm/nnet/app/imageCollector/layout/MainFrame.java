@@ -4,49 +4,52 @@ import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 import org.springframework.beans.factory.annotation.Required;
 
+import team.nm.nnet.app.imageCollector.basis.FaceDetector;
 import team.nm.nnet.app.imageCollector.utils.ColorDetection;
 import team.nm.nnet.app.imageCollector.utils.ImageFilter;
 import team.nm.nnet.app.imageCollector.utils.ImagePreviewPanel;
-import team.nm.nnet.core.Const;
 import team.nm.nnet.util.ImageUtils;
-import team.nm.nnet.util.Matrix;
-
 
 public class MainFrame extends javax.swing.JFrame {
-	
-	private static final long serialVersionUID = -5480005990507067644L;
-	private Capture capture;
-	private Image showingImage;
-	
-	public MainFrame() {
+
+    private static final long serialVersionUID = -5480005990507067644L;
+    private Capture capture;
+    private Image showingImage;
+    
+    private FaceDetector faceDetector = null;
+    
+    public MainFrame() {
         setTitle("Dò Tìm và Nhận Dạng Khuôn Mặt - NM Team");
         initComponents();
     }
-	
-	public void displayImage(Image image) {
-		BufferedImage bufferedImage = ImageUtils.toBufferedImage(image);
-		if(bufferedImage == null) {
-			JOptionPane.showMessageDialog(this, "Không thể hiển thị ảnh này!");
-		} else {
-			showingImage = fitView(bufferedImage, lblImgView.getWidth(), lblImgView.getHeight());
-			lblImgView.setIcon(new javax.swing.ImageIcon(showingImage));
-			lblImgName.setText("Camera Image");
-			lblImgSize.setText(bufferedImage.getWidth(null) + " x " + bufferedImage.getHeight(null) + " pixels");
-			lblImgCap.setText("? KB");
-			
-			detectFaceCandidates();
-		}
-	}
-	
-	public void addFaceCandidates(FacePanel facePanel) {
-        pnlFaces.add(facePanel);
-        pnlFaces.updateUI();
-	}
+
+    public void displayImage(Image image, String imgName, long imgLength) {
+        if (image == null) {
+            JOptionPane.showMessageDialog(this, "Không thể hiển thị ảnh này!");
+            return;
+        }
+
+        BufferedImage bufferedImage = ImageUtils.toBufferedImage(image);
+        if (bufferedImage == null) {
+            JOptionPane.showMessageDialog(this, "Không thể hiển thị ảnh này!");
+        } else {
+            showingImage = fitView(bufferedImage, lblImgView.getWidth(),
+                    lblImgView.getHeight());
+            lblImgView.setIcon(new javax.swing.ImageIcon(showingImage));
+            lblImgName.setText(imgName);
+            lblImgSize.setText(bufferedImage.getWidth(null) + "x"
+                    + bufferedImage.getHeight(null) + " pixels");
+            lblImgCap.setText(imgLength / 1024 + " KB");
+
+            detectFaceCandidates();
+        }
+    }
 
     // construct form view
     private void initComponents() {
@@ -99,9 +102,10 @@ public class MainFrame extends javax.swing.JFrame {
         jPanel5.add(jLabel3, gridBagConstraints);
 
         pnlFaces.setBackground(new java.awt.Color(255, 255, 255));
-        pnlFaces.setLayout(new javax.swing.BoxLayout(pnlFaces, javax.swing.BoxLayout.PAGE_AXIS));
+        pnlFaces.setLayout(new javax.swing.BoxLayout(pnlFaces,
+                javax.swing.BoxLayout.PAGE_AXIS));
 
-//        addFacesDemo();
+        // addFacesDemo();
 
         splFaces.setViewportView(pnlFaces);
 
@@ -139,7 +143,8 @@ public class MainFrame extends javax.swing.JFrame {
         getContentPane().add(jPanel5, gridBagConstraints);
 
         lblImgView.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblImgView.setIcon(new javax.swing.ImageIcon("D:\\FindMyPic\\IMG_4003.jpg")); // NOI18N
+        lblImgView.setIcon(new javax.swing.ImageIcon(
+                "D:\\FindMyPic\\IMG_4003.jpg")); // NOI18N
         lblImgView.setBorder(new javax.swing.border.MatteBorder(null));
         lblImgView.setPreferredSize(new java.awt.Dimension(3074, 2306));
 
@@ -171,57 +176,120 @@ public class MainFrame extends javax.swing.JFrame {
 
         lblImgCap.setText("? KB");
 
-        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(jPanel7);
+        javax.swing.GroupLayout jPanel7Layout = new javax.swing.GroupLayout(
+                jPanel7);
         jPanel7.setLayout(jPanel7Layout);
-        jPanel7Layout.setHorizontalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel7Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel7Layout.createSequentialGroup()
-                        .addComponent(lblImgView, javax.swing.GroupLayout.DEFAULT_SIZE, 717, Short.MAX_VALUE)
-                        .addContainerGap())
-                    .addGroup(jPanel7Layout.createSequentialGroup()
-                        .addComponent(jLabel2)
-                        .addGap(130, 130, 130)
-                        .addComponent(btnSysFile, javax.swing.GroupLayout.PREFERRED_SIZE, 118, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(109, 109, 109)
-                        .addComponent(btnWebcam, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap())
-                    .addGroup(jPanel7Layout.createSequentialGroup()
-                        .addComponent(jLabel4)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblImgName)
-                        .addGap(80, 80, 80)
-                        .addComponent(jLabel5)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblImgSize)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 296, Short.MAX_VALUE)
-                        .addComponent(jLabel6)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblImgCap)
-                        .addGap(47, 47, 47))))
-        );
-        jPanel7Layout.setVerticalGroup(
-            jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel7Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2)
-                    .addComponent(btnWebcam)
-                    .addComponent(btnSysFile))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblImgView, javax.swing.GroupLayout.PREFERRED_SIZE, 552, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addGroup(jPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel5)
-                    .addComponent(jLabel4)
-                    .addComponent(lblImgName)
-                    .addComponent(lblImgSize)
-                    .addComponent(jLabel6)
-                    .addComponent(lblImgCap))
-                .addContainerGap())
-        );
+        jPanel7Layout
+                .setHorizontalGroup(jPanel7Layout
+                        .createParallelGroup(
+                                javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(
+                                jPanel7Layout
+                                        .createSequentialGroup()
+                                        .addContainerGap()
+                                        .addGroup(
+                                                jPanel7Layout
+                                                        .createParallelGroup(
+                                                                javax.swing.GroupLayout.Alignment.LEADING)
+                                                        .addGroup(
+                                                                jPanel7Layout
+                                                                        .createSequentialGroup()
+                                                                        .addComponent(
+                                                                                lblImgView,
+                                                                                javax.swing.GroupLayout.DEFAULT_SIZE,
+                                                                                717,
+                                                                                Short.MAX_VALUE)
+                                                                        .addContainerGap())
+                                                        .addGroup(
+                                                                jPanel7Layout
+                                                                        .createSequentialGroup()
+                                                                        .addComponent(
+                                                                                jLabel2)
+                                                                        .addGap(130,
+                                                                                130,
+                                                                                130)
+                                                                        .addComponent(
+                                                                                btnSysFile,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                                118,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                        .addGap(109,
+                                                                                109,
+                                                                                109)
+                                                                        .addComponent(
+                                                                                btnWebcam,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                                125,
+                                                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                        .addContainerGap())
+                                                        .addGroup(
+                                                                jPanel7Layout
+                                                                        .createSequentialGroup()
+                                                                        .addComponent(
+                                                                                jLabel4)
+                                                                        .addPreferredGap(
+                                                                                javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                        .addComponent(
+                                                                                lblImgName)
+                                                                        .addGap(80,
+                                                                                80,
+                                                                                80)
+                                                                        .addComponent(
+                                                                                jLabel5)
+                                                                        .addPreferredGap(
+                                                                                javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                        .addComponent(
+                                                                                lblImgSize)
+                                                                        .addPreferredGap(
+                                                                                javax.swing.LayoutStyle.ComponentPlacement.RELATED,
+                                                                                296,
+                                                                                Short.MAX_VALUE)
+                                                                        .addComponent(
+                                                                                jLabel6)
+                                                                        .addPreferredGap(
+                                                                                javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                                        .addComponent(
+                                                                                lblImgCap)
+                                                                        .addGap(47,
+                                                                                47,
+                                                                                47)))));
+        jPanel7Layout
+                .setVerticalGroup(jPanel7Layout
+                        .createParallelGroup(
+                                javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(
+                                jPanel7Layout
+                                        .createSequentialGroup()
+                                        .addContainerGap()
+                                        .addGroup(
+                                                jPanel7Layout
+                                                        .createParallelGroup(
+                                                                javax.swing.GroupLayout.Alignment.BASELINE)
+                                                        .addComponent(jLabel2)
+                                                        .addComponent(btnWebcam)
+                                                        .addComponent(
+                                                                btnSysFile))
+                                        .addPreferredGap(
+                                                javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(
+                                                lblImgView,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                552,
+                                                javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(18, 18, 18)
+                                        .addGroup(
+                                                jPanel7Layout
+                                                        .createParallelGroup(
+                                                                javax.swing.GroupLayout.Alignment.BASELINE)
+                                                        .addComponent(jLabel5)
+                                                        .addComponent(jLabel4)
+                                                        .addComponent(
+                                                                lblImgName)
+                                                        .addComponent(
+                                                                lblImgSize)
+                                                        .addComponent(jLabel6)
+                                                        .addComponent(lblImgCap))
+                                        .addContainerGap()));
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -285,109 +353,67 @@ public class MainFrame extends javax.swing.JFrame {
         pack();
     }// </editor-fold>
 
-    private void btnSearchInDBActionPerformed(java.awt.event.ActionEvent evt) {                                              
-        /*frmResult frm = new frmResult();
-        frm.setTitle("Kết Quả Tìm Kiếm");
-        frm.setVisible(true);*/
-    }                                             
+    private void btnSearchInDBActionPerformed(java.awt.event.ActionEvent evt) {
+        /*
+         * frmResult frm = new frmResult(); frm.setTitle("Kết Quả Tìm Kiếm");
+         * frm.setVisible(true);
+         */
+    }
 
-    private void smnOpen_ImageActionPerformed(java.awt.event.ActionEvent evt) {                                              
+    private void smnOpen_ImageActionPerformed(java.awt.event.ActionEvent evt) {
         // TODO add your handling code here:
-    }                                             
+    }
 
     private void btnSysFileActionPerformed(java.awt.event.ActionEvent evt) {
-    	final JFileChooser chooser = new JFileChooser(".");
-		ImageFilter imageFilter = new ImageFilter();
-		chooser.addChoosableFileFilter(imageFilter);
-		ImagePreviewPanel preview = new ImagePreviewPanel();
-		chooser.setAccessory(preview);
-		chooser.addPropertyChangeListener(preview);
-		chooser.setName("Lấy ảnh mẫu");
-		int returnVal = chooser.showOpenDialog(null);
-		if (returnVal == JFileChooser.APPROVE_OPTION) {
-			File selectedFile = chooser.getSelectedFile();
-			if (imageFilter.accept(selectedFile)) {
-				BufferedImage bufferedImage = ImageUtils.load(selectedFile.getPath());
-				if(bufferedImage == null) {
-					JOptionPane.showMessageDialog(this, "Không thể mở têp '" + selectedFile.getPath() + "'");
-				} else {
-					showingImage = fitView(bufferedImage, lblImgView.getWidth(), lblImgView.getHeight());
-					lblImgView.setIcon(new javax.swing.ImageIcon(showingImage));
-					lblImgName.setText(selectedFile.getName());
-					lblImgSize.setText(bufferedImage.getWidth(null) + "x" + bufferedImage.getHeight(null) + " pixels");
-					lblImgCap.setText(selectedFile.length() / 1024 + " KB");
-					
-					detectFaceCandidates();
-				}
-			}
-		}
+        final JFileChooser chooser = new JFileChooser(".");
+        ImageFilter imageFilter = new ImageFilter();
+        chooser.addChoosableFileFilter(imageFilter);
+        ImagePreviewPanel preview = new ImagePreviewPanel();
+        chooser.setAccessory(preview);
+        chooser.addPropertyChangeListener(preview);
+        chooser.setName("Lấy ảnh mẫu");
+        int returnVal = chooser.showOpenDialog(null);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = chooser.getSelectedFile();
+            if (imageFilter.accept(selectedFile)) {
+                displayImage(new ImageIcon(selectedFile.getPath()).getImage(),
+                        selectedFile.getName(), selectedFile.length());
+            }
+        }
     }
 
     private void btnWebcamActionPerformed(java.awt.event.ActionEvent evt) {
-    	capture.setParent(this);
+        capture.setParent(this);
         capture.show();
     }
-    
+
     private Image fitView(BufferedImage bufferedImage, int width, int height) {
-    	if((bufferedImage.getWidth(null) > width) || (bufferedImage.getHeight(null)) > height) {
-    		bufferedImage = ImageUtils.scale(bufferedImage, width, height);
-    	}
-    	return ImageUtils.toImage(bufferedImage);
+        if ((bufferedImage.getWidth(null) > width)
+                || (bufferedImage.getHeight(null)) > height) {
+            bufferedImage = ImageUtils.scale(bufferedImage, width, height);
+        }
+        return ImageUtils.toImage(bufferedImage);
     }
-    
+
     private void detectFaceCandidates() {
+        
+        if((faceDetector != null) && (faceDetector.isDetecting())) {
+            faceDetector.requestStop();
+        }
+
         pnlFaces.removeAll();
         pnlFaces.updateUI();
-        new Thread(new Runnable() {
-            
-            @Override
-            public void run() {
-                BufferedImage bufferedImage = ImageUtils.toBufferedImage(showingImage);
-                
-                BufferedImage y2CBuff = ColorDetection.toYCbCr(bufferedImage);
-                lblImgView.setIcon(new javax.swing.ImageIcon(ImageUtils.toImage(y2CBuff)));
-                
-                Matrix<Integer> integralArr = ColorDetection.getIntegralMatrix(bufferedImage);
-                int detectorWidth = Const.FACE_WIDTH;
-                int detectorHeight = Const.FACE_HEIGHT;
-                int width = integralArr.getWidth();
-                int height = integralArr.getHeight();
-
-                do {
-                    for(int i = 0; i < width; i += Const.JUMP_LENGHT) {
-                        for(int j = 0; j < height; j += Const.JUMP_LENGHT) {
-                            if((i + detectorWidth < width) && (j + detectorHeight < height)) {
-                                int d = integralArr.getValue(i + detectorWidth, j + detectorHeight);
-                                int c = integralArr.getValue(i, j + detectorHeight);
-                                int b = integralArr.getValue(i, j + detectorWidth);
-                                int a = integralArr.getValue(i, j);
-                                float whitePixelSum = d - (b + c) + a;
-                                float rate = whitePixelSum / (detectorWidth * detectorHeight);
-System.out.println(String.format("sWidth=%d, sHeight=%d, pos[%d][%d]: d=%d, c=%d, b=%d, a=%d, wiSum=%f, rate=%f", 
-        detectorWidth, detectorHeight, i, j, d, c, b, a, whitePixelSum, rate));
-                                if(rate > Const.SCANNER_RATE_THRESHOLD) {
-                                    BufferedImage subBuff = bufferedImage.getSubimage(i, j, detectorWidth, detectorHeight);
-                                    FacePanel fp = new FacePanel(pnlFaces, ImageUtils.toImage(subBuff));
-                                    fp.setFaceName(String.valueOf(rate));
-                                    addFaceCandidates(fp);
-                                }
-                            }
-                        }
-                    }
-                    if((detectorWidth < width) && (detectorHeight < height)) {
-                        detectorWidth += Const.SCANNER_GROWTH;
-                        detectorHeight += Const.SCANNER_GROWTH;
-                    } else {
-                        break;
-                    }
-                } while((detectorWidth < width) && (detectorHeight < height));
-                System.out.println("Finished!");
-            }
-        }).start();
-    	
+        System.gc();
+        
+        BufferedImage bufferedImage = ImageUtils.toBufferedImage(showingImage);
+        BufferedImage y2CBuff = ColorDetection.toYCbCr(bufferedImage);
+        lblImgView.setIcon(new javax.swing.ImageIcon(ImageUtils.toImage(y2CBuff)));
+        
+        faceDetector = new FaceDetector(pnlFaces, showingImage);
+        faceDetector.start();
     }
 
-    // Variables declaration - do not modify
+    // Variables declaration
     private javax.swing.JButton btnSearchInDB;
     private javax.swing.JButton btnSysFile;
     private javax.swing.JButton btnWebcam;
@@ -418,15 +444,16 @@ System.out.println(String.format("sWidth=%d, sHeight=%d, pos[%d][%d]: d=%d, c=%d
     private javax.swing.JCheckBoxMenuItem smnDB_Save;
     private javax.swing.JMenuItem smnOpen_Image;
     private javax.swing.JScrollPane splFaces;
+
     // End of variables declaration
 
-	public Capture getCapture() {
-		return capture;
-	}
+    public Capture getCapture() {
+        return capture;
+    }
 
-	@Required
-	public void setCapture(Capture capture) {
-		this.capture = capture;
-	}
+    @Required
+    public void setCapture(Capture capture) {
+        this.capture = capture;
+    }
 
 }

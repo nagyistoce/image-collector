@@ -99,7 +99,7 @@ public class MediaCapture extends Panel implements ActionListener {
 			} else if (c == takeBtn) {
 				takeImage();
 				if(parent != null) {
-					parent.displayImage(img);
+					parent.displayImage(img, "Camera Image", 0);
 				}
 			}
 		}
