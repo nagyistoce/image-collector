@@ -49,7 +49,7 @@ public class Const {
     /**
      * Ngưỡng để xác định một khung hình có khả năng là khuôn mặt hay không
      */
-    public static final double SCANNER_RATE_THRESHOLD = 0.7;
+    public static final double SCANNER_RATE_THRESHOLD = 0.6;
     
     /**
      * Luu duong dan file mask
