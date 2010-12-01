@@ -101,6 +101,7 @@ public class NeuralFaceClassify implements Runnable {
 		listDesireOutput = new ArrayList<int[]>();
 		listInputSignal = new ArrayList<double[]>();
 		this.filename = filename;
+		initNeural();
 	}
 
 	/**
@@ -279,7 +280,7 @@ public class NeuralFaceClassify implements Runnable {
 		calculateOutput();
 		double max = outputNode[NUMBER_OF_LAYER - 1][0];
 		int index = 0;
-		for (int i = 1; i < NUMBER_OF_OUTPUT; i++) {
+ 		for (int i = 1; i < NUMBER_OF_OUTPUT; i++) {
 			if (max < outputNode[NUMBER_OF_LAYER - 1][i]) {
 				max = outputNode[NUMBER_OF_LAYER - 1][i];
 				index = i;
