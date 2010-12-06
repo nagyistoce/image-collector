@@ -153,7 +153,7 @@ public class NeuralFaceClassify implements Runnable {
 		for (int i = 1; i < NUMBER_OF_LAYER; i++) {
 			for (int j = 0; j < neuralInLayer[i]; j++) {
 				for (int k = 0; k < neuralInLayer[i - 1]; k++) {
-					weight[i][j][k] = random.nextInt(BIAS * 2) - BIAS;
+					weight[i][j][k] = random.nextInt(BIAS) - BIAS;
 				}
 			}
 		}
