@@ -45,7 +45,7 @@ public class NeuralFaceClassify implements Runnable {
 	/**
 	 * So lan lap cho viec hoc
 	 */
-	private final int EPOCHS = 1200;
+	private final int EPOCHS = 800;
 
 	/**
 	 * Nguong sai
@@ -153,7 +153,7 @@ public class NeuralFaceClassify implements Runnable {
 		for (int i = 1; i < NUMBER_OF_LAYER; i++) {
 			for (int j = 0; j < neuralInLayer[i]; j++) {
 				for (int k = 0; k < neuralInLayer[i - 1]; k++) {
-					weight[i][j][k] = random.nextInt(BIAS) - BIAS;
+					weight[i][j][k] = random.nextInt(2*BIAS) - BIAS;
 				}
 			}
 		}
@@ -195,7 +195,7 @@ public class NeuralFaceClassify implements Runnable {
 	private void calculateError() {
 		double sum = 0.0F;
 		for (int i = 0; i < NUMBER_OF_OUTPUT; i++) {
-			error[NUMBER_OF_LAYER - 1][i] = (curDesireOutput[i] - outputNode[NUMBER_OF_LAYER - 1][i]
+			error[NUMBER_OF_LAYER - 1][i] = (double)(curDesireOutput[i] - outputNode[NUMBER_OF_LAYER - 1][i]
 					* getDerivativeTangen(outputNode[NUMBER_OF_LAYER - 1][i]));
 		}
 		for (int i = NUMBER_OF_LAYER - 2; i >= 0; i--) {
@@ -205,7 +205,7 @@ public class NeuralFaceClassify implements Runnable {
 					sum = sum + error[i + 1][k] * weight[i + 1][k][j];
 
 				}
-				error[i][j] = getDerivativeTangen(outputNode[i][j]) * sum;
+				error[i][j] = (double)(getDerivativeTangen(outputNode[i][j]) * sum);
 
 			}
 
