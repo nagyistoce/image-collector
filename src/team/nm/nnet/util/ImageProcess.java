@@ -189,11 +189,13 @@ public class ImageProcess {
 			if (input[i] == 127) {
 				result[i] = 0;
 			}
-			else if (input[i] > 127) {
-				result[i] = (input[i] - 127) / 127; 
-			}
 			else {
-				result[i] = -input[i] / 127;
+				if (input[i] > 127) {
+					input[i] = (input[i] - 127) / 127;
+				}
+				else {
+					input[i] = -input[i] / 127;
+				}
 			}
 		}
 		return result;
