@@ -191,10 +191,10 @@ public class ImageProcess {
 			}
 			else {
 				if (input[i] > 127) {
-					input[i] = (input[i] - 127) / 127;
+					result[i] = (input[i] - 127) / 127;
 				}
 				else {
-					input[i] = -input[i] / 127;
+					result[i] = -input[i] / 127;
 				}
 			}
 		}
