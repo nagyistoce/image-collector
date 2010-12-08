@@ -1,10 +1,20 @@
 package team.nm.nnet.app.imageCollector.test;
 
+import java.awt.image.BufferedImage;
+
+import team.nm.nnet.tmp.ImageProcess;
+
 public class TestFunction {
 
 	public static void main(String[] args) {
+		BufferedImage bi = ImageProcess.load("D:\\nhat.jpg");
+		bi = ImageProcess.resize(bi, 20, 30);
+		float[] d = ImageProcess.imageToArray(bi);
+		d = ImageProcess.adaptArray(d);
+		for (int i = 0; i < 600; i ++) {
+			System.out.println(d[i]);
+		}
 		
-			System.out.println(getDerivativeTangen(0.5F));
 		
 	}
 	

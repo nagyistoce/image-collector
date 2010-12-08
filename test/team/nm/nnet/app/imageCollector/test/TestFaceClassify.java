@@ -18,6 +18,7 @@ public class TestFaceClassify {
 		// TODO Auto-generated method stub
 		//Cho chuong trinh hoc
 		
+		/*
 		String sysPath = System.getProperty("user.dir");
 		String facePath = sysPath + "/" + "ref/imageStore/faces";
 		String noneFacePath = sysPath + "/" + "ref/imageStore/nonFaces";
@@ -38,10 +39,10 @@ public class TestFaceClassify {
 		
 		Thread t = new Thread(nfc);
 		t.start();
-		
+		*/
 		
 		//Test chat luong
-		/*
+		
 		System.out.println("Test:");
 		NeuralFaceClassify nfc = new NeuralFaceClassify("");
 		nfc.loadWeight("D:/weight.txt");
@@ -60,7 +61,7 @@ public class TestFaceClassify {
 			BufferedImage image = ImageProcess.load(noneFacePathTest + "/" + listNoneFaceTest.get(i));
 			System.out.println(nfc.getWinner(image));
 		}
-		*/
+		
 		
 	}
 
