@@ -25,6 +25,7 @@ import java.awt.image.ImageFilter;
 import java.awt.image.ImageProducer;
 import java.awt.image.Kernel;
 import java.awt.image.PixelGrabber;
+import java.awt.image.Raster;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -129,6 +130,30 @@ public class ImageUtils {
 	    ColorModel cm = pg.getColorModel();
 	    return cm.hasAlpha();
 	}
+	
+	public static BufferedImage toYCbCr(BufferedImage bufferedImage) {
+        int width = bufferedImage.getWidth(null);
+        int  height = bufferedImage.getHeight(null);
+        Raster raster = bufferedImage.getRaster();
+        float[] sample = new float[4];
+        BufferedImage yCbCrBufImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                sample = raster.getPixel(i, j, sample);
+//                int y  = (int)( 0.257   * sample[0] + 0.504   * sample[1] + 0.098   * sample[2] + 16);
+                int cb = (int)( 0.148   * sample[0] - 0.291   * sample[1] + 0.439   * sample[2] + 128);
+                int cr = (int)( 0.439   * sample[0] - 0.368   * sample[1] - 0.071   * sample[2] + 128);
+                boolean isCr = (140<cr) && (cr<165);
+                boolean isCb = (105<cb) && (cb<130);
+                if( isCr || isCb) {
+                    yCbCrBufImage.setRGB(i, j, 255);
+                } else {
+                    yCbCrBufImage.setRGB(i, j, 0);
+                }
+            }
+        }
+        return yCbCrBufImage;
+    }
 
 	/**
 	 * Load anh tra ve buffred image

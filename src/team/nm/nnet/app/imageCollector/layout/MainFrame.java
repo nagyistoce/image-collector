@@ -11,6 +11,7 @@ import javax.swing.JOptionPane;
 import org.springframework.beans.factory.annotation.Required;
 
 import team.nm.nnet.app.imageCollector.basis.FaceDetector;
+import team.nm.nnet.app.imageCollector.basis.SegmentFaceDetector;
 import team.nm.nnet.app.imageCollector.utils.ColorDetection;
 import team.nm.nnet.app.imageCollector.utils.ImageFilter;
 import team.nm.nnet.app.imageCollector.utils.ImagePreviewPanel;
@@ -22,7 +23,8 @@ public class MainFrame extends javax.swing.JFrame {
     private Capture capture;
     private Image showingImage;
     
-    private FaceDetector faceDetector = null;
+//    private FaceDetector faceDetector = null;
+    private SegmentFaceDetector faceDetector = null;
     
     public MainFrame() {
         setTitle("Dò Tìm và Nhận Dạng Khuôn Mặt - NM Team");
@@ -408,8 +410,8 @@ public class MainFrame extends javax.swing.JFrame {
         BufferedImage bufferedImage = ImageUtils.toBufferedImage(showingImage);
         BufferedImage y2CBuff = ColorDetection.toYCbCr(bufferedImage);
         lblImgView.setIcon(new javax.swing.ImageIcon(ImageUtils.toImage(y2CBuff)));
-        
-        faceDetector = new FaceDetector(pnlFaces, showingImage);
+        ImageUtils.drawImageToJpgByteStream(y2CBuff, new File("D:/lenaa.jpg"));
+        faceDetector = new SegmentFaceDetector(pnlFaces, showingImage);
         faceDetector.start();
     }
 
