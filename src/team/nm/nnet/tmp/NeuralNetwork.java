@@ -16,6 +16,11 @@ public class NeuralNetwork implements Runnable{
 	
 	private final int FACE_HEIGHT = 30;
 	
+	/**
+	 * Luu duong dan de luu file weight.
+	 */
+	private String strFilename = "";
+	
 	/// <summary>
     /// So luong input
     /// </summary>
@@ -142,7 +147,8 @@ public class NeuralNetwork implements Runnable{
 
     }
     
-    public NeuralNetwork() {
+    public NeuralNetwork(String strFilename) {
+    	this.strFilename = strFilename;
     	psubInitNeural();
     	psubInitWeight();
     }
@@ -282,10 +288,11 @@ public class NeuralNetwork implements Runnable{
     	float flMax = pflOutputNode[CintNuberOflayers - 1][0];
     	int intIndex = 0;
     	for (int i = 1; i < CintNumberOfOutput; i ++) {
-    		if (flMax < pflOutputNode[CintNumberOfOutput - 1][i]) {
+    		if (flMax < pflOutputNode[CintNuberOflayers - 1][i]) {
     			intIndex = i;
     		}
     	}
+    	System.out.println(pflOutputNode[CintNuberOflayers - 1][0] + "," + pflOutputNode[CintNuberOflayers - 1][1]);
     	return intIndex;
     }
 
@@ -306,13 +313,19 @@ public class NeuralNetwork implements Runnable{
                 psubCalError();
                 psubCalWeight();
                 avgError = avgError + psubGetAvgError();
+                
             }
+            System.out.println("Epoch: " + epoch + " in " + CintEpochs);
             avgError = avgError / lstListDesireOutput.size();
+            System.out.println("Avgerror: " + avgError);
             if (avgError < CflErrorThreshold)
             {
                 epoch = CintEpochs + 1;
             }
         }
+        System.out.println("Saving weight file in " + strFilename);
+        saveWeight(strFilename);
+        System.out.println("Xong");
     	
     }
     
