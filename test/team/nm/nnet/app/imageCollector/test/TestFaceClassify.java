@@ -55,7 +55,7 @@ public class TestFaceClassify {
 		System.out.println("Face test:");
 		for (int i = 0; i < listFaceTest.size(); i ++) {
 			BufferedImage image = ImageProcess.load(facePathTest + "/" + listFaceTest.get(i));
-			nn.gfncGetWinner(image);
+			System.out.println(nn.gfncGetWinner(image));
 		}
 		System.out.println("None face test:");
 		for (int i = 0; i < listNoneFaceTest.size(); i ++) {
