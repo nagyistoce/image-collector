@@ -280,20 +280,22 @@ public class NeuralNetwork implements Runnable{
 
     }
     
-    public int gfncGetWinner(BufferedImage image) {
+    /**
+     * Xac dinh face hay none face
+     * @param image Anh can xac dinh
+     * @return Ket qua xac dinh
+     * Return true: face
+     * Return false: none face
+     */
+    public boolean gfncGetWinner(BufferedImage image) {
     	image = ImageProcess.resize(image, FACE_WIDTH, FACE_HEIGHT);
     	float[] input = ImageProcess.imageToArray(image);
     	pintCurInput = ImageProcess.adaptArray(input);
     	psubCalOutput();
-    	float flMax = pflOutputNode[CintNuberOflayers - 1][0];
-    	int intIndex = 0;
-    	for (int i = 1; i < CintNumberOfOutput; i ++) {
-    		if (flMax < pflOutputNode[CintNuberOflayers - 1][i]) {
-    			intIndex = i;
-    		}
+    	if(pflOutputNode[CintNuberOflayers - 1][0] >= pflOutputNode[CintNuberOflayers - 1][1]) {
+    		return true;
     	}
-    	System.out.println(pflOutputNode[CintNuberOflayers - 1][0] + "," + pflOutputNode[CintNuberOflayers - 1][1]);
-    	return intIndex;
+    	return false;
     }
 
     @Override
