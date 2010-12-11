@@ -1,47 +1,47 @@
 package team.nm.nnet.app.imageCollector.layout;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Panel;
+import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.List;
 
-import javax.media.Buffer;
-import javax.media.Manager;
-import javax.media.MediaLocator;
-import javax.media.Player;
-import javax.media.control.FrameGrabbingControl;
-import javax.media.format.VideoFormat;
-import javax.media.util.BufferToImage;
 import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
-import org.springframework.beans.factory.annotation.Required;
-
+import net.sf.fmj.ejmf.toolkit.install.PackageUtility;
+import net.sf.fmj.ui.application.ContainerPlayer;
+import net.sf.fmj.utility.PlugInUtility;
 import team.nm.nnet.app.imageCollector.utils.ImageFilter;
 import team.nm.nnet.util.ImageUtils;
+
+import com.lti.civil.CaptureException;
+import com.lti.civil.CaptureSystem;
+import com.lti.civil.CaptureSystemFactory;
+import com.lti.civil.DefaultCaptureSystemFactorySingleton;
+
 
 public class MediaCapture extends Panel implements ActionListener {
 
 	private static final long serialVersionUID = 8927815914445440376L;
 	
-	private static Player player;
-	private MediaLocator mediaLocator;
-	private Component comp;
+	private static ContainerPlayer containerPlayer;
+	private JPanel videoPanel;
 	private JButton saveBtn;
 	private JButton takeBtn;
-	private Buffer buffer;
 	private Image img;
-	private BufferToImage buffToImg;
-	private String locatorString;
 	private MainFrame parent;
 
-	public void initialize() {
+	public void initialize() throws Exception {
 		setLayout(new BorderLayout());
 
 		saveBtn = new JButton("Lưu ảnh");
@@ -49,17 +49,14 @@ public class MediaCapture extends Panel implements ActionListener {
 		saveBtn.addActionListener(this);
 		takeBtn.addActionListener(this);
 
-		mediaLocator = new MediaLocator(locatorString);
-
 		try {
-			player = Manager.createRealizedPlayer(mediaLocator);
-			player.start();
-			if ((comp = player.getVisualComponent()) != null) {
-				setSize(comp.getSize());
-				add(comp, BorderLayout.CENTER);
-			}
+			containerPlayer = getContainerPlayer();
+			setSize(350, 500);
+			add(getVideoPanel(), BorderLayout.CENTER);
 		} catch (Exception e) {
 			e.printStackTrace();
+			JOptionPane.showMessageDialog(this, "Không thể kết nối với camera", "Cannot connect to device", JOptionPane.ERROR_MESSAGE);
+			throw new Exception("Cannot connect to device");
 		}
 		
 		Panel footer = new Panel();
@@ -70,16 +67,22 @@ public class MediaCapture extends Panel implements ActionListener {
 	}
 
 	public void play() {
-		player.start();
+		if(containerPlayer != null) {
+			containerPlayer.start();
+		}
 	}
 	
 	public void stop() {
-		player.stop();
+		if(containerPlayer != null) {
+			containerPlayer.stop();
+		}
 	}
 	
 	public void close() {
-		player.close();
-		player.deallocate();		
+		if(containerPlayer != null) {
+			containerPlayer.close();
+			containerPlayer.deallocate();		
+		}
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -106,13 +109,14 @@ public class MediaCapture extends Panel implements ActionListener {
 	}
 	
 	protected void takeImage() {
-		// Grab a frame
-		FrameGrabbingControl fgc = (FrameGrabbingControl) player.getControl("javax.media.control.FrameGrabbingControl");
-		buffer = fgc.grabFrame();
-
-		// Convert it to an image
-		buffToImg = new BufferToImage((VideoFormat) buffer.getFormat());
-		img = buffToImg.createImage(buffer);
+		
+		/* get the image on the Panel */
+		BufferedImage bufferedImage = new BufferedImage(videoPanel.getWidth(),videoPanel.getHeight(), BufferedImage.TYPE_INT_RGB);
+		Graphics g = bufferedImage.getGraphics();
+		videoPanel.paint(g);
+		g.dispose();
+		
+		img = ImageUtils.toImage(bufferedImage);
 	}
 
 	protected void action(File file) {
@@ -130,12 +134,50 @@ public class MediaCapture extends Panel implements ActionListener {
 		}
 
 	}
-
-	@Required
-	public void setLocatorString(String locatorString) {
-		this.locatorString = locatorString;
+	
+	protected JPanel getVideoPanel() {
+		if (videoPanel == null) {
+			videoPanel = new JPanel();
+			videoPanel.setLayout(new BorderLayout());
+			videoPanel.setBackground(SystemColor.controlShadow);
+		}
+		return videoPanel;
 	}
 	
+	protected ContainerPlayer getContainerPlayer() throws CaptureException {
+
+		PackageUtility.addContentPrefix("net.sf.fmj", false);
+		PackageUtility.addProtocolPrefix("net.sf.fmj", false);
+		
+    	PlugInUtility.registerPlugIn("net.sf.fmj.media.renderer.video.SimpleAWTRenderer");
+		
+		CaptureSystemFactory factory = DefaultCaptureSystemFactorySingleton.instance();
+		CaptureSystem system = factory.createCaptureSystem();
+		system.init();
+		
+		containerPlayer = null;
+		List<?> list = system.getCaptureDeviceInfoList();
+		for (int i = 0, length = list.size(); i < length; ++i)
+		{
+			com.lti.civil.CaptureDeviceInfo civilInfo = (com.lti.civil.CaptureDeviceInfo) list.get(i);
+			
+			{
+				if(civilInfo.getDescription().compareToIgnoreCase("Video WebCam") == 0) {
+					try
+					{
+						containerPlayer = new ContainerPlayer(getVideoPanel());
+						containerPlayer.setMediaLocation("civil:" + civilInfo.getDeviceID(), true);
+					} catch (Exception e)
+					{	
+						throw new CaptureException(e);
+					}
+					break;
+				}
+			}
+		}
+		return containerPlayer;
+	}
+
 	public void setParent(MainFrame parent) {
 		this.parent = parent;
 	}

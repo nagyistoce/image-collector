@@ -1,5 +1,7 @@
 package team.nm.nnet.app.imageCollector.layout;
 
+import java.awt.event.ContainerEvent;
+import java.awt.event.ContainerListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -10,14 +12,18 @@ public class Capture {
 	private MediaCapture mediaCapture;
 	private JFrame frame = null;
 	
-	public Capture(MediaCapture mediaCapture) {
-		this.mediaCapture = mediaCapture;
+	public Capture() {
+		this.mediaCapture = new MediaCapture();
 	}
 	
 	public void show() {
 
 		if(frame == null) {
-			mediaCapture.initialize();		
+			try {
+				mediaCapture.initialize();		
+			} catch(Exception e) {
+				return;
+			}
 			frame = new JFrame();
 	        frame.addWindowListener(new WindowAdapter() {
 	 
@@ -35,6 +41,17 @@ public class Capture {
 	 
 	        frame.setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
 	        frame.add("Center", mediaCapture);
+	        //  Resize frame whenever new Component is added
+	        mediaCapture.getVideoPanel().addContainerListener(
+	            new ContainerListener() {
+	                public void componentAdded(ContainerEvent e) {
+	                    frame.pack();
+	                }
+	                public void componentRemoved(ContainerEvent e) {
+	                    frame.pack();
+	                }
+	            }
+	        );
 	        frame.setTitle("Camera - NM Team");
 	        frame.setSize(mediaCapture.getSize());
 	        frame.pack();

@@ -11,11 +11,9 @@
     </bean>    
     <bean 
     	id="mediaCapture" class="team.nm.nnet.app.imageCollector.layout.MediaCapture">
-    	<property name="locatorString" value="${media.locator}"/>
     </bean>    
     <bean 
     	id="capture" class="team.nm.nnet.app.imageCollector.layout.Capture">
-    	<constructor-arg ref="mediaCapture"/>
     </bean>
     <bean 
     	id="mainFrame" class="team.nm.nnet.app.imageCollector.layout.MainFrame">
