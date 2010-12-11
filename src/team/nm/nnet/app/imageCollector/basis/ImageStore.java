@@ -87,6 +87,12 @@ public class ImageStore {
         return count;
     }
     
+    /**
+     * Tao none face cho viec train
+     * @param srcPath Duong dan luu anh de tao none face
+     * @param destPath Duong dan luu cac file none face
+     * @return So luong none face tao duoc
+     */
     public long createNonFaces(String srcPath, String destPath) {
     	long count = 0;
     	List<String> fileNames = IOUtils.listFileName(srcPath);
