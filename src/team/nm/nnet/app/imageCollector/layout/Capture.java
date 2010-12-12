@@ -31,12 +31,6 @@ public class Capture {
 	            	mediaCapture.stop();
 	            	super.windowClosing(e);
 	            }
-	            
-	            @Override
-	            public void windowClosed(WindowEvent e) {
-	            	mediaCapture.close();
-	            	super.windowClosed(e);
-	            }
 	        });
 	 
 	        frame.setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
@@ -59,6 +53,15 @@ public class Capture {
 			mediaCapture.play();
 		}
         frame.setVisible(true);
+	}
+	
+	public void close() {
+		if(frame != null) {
+			frame.dispose();
+		}
+		if(mediaCapture != null) {
+			mediaCapture.close();
+		}
 	}
 	
 	public void setParent(MainFrame parent) {

@@ -42,6 +42,7 @@ public class MediaCapture extends Panel implements ActionListener {
 	private MainFrame parent;
 
 	public void initialize() throws Exception {
+		
 		setLayout(new BorderLayout());
 
 		saveBtn = new JButton("Lưu ảnh");
@@ -81,7 +82,7 @@ public class MediaCapture extends Panel implements ActionListener {
 	public void close() {
 		if(containerPlayer != null) {
 			containerPlayer.close();
-			containerPlayer.deallocate();		
+			containerPlayer.deallocate();
 		}
 	}
 
@@ -107,6 +108,14 @@ public class MediaCapture extends Panel implements ActionListener {
 			}
 		}
 	}
+
+	public void setParent(MainFrame parent) {
+		this.parent = parent;
+	}
+	
+	/*
+	 * Internal method region
+	 */
 	
 	protected void takeImage() {
 		
@@ -178,7 +187,5 @@ public class MediaCapture extends Panel implements ActionListener {
 		return containerPlayer;
 	}
 
-	public void setParent(MainFrame parent) {
-		this.parent = parent;
-	}
+	
 }

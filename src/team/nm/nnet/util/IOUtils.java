@@ -1,11 +1,22 @@
 package team.nm.nnet.util;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import team.nm.nnet.app.imageCollector.layout.MediaCapture;
+
 public class IOUtils {
 
+	private static Log   log = LogFactory.getLog(MediaCapture.class);
+	
 	/**
 	 * Lấy các file name trong thư mục
 	 * @param directoryPath Thu muc can lay
@@ -54,4 +65,51 @@ public class IOUtils {
     	}
     	return listSubFolder;
     }
+    
+    public static void copy(String sourcePath, String[] fileNames, String destPath) {
+		File dest = new File(destPath);
+		if(!dest.exists()) {
+			log.error("Destination doesn't exist!");
+			return;
+		}
+		
+		for(String fileName : fileNames) {
+			File file = new File(sourcePath + fileName);
+			File destFile = new File(destPath, fileName);
+			if(!destFile.exists()) {
+				InputStream in;
+				try {
+					in = new FileInputStream(file);
+				
+					//For Overwrite the file.
+					OutputStream out = new FileOutputStream(destFile);
+	
+					byte[] buf = new byte[1024];
+					int len;
+					while ((len = in.read(buf)) > 0){
+						out.write(buf, 0, len);
+					}
+					in.close();
+					out.close();
+				} catch (Exception e) {
+					log.error(e.getMessage());
+				}
+			}
+		}
+	}
+	
+    public static void delete(String sourcePath, String[] fileNames) {
+		File dest = new File(sourcePath);
+		if(!dest.exists()) {
+			log.error("Destination doesn't exist!");
+			return;
+		}
+		
+		for(String fileName : fileNames) {
+			File destFile = new File(sourcePath, fileName);
+			if(destFile.exists()) {
+				destFile.delete();
+			}
+		}
+	}
 }

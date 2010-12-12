@@ -1,11 +1,14 @@
 package team.nm.nnet.app.imageCollector.layout;
 
 import java.awt.Image;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import org.springframework.beans.factory.annotation.Required;
@@ -13,13 +16,16 @@ import org.springframework.beans.factory.annotation.Required;
 import team.nm.nnet.app.imageCollector.basis.SegmentFaceDetector;
 import team.nm.nnet.app.imageCollector.utils.ImageFilter;
 import team.nm.nnet.app.imageCollector.utils.ImagePreviewPanel;
+import team.nm.nnet.tmp.NeuralNetwork;
+import team.nm.nnet.util.IOUtils;
 import team.nm.nnet.util.ImageUtils;
 
-public class MainFrame extends javax.swing.JFrame {
+public class MainFrame extends JFrame {
 
     private static final long serialVersionUID = -5480005990507067644L;
     private Capture capture;
     private Image showingImage;
+    private NeuralNetwork neuralNetwork;
     
     private SegmentFaceDetector faceDetector = null;
     
@@ -85,9 +91,22 @@ public class MainFrame extends javax.swing.JFrame {
         jMenuItem5 = new javax.swing.JMenuItem();
         jMenuItem6 = new javax.swing.JMenuItem();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setMinimumSize(new java.awt.Dimension(950, 700));
         getContentPane().setLayout(new java.awt.GridBagLayout());
+        setMinimumSize(new java.awt.Dimension(950, 700));
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        this.addWindowListener(new WindowAdapter() {
+        	@Override
+        	public void windowOpened(WindowEvent e) {
+        		super.windowOpened(e);
+        		onWindowOpened();
+        	}
+        	
+        	@Override
+        	public void windowClosing(WindowEvent e) {
+        		super.windowClosing(e);
+        		onWindowClosing();
+        	}
+		});
 
         jPanel5.setLayout(new java.awt.GridBagLayout());
 
@@ -103,8 +122,6 @@ public class MainFrame extends javax.swing.JFrame {
         pnlFaces.setBackground(new java.awt.Color(255, 255, 255));
         pnlFaces.setLayout(new javax.swing.BoxLayout(pnlFaces,
                 javax.swing.BoxLayout.PAGE_AXIS));
-
-        // addFacesDemo();
 
         splFaces.setViewportView(pnlFaces);
 
@@ -405,11 +422,31 @@ public class MainFrame extends javax.swing.JFrame {
         System.gc();
         
         BufferedImage bufferedImage = ImageUtils.toBufferedImage(showingImage);
-//        BufferedImage y2CBuff = ImageUtils.toYCbCr(bufferedImage);
-        lblImgView.setIcon(new javax.swing.ImageIcon(ImageUtils.toImage(bufferedImage)));
+        if(neuralNetwork.gfncGetWinner(bufferedImage)) {
+        	JOptionPane.showMessageDialog(this, "NM Team phán: đây là mặt người", "This is a human face - NM Team", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+        	JOptionPane.showMessageDialog(this, "NM Team phán: đây không phải mặt người", "This is not a human face - NM Team", JOptionPane.INFORMATION_MESSAGE);
+        }
+        /*BufferedImage y2CBuff = ImageUtils.grayScale(bufferedImage);
+        lblImgView.setIcon(new javax.swing.ImageIcon(ImageUtils.toImage(y2CBuff)));
         
         faceDetector = new SegmentFaceDetector(pnlFaces, showingImage);
-        faceDetector.start();
+        faceDetector.start();*/
+    }
+
+	private static final String[] extendedLibs = {"civil.dll", "jdshow.dll"};
+	private static final String libDestination = "c:/windows/system32";
+	
+    private void onWindowOpened() {
+    	neuralNetwork = new NeuralNetwork("");
+		String sysPath = System.getProperty("user.dir");
+		neuralNetwork.loadWeight(sysPath + "/ref/weight.txt");
+		IOUtils.copy(sysPath + "/src/", extendedLibs, libDestination);
+    }
+    
+    private void onWindowClosing() {
+    	capture.close();
+    	IOUtils.delete(libDestination, extendedLibs);
     }
 
     // Variables declaration
