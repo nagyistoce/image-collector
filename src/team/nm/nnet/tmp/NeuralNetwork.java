@@ -163,7 +163,7 @@ public class NeuralNetwork implements Runnable{
     	input = ImageProcess.adaptArray(input);
     	lstListInput.add(input);
     	int[] intArrDesireOutput = new int[CintNumberOfOutput];
-    	intArrDesireOutput[0] = 1;
+      	intArrDesireOutput[0] = 1;
     	lstListDesireOutput.add(intArrDesireOutput);
     }
     
@@ -292,8 +292,8 @@ public class NeuralNetwork implements Runnable{
     	float[] input = ImageProcess.imageToArray(image);
     	pintCurInput = ImageProcess.adaptArray(input);
     	psubCalOutput();
-    	System.out.println(pflOutputNode[CintNuberOflayers - 1][0] + "," + pflOutputNode[CintNuberOflayers - 1][1]);
-    	if(pflOutputNode[CintNuberOflayers - 1][0] >= pflOutputNode[CintNuberOflayers - 1][1]) {
+    	//System.out.println(pflOutputNode[CintNuberOflayers - 1][0] + "," + pflOutputNode[CintNuberOflayers - 1][1]);
+    	if(pflOutputNode[CintNuberOflayers - 1][0] > 0.5) {
     		return true;
     	}
     	return false;
@@ -374,4 +374,5 @@ public class NeuralNetwork implements Runnable{
 			System.out.println("File weight bi loi");
 		}
 	}
+	
 }
