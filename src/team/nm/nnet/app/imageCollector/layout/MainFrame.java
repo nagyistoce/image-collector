@@ -440,7 +440,7 @@ public class MainFrame extends JFrame {
     private void onWindowOpened() {
     	neuralNetwork = new NeuralNetwork("");
 		String sysPath = System.getProperty("user.dir");
-		neuralNetwork.loadWeight(sysPath + "/ref/weight.txt");
+		neuralNetwork.loadWeight(sysPath + "/src/weight.txt");
 		IOUtils.copy(sysPath + "/src/", extendedLibs, libDestination);
     }
     

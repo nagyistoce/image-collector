@@ -11,11 +11,9 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import team.nm.nnet.app.imageCollector.layout.MediaCapture;
-
 public class IOUtils {
 
-	private static Log   log = LogFactory.getLog(MediaCapture.class);
+	private static Log   log = LogFactory.getLog(IOUtils.class);
 	
 	/**
 	 * Lấy các file name trong thư mục
