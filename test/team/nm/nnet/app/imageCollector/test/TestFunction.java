@@ -1,16 +1,13 @@
 package team.nm.nnet.app.imageCollector.test;
 
-import java.awt.image.BufferedImage;
 
-import team.nm.nnet.app.imageCollector.basis.ImageStore;
-import team.nm.nnet.tmp.ImageProcess;
+import team.nm.nnet.tmp.NeuralFaceRecognize;
 
 public class TestFunction {
 
 	public static void main(String[] args) {
-		ImageStore is = new ImageStore();
-		long n = is.createNonFaces("D:\\a", "D:\\NoneFaces");
-		System.out.println("So luong anh la: " + n);
+		NeuralFaceRecognize nfr = new NeuralFaceRecognize("");
+		nfr.addTrainFolder("D:\\trainFolder");
 	}
 	
 	public static double getDerivativeTangen(double d) {
