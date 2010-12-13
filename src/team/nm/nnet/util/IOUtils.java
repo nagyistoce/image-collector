@@ -36,6 +36,24 @@ public class IOUtils {
     }
     
     /**
+     * Tra ve trang thai co file ben trong thu muc hay khong.
+     * @param folderPath Duong dan toi thu muc can xac dinh.
+     * @return 
+     * True co file trong thu muc
+     * False khong co file trong thu muc
+     */
+    public static boolean hasFile(String folderPath) {
+    	File dir = new File(folderPath);
+    	File[] files = dir.listFiles();
+    	for (File fileI : files) {
+    		if (fileI.isFile()) {
+    			return true;
+    		}
+    	}
+    	return false;
+    }
+    
+    /**
      * Xac dinh file co ton tai hay khong
      * @param filename File name can xac dinh
      * @return Ket qua
