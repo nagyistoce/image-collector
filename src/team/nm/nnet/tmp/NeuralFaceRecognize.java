@@ -288,16 +288,21 @@ public class NeuralFaceRecognize implements Runnable{
      * Return true: face
      * Return false: none face
      */
-    public boolean gfncGetWinner(BufferedImage image) {
+    public int gfncGetWinner(BufferedImage image) {
     	image = ImageProcess.resize(image, FACE_WIDTH, FACE_HEIGHT);
     	float[] input = ImageProcess.imageToArray(image);
     	pintCurInput = ImageProcess.adaptArray(input);
     	psubCalOutput();
-    	//System.out.println(pflOutputNode[CintNuberOflayers - 1][0] + "," + pflOutputNode[CintNuberOflayers - 1][1]);
-    	if(pflOutputNode[CintNuberOflayers - 1][0] > 0.5) {
-    		return true;
+    	float max = pflOutputNode[CintNuberOflayers - 1][0];
+    	int index = 0;
+    	for (int i = 1; i < numberOfOutput; i ++) {
+    		if (max < pflOutputNode[CintNuberOflayers - 1][i]) {
+    			max = pflOutputNode[CintNuberOflayers - 1][i];
+    			index = i;
+    		}
     	}
-    	return false;
+    	System.out.println("Max: " + max);
+    	return index;
     }
 
     @Override
@@ -341,6 +346,7 @@ public class NeuralFaceRecognize implements Runnable{
 		try {
 			FileOutputStream fos = new FileOutputStream(filename, false);
 			PrintWriter pw = new PrintWriter(fos);
+			pw.println(numberOfOutput);
 			for (int i = 1; i < CintNuberOflayers; i++) {
 				for (int j = 0; j < pintNeural[i]; j++) {
 					for (int k = 0; k < pintNeural[i - 1]; k++) {
@@ -362,6 +368,8 @@ public class NeuralFaceRecognize implements Runnable{
 		try {
 			FileReader fr = new FileReader(filename);
 			BufferedReader br = new BufferedReader(fr);
+			numberOfOutput = Integer.parseInt(br.readLine());
+			psubInitNeural(numberOfOutput);
 			for (int i = 1; i < CintNuberOflayers; i++) {
 				for (int j = 0; j < pintNeural[i]; j++) {
 					for (int k = 0; k < pintNeural[i - 1]; k++) {
@@ -370,6 +378,7 @@ public class NeuralFaceRecognize implements Runnable{
 					}
 				}
 			}
+			br.close();
 		}
 		catch (Exception ex) {
 			System.out.println("File weight bi loi");
