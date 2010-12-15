@@ -15,8 +15,14 @@ import team.nm.nnet.util.LogicUtils;
 
 public class NeuralFaceRecognize implements Runnable{
 
+	/**
+	 * Chieu rong cua anh
+	 */
 	private final int FACE_WIDTH = 20;
 	
+	/**
+	 * Chieu dai cua anh
+	 */
 	private final int FACE_HEIGHT = 30;
 	
 	/**
@@ -24,89 +30,89 @@ public class NeuralFaceRecognize implements Runnable{
 	 */
 	private String strFilename = "";
 	
-	/// <summary>
-    /// So luong input
-    /// </summary>
+	/**
+	 * So luong input
+	 */
     private final int CintNumberOfInput = 20 * 30; // 30 X 20;
 
-    /// <summary>
-    /// So luong output
-    /// </summary>
+    /**
+     * So luong output
+     */
     private int numberOfOutput = 20; //
 
-    /// <summary>
-    /// So luong neural o layer an
-    /// </summary>
+    /**
+     * So luong neural o layer an
+     */
     private final int CintNumberOfHiddenNeural = 800;
 
-    /// <summary>
-    /// Luu gi tri bia
-    /// </summary>
+    /**
+     * Gia tri bias
+     */
     private final int CintBias = 30;
 
-    /// <summary>
-    /// So luong layer cua mang neural
-    /// </summary>
+    /**
+     * So luong layer cua mang neural
+     */
     private final int CintNuberOflayers = 3;
 
-    /// <summary>
-    /// Gia tri do doc
-    /// </summary>
+    /**
+     * Gia tri do doc
+     */
     private final float slope = 0.014F;
 
-    /// <summary>
-    /// Muc do learning
-    /// </summary>
+    /**
+     * Muc do hoc
+     */
     private final float CflLearningRate = 150F;
 
-    /// <summary>
-    /// So lan hoc
-    /// </summary>
+    /**
+     * So luong hoc
+     */
     private final int CintEpochs = 800;
 
-    /// <summary>
-    /// Nguong sai cho phep
-    /// </summary>
+    /**
+     * Nguong sai gioi hang
+     */
     private final float CflErrorThreshold = 0.0002F;
 
-    /// <summary>
-    /// Mang luu tinh hieu nhap vao neural
-    /// </summary>
+    /**
+     * Mang tinh hieu nhap vao
+     */
     private float[][] pintInputSignal;
 
-    /// <summary>
-    /// Luu gia tri weight cua cac neural
-    /// </summary>
+    /**
+     * Mang luu gia tri weight
+     */
     private float[][][] pflWeight = new float[CintNuberOflayers][CintNumberOfHiddenNeural + 100][CintNumberOfHiddenNeural + 100];
 
-    /// <summary>
-    /// Luu so luong neural tren tung layer
-    /// </summary>
+    /**
+     * Luu so luong weight tren tung layer
+     */
     private int[] pintNeural;
 
-    /// <summary>
-    /// Mang luu cac tinh hieu mong muon xuat ra
-    /// </summary>
+    /**
+     * Mang luu gia tri mong muon xuat ra
+     */
     private int[][] pintDesireOutput;
 
-    /// <summary>
-    /// Bien dung de luu gia tri xuat ra cua cac neural trong trong tung layer
-    /// </summary>
+    /**
+     * Gia tri xuat ra cua cac neural trong tung layer
+     */
     private float[][] pflOutputNode = new float[CintNuberOflayers][CintNumberOfHiddenNeural + 100];
 
-    /// <summary>
-    /// Luu gia tri nhap vao hien tai trong bo gia tri nhap vao cac phan tu
-    /// </summary>
+    /**
+     * Gia tri nhap vao hien tai trong bo gia tri nhap vao
+     */
     private float[] pintCurInput;
 
-    /// <summary>
-    /// Luu gia tri muon xuat ra hien tai trong bo gia tri muon xuat ra cua cac phan tu
-    /// </summary>
+    /**
+     * Gia tri mong muon xuat ra hien tai trong bo gia tri mong muon xuat ra
+     */
     private int[] pintCurDesireOutput;
 
-    /// <summary>
-    /// Mang luu gia tri sai khac giua ket qua xuat ra voi ket qua mong muon xuat ra
-    /// </summary>
+    /**
+     * Mang luu gia tri sai khac giua ket qua xuat ra voi ket qua mong muon xuat ra
+     */
     private float[][] pflError = new float[CintNuberOflayers][CintNumberOfHiddenNeural + 100];
     
     /**
@@ -119,9 +125,9 @@ public class NeuralFaceRecognize implements Runnable{
      */
     private List<int[]> lstListDesireOutput = new ArrayList<int[]>();
 
-    /// <summary>
-    /// Khoi tao ramdom cho viec hoc cac ki tu
-    /// </summary>
+    /**
+     * Khoi tao doi tuong random cho viec hoc cac ki tu
+     */
     private Random rnd = new Random();
 
     /**
@@ -136,6 +142,9 @@ public class NeuralFaceRecognize implements Runnable{
         pintNeural[2] = numberOfOutPut;
     }
 
+    /**
+     * Khoi tao gia tri weight cho mang neural
+     */
     private void psubInitWeight()
     {
         Random rnd = new Random();
@@ -154,6 +163,11 @@ public class NeuralFaceRecognize implements Runnable{
 
     }
     
+    /**
+     * Contructor khoi tao doi tuong
+     * @param strFilename Duong dan luu file weight 
+     * chi can thiet khi hoc
+     */
     public NeuralFaceRecognize(String strFilename) {
 		// TODO Auto-generated constructor stub
     	this.strFilename = strFilename;
@@ -178,6 +192,11 @@ public class NeuralFaceRecognize implements Runnable{
     	lstListDesireOutput.add(intArrDesireOutput);
     }
     
+    /**
+     * Tinh gia tri tangen
+     * @param flActiveValue Gia tri can tinh
+     * @return Ket qua tinh duoc
+     */
     private float pfncGetTangen(float flActiveValue)
     {
         //return (float)(-1 + (2 / (1 + Math.Exp(-2 * flActiveValue))));
@@ -187,12 +206,21 @@ public class NeuralFaceRecognize implements Runnable{
         return result;
     }
     
+    /**
+     * Tinh dan xuat cua tangen
+     * @param fx Gia tri can tinh
+     * @return Ket qua tinh duoc
+     */
     private float pfncGetDerivative(float fx)
     {
         float flResult = (float)(0.5F * (1 - Math.pow(fx, 2)));
         return flResult;
     }
     
+    /**
+     * Tinh gia tri loi trung binh
+     * @return Ket qua tinh duoc
+     */
     private float psubGetAvgError()
     {
         float result = 0.0F;
@@ -205,6 +233,9 @@ public class NeuralFaceRecognize implements Runnable{
         return result;
     }
     
+    /**
+     * Tinh gia tri xuat ra
+     */
     private void psubCalOutput()
     {
         float flActiveValue = 0.0F;
@@ -242,6 +273,9 @@ public class NeuralFaceRecognize implements Runnable{
         }
     }
     
+    /**
+     * Tinh su sai khac
+     */
     private void psubCalError()
     {
         float sum = 0.0F;
@@ -266,6 +300,9 @@ public class NeuralFaceRecognize implements Runnable{
         }
     }
     
+    /**
+     * Tinh gia tri weight
+     */
     private void psubCalWeight()
     {
         for (int i = 1; i < CintNuberOflayers; i++)

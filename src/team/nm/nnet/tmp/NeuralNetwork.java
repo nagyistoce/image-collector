@@ -12,8 +12,14 @@ import java.util.Random;
 
 public class NeuralNetwork implements Runnable{
 
+	/**
+	 * Chieu rong anh
+	 */
 	private final int FACE_WIDTH = 20;
 	
+	/**
+	 * Chieu cao anh
+	 */
 	private final int FACE_HEIGHT = 30;
 	
 	/**
@@ -21,89 +27,89 @@ public class NeuralNetwork implements Runnable{
 	 */
 	private String strFilename = "";
 	
-	/// <summary>
-    /// So luong input
-    /// </summary>
-    private final int CintNumberOfInput = 20 * 30; // 30 X 20;
+	/**
+	 * So luong input
+	 */
+    private final int CintNumberOfInput = FACE_WIDTH * FACE_HEIGHT; // 30 X 20;
 
-    /// <summary>
-    /// So luong output
-    /// </summary>
+    /**
+     * So luong output
+     */
     private final int CintNumberOfOutput = 20; //
 
-    /// <summary>
-    /// So luong neural o layer an
-    /// </summary>
+    /**
+     * So luong neural an
+     */
     private final int CintNumberOfHiddenNeural = 800;
 
-    /// <summary>
-    /// Luu gi tri bia
-    /// </summary>
+    /**
+     * Gia tri bias
+     */
     private final int CintBias = 30;
 
-    /// <summary>
-    /// So luong layer cua mang neural
-    /// </summary>
+    /**
+     * So luong layer cua mang neural
+     */
     private final int CintNuberOflayers = 3;
 
-    /// <summary>
-    /// Gia tri do doc
-    /// </summary>
+    /**
+     * Gia tri do doc
+     */
     private final float slope = 0.014F;
 
-    /// <summary>
-    /// Muc do learning
-    /// </summary>
+    /**
+     * Muc do hoc
+     */
     private final float CflLearningRate = 150F;
 
-    /// <summary>
-    /// So lan hoc
-    /// </summary>
+    /**
+     * So lan hoc
+     */
     private final int CintEpochs = 800;
 
-    /// <summary>
-    /// Nguong sai cho phep
-    /// </summary>
+    /**
+     * Nguong sai cuc tieu
+     */
     private final float CflErrorThreshold = 0.0002F;
 
-    /// <summary>
-    /// Mang luu tinh hieu nhap vao neural
-    /// </summary>
+    /**
+     * Mang luu cac tinh hieu nhap vao mang neural
+     */
     private float[][] pintInputSignal;
 
-    /// <summary>
-    /// Luu gia tri weight cua cac neural
-    /// </summary>
+    /**
+     * Mang luu gia tri weight
+     */
     private float[][][] pflWeight = new float[CintNuberOflayers][CintNumberOfHiddenNeural + 100][CintNumberOfHiddenNeural + 100];
 
-    /// <summary>
-    /// Luu so luong neural tren tung layer
-    /// </summary>
+    /**
+     * So luong neural trong tung layer
+     */
     private int[] pintNeural;
 
-    /// <summary>
-    /// Mang luu cac tinh hieu mong muon xuat ra
-    /// </summary>
+    /**
+     * Mang luu cac tinh hieu mong muon xuat ra
+     */
     private int[][] pintDesireOutput;
 
-    /// <summary>
-    /// Bien dung de luu gia tri xuat ra cua cac neural trong trong tung layer
-    /// </summary>
+    /**
+     * Luu gia tri xuat ra cua cac neural
+     */
     private float[][] pflOutputNode = new float[CintNuberOflayers][CintNumberOfHiddenNeural + 100];
 
-    /// <summary>
-    /// Luu gia tri nhap vao hien tai trong bo gia tri nhap vao cac phan tu
-    /// </summary>
+    /**
+     * Gia tri nhap vao hien tai trong bo gia tri nhap vao
+     */
     private float[] pintCurInput;
 
-    /// <summary>
-    /// Luu gia tri muon xuat ra hien tai trong bo gia tri muon xuat ra cua cac phan tu
-    /// </summary>
+    /**
+     * Gia tri mong muon xuat ra trong bo gia tri mong muon xuat ra
+     */
     private int[] pintCurDesireOutput;
 
-    /// <summary>
-    /// Mang luu gia tri sai khac giua ket qua xuat ra voi ket qua mong muon xuat ra
-    /// </summary>
+    /**
+     * Gia tri sai khac giu gia tri mong mong muon xuat ra va gia tri xuat ra thuc
+     */
     private float[][] pflError = new float[CintNuberOflayers][CintNumberOfHiddenNeural + 100];
     
     /**
@@ -116,11 +122,14 @@ public class NeuralNetwork implements Runnable{
      */
     private List<int[]> lstListDesireOutput = new ArrayList<int[]>();
 
-    /// <summary>
-    /// Khoi tao ramdom cho viec hoc cac ki tu
-    /// </summary>
+    /**
+     * Khoi tao doi tuong random cho viec hoc cac ki tu
+     */
     private Random rnd = new Random();
 
+    /**
+     * Khoi tao so luong neural cho mang neural
+     */
     private void psubInitNeural()
     {
         pintNeural = new int[CintNuberOflayers];
@@ -129,6 +138,9 @@ public class NeuralNetwork implements Runnable{
         pintNeural[2] = CintNumberOfOutput;
     }
 
+    /**
+     * Khoi tao gia tri weight cho mang neural
+     */
     private void psubInitWeight()
     {
         Random rnd = new Random();
@@ -147,6 +159,11 @@ public class NeuralNetwork implements Runnable{
 
     }
     
+    /**
+     * Contructor khoi tao doi tuong
+     * @param strFilename Duong dan luu file weight chi can thiet cho viec save file weight
+     * khi hoc xong
+     */
     public NeuralNetwork(String strFilename) {
     	this.strFilename = strFilename;
     	psubInitNeural();
@@ -154,8 +171,8 @@ public class NeuralNetwork implements Runnable{
     }
     
     /**
-     * Them hinh vao bo train
-     * @param image
+     * Them face vao bo trai
+     * @param image Face can them
      */
     public void addFace(BufferedImage image) {
     	image = ImageProcess.resize(image, FACE_WIDTH, FACE_HEIGHT);
@@ -167,6 +184,10 @@ public class NeuralNetwork implements Runnable{
     	lstListDesireOutput.add(intArrDesireOutput);
     }
     
+    /**
+     * Them noneface vao bo train
+     * @param image Noneface can them
+     */
     public void addNoneFace(BufferedImage image) {
     	image = ImageProcess.resize(image, FACE_WIDTH, FACE_HEIGHT);
     	float[] input = ImageProcess.imageToArray(image);
@@ -177,6 +198,11 @@ public class NeuralNetwork implements Runnable{
     	lstListDesireOutput.add(intArrDesireOutput);
     }
     
+    /**
+     * Tinh gia tri tangen cho mang
+     * @param flActiveValue Gia tri can tinh tangen
+     * @return Ket qua tinh duoc
+     */
     private float pfncGetTangen(float flActiveValue)
     {
         //return (float)(-1 + (2 / (1 + Math.Exp(-2 * flActiveValue))));
@@ -186,12 +212,21 @@ public class NeuralNetwork implements Runnable{
         return result;
     }
     
+    /**
+     * Tinh dan xuat cua gia tri tangen
+     * @param fx Gia tri can tinh dan xuat
+     * @return Ket qua tinh duoc
+     */
     private float pfncGetDerivative(float fx)
     {
         float flResult = (float)(0.5F * (1 - Math.pow(fx, 2)));
         return flResult;
     }
     
+    /**
+     * Tinh trung binh gia tri sai
+     * @return Ket qua tinh duoc
+     */
     private float psubGetAvgError()
     {
         float result = 0.0F;
@@ -204,6 +239,9 @@ public class NeuralNetwork implements Runnable{
         return result;
     }
     
+    /**
+     * Tinh gia tri xuat ra cua mang
+     */
     private void psubCalOutput()
     {
         float flActiveValue = 0.0F;
@@ -241,6 +279,9 @@ public class NeuralNetwork implements Runnable{
         }
     }
     
+    /**
+     * Tinh gia tri sai khac cho mang
+     */
     private void psubCalError()
     {
         float sum = 0.0F;
@@ -265,6 +306,9 @@ public class NeuralNetwork implements Runnable{
         }
     }
     
+    /**
+     * Tinh gia tri weight cho mang neural
+     */
     private void psubCalWeight()
     {
         for (int i = 1; i < CintNuberOflayers; i++)
