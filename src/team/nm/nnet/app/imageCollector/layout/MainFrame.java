@@ -13,9 +13,10 @@ import javax.swing.JOptionPane;
 
 import org.springframework.beans.factory.annotation.Required;
 
-import team.nm.nnet.app.imageCollector.basis.SegmentFaceDetector;
+import team.nm.nnet.app.imageCollector.basis.FaceDetector;
 import team.nm.nnet.app.imageCollector.utils.ImageFilter;
 import team.nm.nnet.app.imageCollector.utils.ImagePreviewPanel;
+import team.nm.nnet.tmp.NeuralFaceRecognize;
 import team.nm.nnet.tmp.NeuralNetwork;
 import team.nm.nnet.util.IOUtils;
 import team.nm.nnet.util.ImageUtils;
@@ -26,8 +27,9 @@ public class MainFrame extends JFrame {
     private Capture capture;
     private Image showingImage;
     private NeuralNetwork neuralNetwork;
+    private NeuralFaceRecognize neuralFaceRecognize;
     
-    private SegmentFaceDetector faceDetector = null;
+    private FaceDetector faceDetector = null;
     
     public MainFrame() {
         setTitle("Dò Tìm và Nhận Dạng Khuôn Mặt - NM Team");
@@ -423,15 +425,15 @@ public class MainFrame extends JFrame {
         
         BufferedImage bufferedImage = ImageUtils.toBufferedImage(showingImage);
         if(neuralNetwork.gfncGetWinner(bufferedImage)) {
-        	JOptionPane.showMessageDialog(this, "NM Team phán: đây là mặt người", "This is a human face - NM Team", JOptionPane.INFORMATION_MESSAGE);
+        	JOptionPane.showMessageDialog(this, "NM Team phán: đây là mặt người.\nKết quả nhận dạng: " + neuralFaceRecognize.gfncGetWinner(bufferedImage), "This is a human face - NM Team", JOptionPane.INFORMATION_MESSAGE);
         } else {
         	JOptionPane.showMessageDialog(this, "NM Team phán: đây không phải mặt người", "This is not a human face - NM Team", JOptionPane.INFORMATION_MESSAGE);
         }
-        /*BufferedImage y2CBuff = ImageUtils.grayScale(bufferedImage);
-        lblImgView.setIcon(new javax.swing.ImageIcon(ImageUtils.toImage(y2CBuff)));
-        
-        faceDetector = new SegmentFaceDetector(pnlFaces, showingImage);
-        faceDetector.start();*/
+//        BufferedImage y2CBuff = ImageUtils.toYCbCr(bufferedImage);
+//        lblImgView.setIcon(new javax.swing.ImageIcon(ImageUtils.toImage(y2CBuff)));
+//        
+//        faceDetector = new FaceDetector(pnlFaces, showingImage, neuralNetwork);
+//        faceDetector.start();
     }
 
 	private static final String[] extendedLibs = {"civil.dll", "jdshow.dll"};
@@ -441,6 +443,8 @@ public class MainFrame extends JFrame {
     	neuralNetwork = new NeuralNetwork("");
 		String sysPath = System.getProperty("user.dir");
 		neuralNetwork.loadWeight(sysPath + "/src/weight.txt");
+		neuralFaceRecognize = new NeuralFaceRecognize("");
+		neuralFaceRecognize.loadWeight(sysPath + "/src/weight_recog.txt");
 		IOUtils.copy(sysPath + "/src/", extendedLibs, libDestination);
     }
     
