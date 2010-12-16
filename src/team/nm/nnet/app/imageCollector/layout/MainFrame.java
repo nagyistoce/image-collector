@@ -10,6 +10,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 import org.springframework.beans.factory.annotation.Required;
 
@@ -34,6 +36,14 @@ public class MainFrame extends JFrame {
     public MainFrame() {
         setTitle("Dò Tìm và Nhận Dạng Khuôn Mặt - NM Team");
         initComponents();
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            SwingUtilities.updateComponentTreeUI(this);
+        }
+        catch (Exception ex) {
+            throw new RuntimeException("Khong the load look and feel.");
+        }
+
     }
 
     public void displayImage(Image image, String imgName, long imgLength) {
