@@ -18,7 +18,7 @@ public class NeuralFaceRecognize implements Runnable{
 	/**
 	 * Bien co dung de xac din hoc lai hay la hoc tiep
 	 */
-	private boolean isRetrain = false;
+	private boolean isRetrain = true;
 	
 	/**
 	 * Chieu rong cua anh
@@ -350,7 +350,14 @@ public class NeuralFaceRecognize implements Runnable{
     @Override
     public void run() {
     	// TODO Auto-generated method stub
-    	psubInitWeight();
+    	//Neu la hoc lai tu dau thi khoi tao file weight
+    	if (isRetrain) {
+    		psubInitWeight();
+    	}
+    	else {
+    		loadWeight(strFilename);
+    	}
+    	
     	float avgError = 0.0F;
         for (int epoch = 0; epoch <= CintEpochs; epoch++)
         {
@@ -379,6 +386,7 @@ public class NeuralFaceRecognize implements Runnable{
         System.out.println("Xong");
     	
     }
+    
     
     /**
 	 * Luu file weight xuong file text
@@ -455,5 +463,15 @@ public class NeuralFaceRecognize implements Runnable{
 			}
 		}
 		
+	}
+	
+	/**
+	 * Thiet lap train lai hay la train tien
+	 * @param isRetrain True: train lai toan bo, false: train tiep. Neu false thi phải thiet lap duong dang file weight
+	 * @param fileName Duong dan de load file weight
+	 */
+	public void configTrain(boolean isRetrain, String fileName) {
+		this.isRetrain = isRetrain;
+		this.strFilename = fileName;
 	}
 }
