@@ -392,8 +392,13 @@ public class MainFrame extends JFrame {
         // TODO add your handling code here:
     }
 
+    /**
+     * Bien luu path den thu muc vua moi chon
+     * (Muon cut bien nay di dau thi cut nhe)
+     */
+    private String curPath = "";
     private void btnSysFileActionPerformed(java.awt.event.ActionEvent evt) {
-        final JFileChooser chooser = new JFileChooser(".");
+        final JFileChooser chooser = new JFileChooser(curPath);
         ImageFilter imageFilter = new ImageFilter();
         chooser.addChoosableFileFilter(imageFilter);
         ImagePreviewPanel preview = new ImagePreviewPanel();
@@ -403,6 +408,7 @@ public class MainFrame extends JFrame {
         int returnVal = chooser.showOpenDialog(null);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             File selectedFile = chooser.getSelectedFile();
+            curPath = selectedFile.getPath();
             if (imageFilter.accept(selectedFile)) {
                 displayImage(new ImageIcon(selectedFile.getPath()).getImage(),
                         selectedFile.getName(), selectedFile.length());
