@@ -16,6 +16,11 @@ import team.nm.nnet.util.LogicUtils;
 public class NeuralFaceRecognize implements Runnable{
 
 	/**
+	 * Bien co dung de xac din hoc lai hay la hoc tiep
+	 */
+	private boolean isRetrain = false;
+	
+	/**
 	 * Chieu rong cua anh
 	 */
 	private final int FACE_WIDTH = 20;
