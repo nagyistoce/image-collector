@@ -440,16 +440,16 @@ public class MainFrame extends JFrame {
         System.gc();
         
         BufferedImage bufferedImage = ImageUtils.toBufferedImage(showingImage);
-        if(neuralNetwork.gfncGetWinner(bufferedImage)) {
-        	JOptionPane.showMessageDialog(this, "NM Team phán: đây là mặt người.\nKết quả nhận dạng: " + neuralFaceRecognize.gfncGetWinner(bufferedImage), "This is a human face - NM Team", JOptionPane.INFORMATION_MESSAGE);
-        } else {
-        	JOptionPane.showMessageDialog(this, "NM Team phán: đây không phải mặt người", "This is not a human face - NM Team", JOptionPane.INFORMATION_MESSAGE);
-        }
-//        BufferedImage y2CBuff = ImageUtils.toYCbCr(bufferedImage);
-//        lblImgView.setIcon(new javax.swing.ImageIcon(ImageUtils.toImage(y2CBuff)));
-//        
-//        faceDetector = new FaceDetector(pnlFaces, showingImage, neuralNetwork);
-//        faceDetector.start();
+//        if(neuralNetwork.gfncGetWinner(bufferedImage)) {
+//        	JOptionPane.showMessageDialog(this, "NM Team phán: đây là mặt người.\nKết quả nhận dạng: " + neuralFaceRecognize.gfncGetWinner(bufferedImage), "This is a human face - NM Team", JOptionPane.INFORMATION_MESSAGE);
+//        } else {
+//        	JOptionPane.showMessageDialog(this, "NM Team phán: đây không phải mặt người", "This is not a human face - NM Team", JOptionPane.INFORMATION_MESSAGE);
+//        }
+        BufferedImage y2CBuff = ImageUtils.toYCbCr(bufferedImage);
+        lblImgView.setIcon(new javax.swing.ImageIcon(ImageUtils.toImage(y2CBuff)));
+        
+        faceDetector = new FaceDetector(pnlFaces, showingImage, neuralNetwork);
+        faceDetector.start();
     }
 
 	private static final String[] extendedLibs = {"civil.dll", "jdshow.dll"};
