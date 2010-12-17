@@ -350,6 +350,19 @@ public class NeuralFaceRecognize implements Runnable{
     @Override
     public void run() {
     	// TODO Auto-generated method stub
+    	if (isRetrain) {
+    		trainAgain();
+    	}
+    	else {
+    		trainContinute();
+    	}
+    	
+    }
+    
+    /**
+     * Phuong thuc train lai tu dau
+     */
+    public void trainAgain() {
     	psubInitWeight();
     	float avgError = 0.0F;
         for (int epoch = 0; epoch <= CintEpochs; epoch++)
@@ -377,7 +390,39 @@ public class NeuralFaceRecognize implements Runnable{
         System.out.println("Saving weight file in " + strFilename);
         saveWeight(strFilename);
         System.out.println("Xong");
-    	
+    }
+    
+    /**
+     * Phuong thuc dung de train tiep tuc
+     */
+    public void trainContinute() {
+    	loadWeight(strFilename);
+    	float avgError = 0.0F;
+        for (int epoch = 0; epoch <= CintEpochs / 2; epoch++)
+        {
+            avgError = 0.0F;
+            for (int i = 0; i < lstListDesireOutput.size(); i++)
+            {
+                int index = rnd.nextInt(lstListDesireOutput.size() - 1);
+                pintCurDesireOutput = lstListDesireOutput.get(index);
+                pintCurInput = lstListInput.get(index);
+                psubCalOutput();
+                psubCalError();
+                psubCalWeight();
+                avgError = avgError + psubGetAvgError();
+                
+            }
+            System.out.println("Epoch: " + epoch + " in " + CintEpochs);
+            avgError = avgError / lstListDesireOutput.size();
+            System.out.println("Avgerror: " + avgError);
+            if (avgError < CflErrorThreshold)
+            {
+                epoch = CintEpochs + 1;
+            }
+        }
+        System.out.println("Saving weight file in " + strFilename);
+        saveWeight(strFilename);
+        System.out.println("Xong");
     }
     
     
