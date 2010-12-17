@@ -350,14 +350,7 @@ public class NeuralFaceRecognize implements Runnable{
     @Override
     public void run() {
     	// TODO Auto-generated method stub
-    	//Neu la hoc lai tu dau thi khoi tao file weight
-    	if (isRetrain) {
-    		psubInitWeight();
-    	}
-    	else {
-    		loadWeight(strFilename);
-    	}
-    	
+    	psubInitWeight();
     	float avgError = 0.0F;
         for (int epoch = 0; epoch <= CintEpochs; epoch++)
         {
