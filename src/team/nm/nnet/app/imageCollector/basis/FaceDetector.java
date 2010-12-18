@@ -2,6 +2,7 @@ package team.nm.nnet.app.imageCollector.basis;
 
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.io.File;
 
 import javax.swing.JPanel;
 
@@ -48,21 +49,26 @@ public class FaceDetector extends Thread {
     }
 
     private void findCandidates(BufferedImage bufferedImage) {
-        int detectorWidth = Const.FACE_WIDTH;
-        int detectorHeight = Const.FACE_HEIGHT;
+//        int detectorWidth = Const.FACE_WIDTH;
+//        int detectorHeight = Const.FACE_HEIGHT;
+    	
+    	int detectorWidth = 68;
+        int detectorHeight = 83;
         int width = bufferedImage.getWidth(null);
         int height = bufferedImage.getHeight(null);
 
         do {
-            for (int i = 1; i < width; i += Const.JUMP_LENGHT) {
-                for (int j = 1; j < height; j += Const.JUMP_LENGHT) {
+            for (int i = 1; i < width; i += detectorWidth / 2) {
+                for (int j = 1; j < height; j += detectorHeight / 2) {
                     if(!state) {
                         return;
                     }
                     
                     if ((i + detectorWidth < width) && (j + detectorHeight < height)) {
 	                    BufferedImage subBuff = bufferedImage.getSubimage(i, j, detectorWidth, detectorHeight);
+	                    
 	                	if(neuralNetwork.gfncGetWinner(subBuff)) {
+	                		ImageUtils.saveToJpg(subBuff, new File("D:\\" + i + j + ".jpg"));
 	                		FacePanel fp = new FacePanel(pnlFaces, ImageUtils.toImage(subBuff));
 	                		fp.setFaceName(String.valueOf(i + " x " + j));
 	                		addFaceCandidates(fp);
@@ -73,12 +79,14 @@ public class FaceDetector extends Thread {
                 System.gc();
             }
             
-            if ((detectorWidth < width) && (detectorHeight < height)) {
-                detectorWidth += Const.SCANNER_GROWTH;
-                detectorHeight += Const.SCANNER_GROWTH;
-            } else {
-                break;
-            }
+            break;
+//            if ((detectorWidth < width) && (detectorHeight < height)) {
+//                detectorWidth += Const.SCANNER_GROWTH;
+//                detectorHeight += Const.SCANNER_GROWTH;
+//            	
+//            } else {
+//                break;
+//            }
         } while ((detectorWidth < width) && (detectorHeight < height));
     }
     
