@@ -192,6 +192,13 @@ public class ImageUtils {
 		}
 	}
 	
+	public static void saveToJpg(BufferedImage bufferedImage, File file) {
+		try {
+			ImageIO.write(bufferedImage,"jpg",file);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
 	
 	@SuppressWarnings("rawtypes")
 	public static void drawImageToJpgByteStream(BufferedImage bufferedImage,
