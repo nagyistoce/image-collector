@@ -336,8 +336,8 @@ public class NeuralNetwork implements Runnable{
     	float[] input = ImageProcess.imageToArray(image);
     	pintCurInput = ImageProcess.adaptArray(input);
     	psubCalOutput();
-    	//System.out.println(pflOutputNode[CintNuberOflayers - 1][0] + "," + pflOutputNode[CintNuberOflayers - 1][1]);
-    	if(pflOutputNode[CintNuberOflayers - 1][0] > 0.5) {
+    	System.out.println(pflOutputNode[CintNuberOflayers - 1][0] + "," + pflOutputNode[CintNuberOflayers - 1][1]);
+    	if(pflOutputNode[CintNuberOflayers - 1][0] > 0.75) {
     		return true;
     	}
     	return false;
