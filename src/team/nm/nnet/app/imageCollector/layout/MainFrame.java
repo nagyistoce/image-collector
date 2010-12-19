@@ -15,7 +15,8 @@ import javax.swing.UIManager;
 
 import org.springframework.beans.factory.annotation.Required;
 
-import team.nm.nnet.app.imageCollector.basis.FaceDetector;
+import team.nm.nnet.app.imageCollector.basis.SegmentFaceDetector;
+import team.nm.nnet.app.imageCollector.utils.ColorDetection;
 import team.nm.nnet.app.imageCollector.utils.ImageFilter;
 import team.nm.nnet.app.imageCollector.utils.ImagePreviewPanel;
 import team.nm.nnet.tmp.NeuralFaceRecognize;
@@ -31,7 +32,7 @@ public class MainFrame extends JFrame {
     private NeuralNetwork neuralNetwork;
     private NeuralFaceRecognize neuralFaceRecognize;
     
-    private FaceDetector faceDetector = null;
+    private SegmentFaceDetector faceDetector = null;
     
     public MainFrame() {
         setTitle("Dò Tìm và Nhận Dạng Khuôn Mặt - NM Team");
@@ -445,10 +446,10 @@ public class MainFrame extends JFrame {
 //        } else {
 //        	JOptionPane.showMessageDialog(this, "NM Team phán: đây không phải mặt người", "This is not a human face - NM Team", JOptionPane.INFORMATION_MESSAGE);
 //        }
-        BufferedImage y2CBuff = ImageUtils.toYCbCr(bufferedImage);
+        BufferedImage y2CBuff = ColorDetection.toYCbCr(bufferedImage);
         lblImgView.setIcon(new javax.swing.ImageIcon(ImageUtils.toImage(y2CBuff)));
         
-        faceDetector = new FaceDetector(pnlFaces, showingImage, neuralNetwork);
+        faceDetector = new SegmentFaceDetector(pnlFaces, showingImage, neuralNetwork);
         faceDetector.start();
     }
 

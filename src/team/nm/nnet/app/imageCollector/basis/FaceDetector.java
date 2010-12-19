@@ -48,7 +48,7 @@ public class FaceDetector extends Thread {
         System.out.println("Face Detection Thread finished!");
     }
 
-    private void findCandidates(BufferedImage bufferedImage) {
+    private void findCandidates2(BufferedImage bufferedImage) {
 //        int detectorWidth = Const.FACE_WIDTH;
 //        int detectorHeight = Const.FACE_HEIGHT;
     	
@@ -90,9 +90,8 @@ public class FaceDetector extends Thread {
         } while ((detectorWidth < width) && (detectorHeight < height));
     }
     
-    private void findCandidates2(BufferedImage bufferedImage) {
-    	BufferedImage yCbCrBuf = ImageUtils.toYCbCr(bufferedImage);
-    	Matrix<Integer> integralImg = ColorDetection.getIntegralMatrix(yCbCrBuf);
+    private void findCandidates(BufferedImage bufferedImage) {
+    	Matrix<Integer> integralImg = ColorDetection.getIntegralMatrix(bufferedImage);
     	int detectorWidth = Const.FACE_WIDTH;
     	int detectorHeight = Const.FACE_HEIGHT;
     	int width = integralImg.getWidth();

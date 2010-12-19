@@ -52,6 +52,16 @@ public class Const {
     public static final double SCANNER_RATE_THRESHOLD = 0.6;
     
     /**
+     * Số lượng pixel thấp nhất mà một vùng còn được xem là vùng khuôn mặt 
+     */
+    public static final int MINIMUM_SKIN_PIXEL_THRESHOLD = 100;
+    
+    /**
+     * Độ giãn giữa tọa độ thật với độ tọa đóng khung khuôn mặt
+     */
+    public static final int SPAN_FACE_BOX = 5;
+    
+    /**
      * Luu duong dan file mask
      */
     public static final String MASK_IMAGE = System.getProperty("user.dir") + "/ref/imageStore/mask.jpg";

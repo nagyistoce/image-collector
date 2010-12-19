@@ -1,19 +1,20 @@
 package team.nm.nnet.app.imageCollector.basis;
 
-import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 import team.nm.nnet.app.imageCollector.om.ColorSegment;
-import team.nm.nnet.util.ImageUtils;
+import team.nm.nnet.app.imageCollector.om.Pixel;
+import team.nm.nnet.app.imageCollector.utils.ColorDetection;
 
 public class ColorSegmentation {
 
     private int noSegments;
     private List<ColorSegment> segments;
     private int[] marks;
-    private int[] pixels;
+    private BufferedImage bufImage;
     private int width, height;
     private volatile boolean state = false;
     
@@ -26,37 +27,35 @@ public class ColorSegmentation {
         if(bufferedImage == null) {
             return null;
         }
-        bufferedImage = ImageUtils.toYCbCr(bufferedImage);
+        bufImage = ColorDetection.toYCbCr(bufferedImage);
         width = bufferedImage.getWidth();
         height = bufferedImage.getHeight();
-        pixels = null;
-        pixels = bufferedImage.getRGB(0, 0, width, height, pixels, 0, width);
-        if(pixels == null) {
-            return null;
-        }
         
         initMarks(width * height);
         // Mark this thread is running
         state = true;
+        
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
+            	if(!state) {
+            		return segments;
+            	}
                 int index = x * height + y;
-                if ((marks[index] == -1) && isWhite(pixels[index])) {
+                if ((marks[index] == -1) && (bufImage.getRGB(x, y) == 0xffffffff)) {
                     ColorSegment coseg = new ColorSegment();
                     coseg.setId(++noSegments);
                     flood(x, y, coseg);
-                    segments.add(coseg);
+                    System.out.println(String.format("[%d -> %d, %d -> %d]: %d, ", x, coseg.getWidth(), y, coseg.getHeight(), noSegments));
+                    if(coseg.isValid()) {
+                    	segments.add(coseg);
+                    }
                 }
             }
         }
+        
         // Finish segmenting
         state = false;
         return segments;
-    }
-    
-    public boolean isWhite(int rgb) {
-        Color pixelColour = new Color(rgb);
-        return pixelColour.getBlue() / 255 == 1;
     }
     
     public boolean isSegmenting() {
@@ -81,40 +80,53 @@ public class ColorSegmentation {
             marks[i] = -1;
         }
     }
-    
+
     protected void flood(int x, int y, ColorSegment colorSegment) {
-        System.out.println(String.format("[%d, %d]", x, y));
-        if(!state) {
-            return;
-        }
-        marks[x * height + y] = noSegments;
-        
-        // Cập nhật lại các cận của phân vùng
-        if(x < colorSegment.getxLeft()) {
-            colorSegment.setxLeft(x);
-        } else if(x > colorSegment.getxRight()) {
-            colorSegment.setxRight(x);
-        }
-        if(y < colorSegment.getyBottom()) {
-            colorSegment.setyBottom(y);
-        } else if(y > colorSegment.getyTop()) {
-            colorSegment.setyTop(y);
-        }
-        
-        int index = x * height + (y + 1);
-        System.out.println(String.format("[%d, %d]: white: %s, marks[%d]: %d", x, y, String.valueOf(isWhite(pixels[index])), index, marks[index]));
-        if(((y + 1) < height) && (marks[index] == -1) && isWhite(pixels[index])) {
-            flood(x, y + 1, colorSegment);
-        }
-        index = x * height + (y - 1);
-        System.out.println(String.format("[%d, %d]: white: %s, marks[%d]: %d", x, y, String.valueOf(isWhite(pixels[index])), index, marks[index]));
-        if(((y - 1) >= 0) && (marks[index] == -1) && isWhite(pixels[index])) {
-            flood(x, y - 1, colorSegment);
-        }
-        index = (x + 1) * height + y;
-        System.out.println(String.format("[%d, %d]: white: %s, marks[%d]: %d", x, y, String.valueOf(isWhite(pixels[index])), index, marks[index]));
-        if((((x + 1) < width) && (y + 1) < height) && (marks[index] == -1) && isWhite(pixels[index])) {
-            flood(x + 1, y, colorSegment);
-        }
+    	Stack<Pixel> stack = new Stack<Pixel>();
+    	pushStack(stack, x, y);
+    	
+    	while(state && !stack.isEmpty()) {
+    		Pixel p = stack.pop();
+    		int xx = p.getX();
+    		int yy = p.getY();
+    		
+    		marks[xx * height + yy] = colorSegment.getId();
+			
+			// Cập nhật lại các cận của phân vùng
+			if(xx < colorSegment.getLeft()) {
+				colorSegment.setLeft(xx);
+			} else if(xx > colorSegment.getRight()) {
+				colorSegment.setRight(xx);
+			}
+			if(yy < colorSegment.getBottom()) {
+				colorSegment.setBottom(yy);
+			} else if(yy > colorSegment.getTop()) {
+				colorSegment.setTop(yy);
+			}
+			
+			// Loang theo phương ngang
+			pushStack(stack, xx, yy - 1);
+			pushStack(stack, xx, yy + 1);
+			
+			// Loang hướng lên trên
+			pushStack(stack, xx - 1, yy - 1);
+			pushStack(stack, xx - 1, yy);
+			pushStack(stack, xx - 1, yy + 1);
+			
+			// Loang hướng xuống dưới
+			pushStack(stack, xx + 1, yy - 1);
+			pushStack(stack, xx + 1, yy);
+			pushStack(stack, xx + 1, yy + 1);
+    	}
+    }
+    
+    private void pushStack(Stack<Pixel> stack, int x, int y) {
+    	int index = x * height + y;
+		boolean isX = (0 <= x) && (x < width);
+		boolean isY = (0 <= y) && (y < height);
+		
+		if(isX && isY && (marks[index] == -1) && (bufImage.getRGB(x, y) == 0xffffffff)) {
+			stack.push(new Pixel(x, y));
+		}
     }
 }
