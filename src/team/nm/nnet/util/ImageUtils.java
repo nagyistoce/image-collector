@@ -450,4 +450,9 @@ public class ImageUtils {
 		tat.translate(-xtrans, -ytrans);
 		return tat;
 	}
+	
+	public static void createRandowImage(int width, int height) {
+//		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+//		image.s
+	}
 }
