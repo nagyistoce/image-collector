@@ -118,6 +118,7 @@ public class FaceDetector extends Thread {
     									whitePixelSum, rate));
     					if (rate > Const.SCANNER_RATE_THRESHOLD) {
     						BufferedImage subBuff = bufferedImage.getSubimage(i, j, detectorWidth, detectorHeight);
+    						ImageUtils.saveToJpg(subBuff, new File("D:\\" + i + "-" + j + ".jpg"));
     						if(neuralNetwork.gfncGetWinner(subBuff)) {
     							FacePanel fp = new FacePanel(pnlFaces, ImageUtils.toImage(subBuff));
     							fp.setFaceName(String.valueOf(rate));
