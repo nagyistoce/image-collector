@@ -11,6 +11,8 @@ import java.io.File;
 
 import javax.imageio.ImageIO;
 
+import team.nm.nnet.core.Const;
+
 public class ImageProcess {
 	
 	/**
@@ -104,11 +106,23 @@ public class ImageProcess {
 				 result[i] = (array[i] - 127) / 127;
 			 }
 		}
+		result = addMask(result);
 		return result;
 	}
 	
+	/**
+	 * Gan mask cho array trong qua trinh chuan hoa
+	 * @param array Mang can chuan hoa
+	 * @return Ket qua chuan hoa
+	 */
 	private static float[] addMask(float[] array) {
-		return new float[2];
-		
+		int len = array.length;
+		int[] mask = Const.MASH;
+		for (int i = 0; i < len; i ++) {
+			if (mask[i] == 1) {
+				array[i] = - 1;
+			}
+		}
+		return array;
 	}
 }
