@@ -106,4 +106,9 @@ public class ImageProcess {
 		}
 		return result;
 	}
+	
+	private static float[] addMask(float[] array) {
+		return new float[2];
+		
+	}
 }
