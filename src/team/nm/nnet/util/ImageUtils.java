@@ -133,6 +133,10 @@ public class ImageUtils {
 	 */
 	public static BufferedImage load(String fileName) {
 		File file = new File(fileName);
+		return load(file);
+	}
+	
+	public static BufferedImage load(File file) {
 		Image image = null;
 		try {
 			image = ImageIO.read(file);

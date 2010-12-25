@@ -16,7 +16,11 @@
     	id="capture" class="team.nm.nnet.app.imageCollector.layout.Capture">
     </bean>
     <bean 
+    	id="imageDB" class="team.nm.nnet.app.imageCollector.bo.ImageDB">
+    </bean>
+    <bean 
     	id="mainFrame" class="team.nm.nnet.app.imageCollector.layout.MainFrame">
+    	<property name="imageDB" ref="imageDB"/>
     	<property name="capture" ref="capture"/>
     </bean>
     

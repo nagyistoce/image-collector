@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -14,10 +15,10 @@ import org.apache.commons.logging.LogFactory;
 
 public class ImageDB {
 	private static Log   log = LogFactory.getLog(ImageDB.class);
-	private List<File> files;
+	private List<File> files = new ArrayList<File>();
 
-	public void load(String fileName) throws Exception {
-		FileReader fr = new FileReader(fileName);
+	public void load(File file) throws Exception {
+		FileReader fr = new FileReader(file);
 		BufferedReader br = new BufferedReader(fr);
 		String path;
 		try{
@@ -43,7 +44,7 @@ public class ImageDB {
 		this.files.addAll(files);
 	}
 	
-	public void save(String fileName) {
+	public void save(File file) {
 		if((files == null) || (files.size() == 0)) {
 			return;
 		}
@@ -51,7 +52,6 @@ public class ImageDB {
 	    DataOutputStream dos;
 
 	    try {
-			File file = new File(fileName);
 			fos = new FileOutputStream(file);
 			dos = new DataOutputStream(fos);
 			for(File f : files) {

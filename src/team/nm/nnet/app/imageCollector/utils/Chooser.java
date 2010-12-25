@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileFilter;
 
 import team.nm.nnet.app.imageCollector.support.ImageFilter;
 import team.nm.nnet.app.imageCollector.support.ImagePreviewPanel;
@@ -14,17 +15,19 @@ public class Chooser extends JFileChooser {
 
 	private static String curPath = ".";
 	
-    public static File getSingleFile(String caption) {
+    public static File getSingleFile(String caption, FileFilter fileFilter) {
         final JFileChooser chooser = new JFileChooser(curPath);
-        ImageFilter imageFilter = new ImageFilter();
-        chooser.addChoosableFileFilter(imageFilter);
-        ImagePreviewPanel preview = new ImagePreviewPanel();
-        chooser.setAccessory(preview);
-        chooser.addPropertyChangeListener(preview);
-        int returnVal = chooser.showDialog(null, caption);
+        chooser.addChoosableFileFilter(fileFilter);
+        if(fileFilter instanceof ImageFilter) {
+	        ImagePreviewPanel preview = new ImagePreviewPanel();
+	        chooser.setAccessory(preview);
+	        chooser.addPropertyChangeListener(preview);
+        }
+        chooser.setDialogTitle(caption);
+        int returnVal = chooser.showOpenDialog(null);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
         	File selectedFile = chooser.getSelectedFile();
-        	if (imageFilter.accept(selectedFile)) {
+        	if (fileFilter.accept(selectedFile)) {
         		curPath = selectedFile.getPath();
         		return selectedFile;
         	}
@@ -32,27 +35,43 @@ public class Chooser extends JFileChooser {
         return null;
     }
     
-    public static List<File> getMultiFiles(String caption) {
+    public static List<File> getMultiFiles(String caption, FileFilter fileFilter) {
     	final JFileChooser chooser = new JFileChooser(curPath);
-        ImageFilter imageFilter = new ImageFilter();
-        chooser.addChoosableFileFilter(imageFilter);
-        ImagePreviewPanel preview = new ImagePreviewPanel();
-        chooser.setAccessory(preview);
-        chooser.addPropertyChangeListener(preview);
-        chooser.setName(caption);
+    	chooser.addChoosableFileFilter(fileFilter);
+        if(fileFilter instanceof ImageFilter) {
+	        ImagePreviewPanel preview = new ImagePreviewPanel();
+	        chooser.setAccessory(preview);
+	        chooser.addPropertyChangeListener(preview);
+        }
         chooser.setMultiSelectionEnabled(true);
-        int returnVal = chooser.showDialog(null, caption);
+        chooser.setDialogTitle(caption);
+        int returnVal = chooser.showOpenDialog(null);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
         	File[] selectedFiles = chooser.getSelectedFiles();
         	if(selectedFiles != null){
         		List<File> list = new ArrayList<File>();
         		for(File f : selectedFiles) {
-        			if (imageFilter.accept(f)) {
+        			if (fileFilter.accept(f)) {
         				list.add(f);
         			}
         		}
         		curPath = list.get(0).getPath();
         		return list;
+        	}
+        }
+        return null;
+    }
+    
+    public static File save(String caption, FileFilter fileFilter) {
+        final JFileChooser chooser = new JFileChooser(curPath);
+        chooser.addChoosableFileFilter(fileFilter);
+        chooser.setDialogTitle(caption);
+        int returnVal = chooser.showSaveDialog(null);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+        	File selectedFile = chooser.getSelectedFile();
+        	if (fileFilter.accept(selectedFile)) {
+        		curPath = selectedFile.getPath();
+        		return selectedFile;
         	}
         }
         return null;

@@ -14,7 +14,6 @@ import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComponent;
-import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
@@ -22,6 +21,8 @@ import net.sf.fmj.ejmf.toolkit.install.PackageUtility;
 import net.sf.fmj.ui.application.ContainerPlayer;
 import net.sf.fmj.utility.PlugInUtility;
 import team.nm.nnet.app.imageCollector.support.ImageFilter;
+import team.nm.nnet.app.imageCollector.support.NMFileFilter;
+import team.nm.nnet.app.imageCollector.utils.Chooser;
 import team.nm.nnet.util.ImageUtils;
 
 import com.lti.civil.CaptureException;
@@ -90,15 +91,9 @@ public class MediaCapture extends Panel implements ActionListener {
 		if (e.getSource() instanceof JComponent) {
 			JComponent c = (JComponent) e.getSource();
 			if (c == saveBtn) {
-				final JFileChooser chooser = new JFileChooser(".");
-				ImageFilter imageFilter = new ImageFilter();
-				chooser.addChoosableFileFilter(imageFilter);
-				int returnVal = chooser.showSaveDialog(null);
-				if (returnVal == JFileChooser.APPROVE_OPTION) {
-					File selectedFile = chooser.getSelectedFile();
-					if (imageFilter.accept(selectedFile)) {
-						action(selectedFile);
-					}
+				File selectedFile = Chooser.save("Lưu ảnh", new ImageFilter());
+				if (selectedFile != null) {
+					action(selectedFile);
 				}
 			} else if (c == takeBtn) {
 				takeImage();
@@ -135,7 +130,7 @@ public class MediaCapture extends Panel implements ActionListener {
 		// save image
 		BufferedImage bufferedImage = ImageUtils.toBufferedImage(img);
 		if (bufferedImage != null) {
-			if(ImageFilter.getExtension(file).compareToIgnoreCase(ImageFilter.PNG) == 0) {
+			if(NMFileFilter.getExtension(file).compareToIgnoreCase(ImageFilter.PNG) == 0) {
 				ImageUtils.saveToPng(bufferedImage, file);
 			} else {
 				ImageUtils.drawImageToJpgByteStream(bufferedImage, file);

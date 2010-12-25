@@ -13,39 +13,18 @@ public class ImageFilter extends FileFilter {
     public final static String TIF = "tif";
     public final static String PNG = "png";
 
-    /*
-     * Get the extension of a file.
-     */
-    public static String getExtension(File f) {
-        String ext = null;
-        String s = f.getName();
-        int i = s.lastIndexOf('.');
-
-        if (i > 0 &&  i < s.length() - 1) {
-            ext = s.substring(i+1).toLowerCase();
-        }
-        return ext;
-    }
-    
-  //Accept all directories and all gif, jpg, tiff, or png files.
+    // Accept all directories and all gif, jpg, tiff, or png files.
     public boolean accept(File f) {
         if (f.isDirectory()) {
             return true;
         }
 
-        String extension = getExtension(f);
-        if (extension != null) {
-            if (extension.equals(TIFF) ||
-                extension.equals(TIF) ||
-                extension.equals(GIF) ||
-                extension.equals(JPEG) ||
-                extension.equals(JPG) ||
-                extension.equals(PNG)) {
-                    return true;
-            } else {
-                return false;
-            }
-        }
+        String name = f.getName().toLowerCase();
+        if (name.endsWith(TIFF) || name.endsWith(TIF) ||
+        	name.endsWith(GIF) || name.endsWith(JPEG) ||
+    		name.endsWith(JPG) || name.endsWith(PNG)) {
+                return true;
+        } 
 
         return false;
     }

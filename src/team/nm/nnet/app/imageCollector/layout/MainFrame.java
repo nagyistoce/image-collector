@@ -7,6 +7,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.List;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
@@ -17,11 +18,14 @@ import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Required;
 
+import team.nm.nnet.app.imageCollector.bo.ImageDB;
 import team.nm.nnet.app.imageCollector.bo.SegmentFaceDetector;
 import team.nm.nnet.app.imageCollector.support.ImageFilter;
 import team.nm.nnet.app.imageCollector.support.ImagePreviewPanel;
+import team.nm.nnet.app.imageCollector.support.NMFileFilter;
 import team.nm.nnet.app.imageCollector.utils.Chooser;
 import team.nm.nnet.app.imageCollector.utils.ColorSpace;
 import team.nm.nnet.core.Const;
@@ -34,6 +38,7 @@ public class MainFrame extends JFrame {
 
     private static final long serialVersionUID = -5480005990507067644L;
     private Capture capture;
+    private ImageDB imageDB;
     private Image showingImage = new javax.swing.ImageIcon(System.getProperty("user.dir") + Const.RESOURCE_PATH + "authors.jpg").getImage();
     private NeuralNetwork neuralNetwork;
     private NeuralFaceRecognize neuralFaceRecognize;
@@ -55,13 +60,13 @@ public class MainFrame extends JFrame {
 
     public void displayImage(Image image, String imgName, long imgLength) {
         if (image == null) {
-            JOptionPane.showMessageDialog(this, "Không thể hiển thị ảnh này!");
+        	JOptionPane.showMessageDialog(this, "Không thể hiển thị ảnh này!", "Failed", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         BufferedImage bufferedImage = ImageUtils.toBufferedImage(image);
         if (bufferedImage == null) {
-            JOptionPane.showMessageDialog(this, "Không thể hiển thị ảnh này!");
+        	JOptionPane.showMessageDialog(this, "Không thể hiển thị ảnh này!", "Failed", JOptionPane.ERROR_MESSAGE);
         } else {
             showingImage = fitView(bufferedImage, lblImgView.getWidth(),
                     lblImgView.getHeight());
@@ -105,7 +110,7 @@ public class MainFrame extends JFrame {
         smnDB_Show = new javax.swing.JMenuItem();
         smnDB_Clear = new javax.swing.JMenuItem();
         smnDB_Add = new javax.swing.JMenuItem();
-        smnDB_Save = new javax.swing.JCheckBoxMenuItem();
+        smnDB_Save = new javax.swing.JMenuItem();
         jMenu5 = new javax.swing.JMenu();
         jMenuItem7 = new javax.swing.JMenuItem();
         jMenu2 = new javax.swing.JMenu();
@@ -142,6 +147,7 @@ public class MainFrame extends JFrame {
         gridBagConstraints.insets = new java.awt.Insets(11, 10, 0, 0);
         jPanel5.add(jLabel3, gridBagConstraints);
 
+        pnlFaces.setToolTipText("The face are detected");
         pnlFaces.setBackground(new java.awt.Color(255, 255, 255));
         pnlFaces.setLayout(new javax.swing.BoxLayout(pnlFaces,
                 javax.swing.BoxLayout.PAGE_AXIS));
@@ -162,6 +168,7 @@ public class MainFrame extends JFrame {
         jPanel5.add(splFaces, gridBagConstraints);
 
         btnSearchInDB.setText("Tìm ảnh trong CSDL");
+        btnSearchInDB.setToolTipText("Search in DB");
         btnSearchInDB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSearchInDBActionPerformed(evt);
@@ -200,6 +207,7 @@ public class MainFrame extends JFrame {
         jLabel6.setText("Dung lượng:");
 
         btnSysFile.setText("Từ hệ thống");
+        btnSysFile.setToolTipText("From system file");
         btnSysFile.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnSysFileActionPerformed(evt);
@@ -207,6 +215,7 @@ public class MainFrame extends JFrame {
         });
 
         btnWebcam.setText("Từ webcam");
+        btnWebcam.setToolTipText("From webcam");
         btnWebcam.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnWebcamActionPerformed(evt);
@@ -356,22 +365,82 @@ public class MainFrame extends JFrame {
         smnDB_New.setText("Tạo mới");
         smnDB_New.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                Chooser.getMultiFiles("Tạo mới CSDL ảnh");
+                List<File> files = Chooser.getMultiFiles("Tạo mới CSDL ảnh", new ImageFilter());
+                if(CollectionUtils.isNotEmpty(files)) {
+                	imageDB.setFiles(files);
+                	JOptionPane.showMessageDialog(null, "CSDL ảnh đã được tạo!", "Succeed", JOptionPane.INFORMATION_MESSAGE);
+                }
             }
         });
         jMenu3.add(smnDB_New);
         
         smnDB_Load.setText("Nạp từ tệp");
+        smnDB_Load.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                File file = Chooser.getSingleFile("Nạp CSDL ảnh", new NMFileFilter());
+                if(file != null) {
+                	try {
+                		imageDB.load(file);
+                		JOptionPane.showMessageDialog(null, "CSDL ảnh đã nạp thành công!", "Succeed", JOptionPane.INFORMATION_MESSAGE);
+                	} catch(Exception e) {
+                		JOptionPane.showMessageDialog(null, "Không thể nạp CSDL ảnh từ tệp này!", "Failed", JOptionPane.ERROR_MESSAGE);
+                	}
+                }
+            }
+        });
         jMenu3.add(smnDB_Load);
         jMenu3.add(new JSeparator());
+        
         smnDB_Show.setText("Xem");
+        smnDB_Show.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            	if(imageDB.getFiles().size() > 0) {
+            		new DBViewer(imageDB).setVisible(true);
+            	} else {
+            		JOptionPane.showMessageDialog(null, "Chưa có ảnh nào trong CSDL!", "Empty!", JOptionPane.ERROR_MESSAGE);
+            	}
+            }
+        });
         jMenu3.add(smnDB_Show);
         jMenu3.add(new JSeparator());
+        
         smnDB_Clear.setText("Xóa");
+        smnDB_Clear.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            	int confirm = JOptionPane.showConfirmDialog(null, "Bạn có chắc muốn xóa CSDL ảnh không!", "Clear image DB?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+            	if(confirm == JOptionPane.YES_OPTION) {
+            		imageDB.clear();
+            	}
+            }
+        });
         jMenu3.add(smnDB_Clear);
+        
         smnDB_Add.setText("Thêm");
+        smnDB_Add.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+            	List<File> files = Chooser.getMultiFiles("Thêm ảnh vào CSDL", new ImageFilter());
+                if(CollectionUtils.isNotEmpty(files)) {
+                	imageDB.add(files);
+                	JOptionPane.showMessageDialog(null, "CSDL ảnh đã được cập nhật!", "Succeed", JOptionPane.INFORMATION_MESSAGE);
+                }
+            }
+        });
         jMenu3.add(smnDB_Add);
+        
         smnDB_Save.setText("Lưu lại");
+        smnDB_Save.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                File file = Chooser.save("Lưu CSDL ảnh", new NMFileFilter());
+                if(file != null) {
+                	try {
+                		imageDB.save(file);
+                		JOptionPane.showMessageDialog(null, "CSDL ảnh đã lưu thành công!", "Succeed", JOptionPane.INFORMATION_MESSAGE);
+                	} catch(Exception e) {
+                		JOptionPane.showMessageDialog(null, "không thể lưu CSDL ảnh!", "Failed", JOptionPane.ERROR_MESSAGE);
+                	}
+                }
+            }
+        });
         jMenu3.add(smnDB_Save);
 
         jMenu1.add(jMenu3);
@@ -403,7 +472,7 @@ public class MainFrame extends JFrame {
         setJMenuBar(jMenuBar1);
 
         pack();
-    }// </editor-fold>
+    }
 
     private void btnSearchInDBActionPerformed(java.awt.event.ActionEvent evt) {
         /*
@@ -417,7 +486,7 @@ public class MainFrame extends JFrame {
     }
 
     private void btnSysFileActionPerformed(java.awt.event.ActionEvent evt) {
-        File selectedFile = Chooser.getSingleFile("Lấy ảnh mẫu");
+        File selectedFile = Chooser.getSingleFile("Lấy ảnh mẫu", new ImageFilter());
         if(selectedFile != null) {
             displayImage(new ImageIcon(selectedFile.getPath()).getImage(),
                     selectedFile.getName(), selectedFile.length());
@@ -517,13 +586,14 @@ public class MainFrame extends JFrame {
 
     // End of variables declaration
 
-    public Capture getCapture() {
-        return capture;
-    }
-
     @Required
     public void setCapture(Capture capture) {
         this.capture = capture;
     }
+
+    @Required
+	public void setImageDB(ImageDB imageDB) {
+		this.imageDB = imageDB;
+	}
 
 }
