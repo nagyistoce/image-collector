@@ -70,7 +70,7 @@ public class Const {
     /**
      * Ngưỡng xác định kết xuất từ neural network là khuôn mặt
      */
-    public static final float NETWORK_FACE_VALIDATION_THRESHOLD = (float) 0.5;
+    public static final float NETWORK_FACE_VALIDATION_THRESHOLD = (float) 0.75;
     
     /**
      * Độ giãn giữa tọa độ thật với độ tọa đóng khung khuôn mặt
