@@ -95,16 +95,7 @@ public class ImageProcess {
 		int len = array.length;
 		float[] result = new float[len];
 		for (int i = 0; i < len; i ++) {
-			 if (array[i] == 127)
-             {
-                 result[i] = 0;
-             }
-			 else if (array[i] > 127) {
-				 result[i] = (array[i] - 127) / 127;
-			 }
-			 else {
-				 result[i] = (array[i] - 127) / 127;
-			 }
+			 result[i] = array[i] / 255;
 		}
 		result = addMask(result);
 		return result;
