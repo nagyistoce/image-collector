@@ -5,7 +5,7 @@
            http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
 
     <bean 
-    	id="imageStore" class="team.nm.nnet.app.imageCollector.basis.ImageStore">
+    	id="imageStore" class="team.nm.nnet.app.imageCollector.bo.ImageStore">
     	<property name="frameWidth" value="${store.image.frame.width}"/>
     	<property name="frameHeight" value="${store.image.frame.height}"/>
     </bean>    

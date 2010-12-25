@@ -20,12 +20,8 @@ import java.awt.image.BufferedImageOp;
 import java.awt.image.ColorModel;
 import java.awt.image.ConvolveOp;
 import java.awt.image.DataBuffer;
-import java.awt.image.FilteredImageSource;
-import java.awt.image.ImageFilter;
-import java.awt.image.ImageProducer;
 import java.awt.image.Kernel;
 import java.awt.image.PixelGrabber;
-import java.awt.image.Raster;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -40,7 +36,6 @@ import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;
-import javax.swing.GrayFilter;
 import javax.swing.ImageIcon;
 
 public class ImageUtils {
@@ -291,49 +286,7 @@ public class ImageUtils {
 		}
 		return image;
 	}
-	
-	public static BufferedImage toYCbCr(BufferedImage bufferedImage) {
-        int width = bufferedImage.getWidth(null);
-        int  height = bufferedImage.getHeight(null);
-        Raster raster = bufferedImage.getRaster();
-        float[] sample = new float[4];
-        BufferedImage yCbCrBufImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                sample = raster.getPixel(i, j, sample);
-//                int y  = (int)( 0.257   * sample[0] + 0.504   * sample[1] + 0.098   * sample[2] + 16);
-                int cb = (int)( 0.148   * sample[0] - 0.291   * sample[1] + 0.439   * sample[2] + 128);
-                int cr = (int)( 0.439   * sample[0] - 0.368   * sample[1] - 0.071   * sample[2] + 128);
-                boolean isCr = (140<cr) && (cr<165);
-                boolean isCb = (105<cb) && (cb<130);
-                if(isCr || isCb) {
-                    yCbCrBufImage.setRGB(i, j, 255);
-                } else {
-                    yCbCrBufImage.setRGB(i, j, 0);
-                }
-            }
-            System.out.println();
-        }
-        return yCbCrBufImage;
-    }
 
-	/**
-	 * Chuyen anh anh anh xam
-	 * @param bufferedImage Anh can chuyen 
-	 * @return Ket qua chuyen
-	 */
-	public static BufferedImage grayScale(BufferedImage bufferedImage) {
-		ImageFilter filter = new GrayFilter(true, 50);
-		ImageProducer producer = new FilteredImageSource(
-				bufferedImage.getSource(), filter);
-		Image image = Toolkit.getDefaultToolkit().createImage(producer);
-
-		BufferedImage grayScaleBuff = new BufferedImage(image.getWidth(null),
-				image.getHeight(null), BufferedImage.TYPE_BYTE_GRAY);
-		grayScaleBuff.createGraphics().drawImage(image, 0, 0, null);
-		return grayScaleBuff;
-	}
-	
 	/**
 	 * Chuyen image thanh array
 	 * @param bufferedImage Anh can chuyen thanh array
@@ -449,10 +402,5 @@ public class ImageUtils {
 		AffineTransform tat = new AffineTransform();
 		tat.translate(-xtrans, -ytrans);
 		return tat;
-	}
-	
-	public static void createRandowImage(int width, int height) {
-//		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-//		image.s
 	}
 }

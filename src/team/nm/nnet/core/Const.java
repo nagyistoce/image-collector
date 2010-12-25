@@ -6,6 +6,11 @@ package team.nm.nnet.core;
  *
  */
 public class Const {
+	/**
+	 * Đường dẫn đến thư mục chứa các resource
+	 */
+	public static final String RESOURCE_PATH = "/src/team/nm/nnet/app/imageCollector/resources/";
+	
     /**
      * Height of face image
      */
@@ -57,14 +62,25 @@ public class Const {
     public static final int MINIMUM_SKIN_PIXEL_THRESHOLD = 100;
     
     /**
+     * Khoảng giá trị của vùng được cho là khuôn mặt 
+     */
+    public static final int LOWER_STANDARD_DEVIATION = 30;
+    public static final int UPPER_STANDARD_DEVIATION = 100;
+    
+    /**
+     * Ngưỡng xác định kết xuất từ neural network là khuôn mặt
+     */
+    public static final float NETWORK_FACE_VALIDATION_THRESHOLD = (float) 0.5;
+    
+    /**
      * Độ giãn giữa tọa độ thật với độ tọa đóng khung khuôn mặt
      */
     public static final int SPAN_FACE_BOX = 5;
     
     /**
-     * Mang luu mash cua he thong
+     * Mang luu mask cua he thong
      */
-    public static final int[] MASH = {
+    public static final int[] MASK = {
     	1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,
     	1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,
     	1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,

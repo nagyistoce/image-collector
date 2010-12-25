@@ -1,3 +1,5 @@
+package team.nm.nnet.app.imageCollector.bo;
+/*
 package team.nm.nnet.app.imageCollector.basis;
 
 import java.awt.Image;
@@ -153,3 +155,4 @@ public class FaceDetector extends Thread {
         pnlFaces.updateUI();
     }
 }
+*/

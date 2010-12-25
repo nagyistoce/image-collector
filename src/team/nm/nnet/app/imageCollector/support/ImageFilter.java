@@ -1,4 +1,4 @@
-package team.nm.nnet.app.imageCollector.utils;
+package team.nm.nnet.app.imageCollector.support;
 
 import java.io.File;
 

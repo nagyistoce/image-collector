@@ -21,7 +21,7 @@ import javax.swing.JPanel;
 import net.sf.fmj.ejmf.toolkit.install.PackageUtility;
 import net.sf.fmj.ui.application.ContainerPlayer;
 import net.sf.fmj.utility.PlugInUtility;
-import team.nm.nnet.app.imageCollector.utils.ImageFilter;
+import team.nm.nnet.app.imageCollector.support.ImageFilter;
 import team.nm.nnet.util.ImageUtils;
 
 import com.lti.civil.CaptureException;

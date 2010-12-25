@@ -117,7 +117,7 @@ public class ImageProcess {
 	 */
 	private static float[] addMask(float[] array) {
 		int len = array.length;
-		int[] mask = Const.MASH;
+		int[] mask = Const.MASK;
 		for (int i = 0; i < len; i ++) {
 			if (mask[i] == 1) {
 				array[i] = - 1;

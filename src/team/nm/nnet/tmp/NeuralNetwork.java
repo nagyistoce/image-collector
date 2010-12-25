@@ -331,16 +331,14 @@ public class NeuralNetwork implements Runnable{
      * Return true: face
      * Return false: none face
      */
-    public boolean gfncGetWinner(BufferedImage image) {
+    public float gfncGetWinner(BufferedImage image) {
     	image = ImageProcess.resize(image, FACE_WIDTH, FACE_HEIGHT);
     	float[] input = ImageProcess.imageToArray(image);
     	pintCurInput = ImageProcess.adaptArray(input);
     	psubCalOutput();
-    	System.out.println(pflOutputNode[CintNuberOflayers - 1][0] + "," + pflOutputNode[CintNuberOflayers - 1][1]);
-    	if(pflOutputNode[CintNuberOflayers - 1][0] > 0.75) {
-    		return true;
-    	}
-    	return false;
+//    	System.out.println(pflOutputNode[CintNuberOflayers - 1][0] + "," + pflOutputNode[CintNuberOflayers - 1][1]);
+
+    	return pflOutputNode[CintNuberOflayers - 1][0];
     }
 
     @Override

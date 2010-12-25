@@ -1,16 +1,40 @@
 package team.nm.nnet.app.imageCollector.utils;
 
 import java.awt.Color;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
+import java.awt.image.FilteredImageSource;
+import java.awt.image.ImageFilter;
+import java.awt.image.ImageProducer;
 import java.awt.image.Raster;
+
+import javax.swing.GrayFilter;
 
 import sole.hawking.image.filter.DilateFilter;
 import sole.hawking.image.filter.ErodeFilter;
 import sole.hawking.image.filter.MedianFilter;
 import team.nm.nnet.util.Matrix;
 
-public class ColorDetection {
+public class ColorSpace {
 
+	/**
+	 * Chuyen anh anh anh xam
+	 * @param bufferedImage Anh can chuyen 
+	 * @return Ket qua chuyen
+	 */
+	public static BufferedImage toGrayScale(BufferedImage bufferedImage) {
+		ImageFilter filter = new GrayFilter(true, 50);
+		ImageProducer producer = new FilteredImageSource(
+				bufferedImage.getSource(), filter);
+		Image image = Toolkit.getDefaultToolkit().createImage(producer);
+
+		BufferedImage grayScaleBuff = new BufferedImage(image.getWidth(null),
+				image.getHeight(null), BufferedImage.TYPE_BYTE_GRAY);
+		grayScaleBuff.createGraphics().drawImage(image, 0, 0, null);
+		return grayScaleBuff;
+	}
+	
 	public static BufferedImage toYCbCr(BufferedImage bufferedImage) {
         int width = bufferedImage.getWidth(null);
         int  height = bufferedImage.getHeight(null);
@@ -38,9 +62,9 @@ public class ColorDetection {
         ErodeFilter erodeFilter = new ErodeFilter();
         erodeFilter.setThreshold(9);
         yCbCrBufImage = erodeFilter.filter(yCbCrBufImage, null);
-        DilateFilter dilateFilter = new DilateFilter();
-		dilateFilter.setThreshold(10);
-		yCbCrBufImage = dilateFilter.filter(yCbCrBufImage, null);
+//        DilateFilter dilateFilter = new DilateFilter();
+//		dilateFilter.setThreshold(10);
+//		yCbCrBufImage = dilateFilter.filter(yCbCrBufImage, null);
         return yCbCrBufImage;
     }
 	
@@ -135,6 +159,14 @@ public class ColorDetection {
         	}
         }
         
+        MedianFilter medianFilter = new MedianFilter();
+        normalRGBBuf = medianFilter.filter(normalRGBBuf, null);
+        ErodeFilter erodeFilter = new ErodeFilter();
+        erodeFilter.setThreshold(9);
+        normalRGBBuf = erodeFilter.filter(normalRGBBuf, null);
+        DilateFilter dilateFilter = new DilateFilter();
+		dilateFilter.setThreshold(10);
+		normalRGBBuf = dilateFilter.filter(normalRGBBuf, null);
         return normalRGBBuf;
 	}
 }

@@ -1,10 +1,16 @@
 package team.nm.nnet.app.imageCollector.om;
 
+import java.awt.Color;
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.List;
+
 public class ColorSegment {
 
 	private int id;
 	private int left, right;
 	private int top, bottom;
+	private List<Pixel> pixels;
 
 	public ColorSegment() {
 		id = -1;
@@ -12,6 +18,43 @@ public class ColorSegment {
 		right = -1;
 		bottom = Integer.MAX_VALUE;
 		top = -1;
+		pixels = new ArrayList<Pixel>();
+	}
+	
+	public boolean isValid() {
+		return (left != Integer.MAX_VALUE) && (right != -1) && (bottom != Integer.MAX_VALUE) && (top != -1);
+	}
+	
+	public void addPixel(Pixel pixel) {
+		pixels.add(pixel);
+	}
+	
+	public double getStandardDev(BufferedImage bufferedImage) {
+		double standardDeviation = 0;
+		if(pixels.size() < 2) {
+			return standardDeviation;
+		}
+		
+		Color pColor;
+		// Tính giá trị trung bình
+        double mean = 0;
+        for(Pixel p : pixels) {
+        	pColor = new Color(bufferedImage.getRGB(p.getX(), p.getY()));
+        	int rgb = (pColor.getRed() + pColor.getGreen() + pColor.getBlue());
+        	mean += rgb;
+        }
+        mean /= pixels.size();
+        
+        // Tính độ lệch tiêu chuẩn
+        for(Pixel p : pixels) {
+        	pColor = new Color(bufferedImage.getRGB(p.getX(), p.getY()));
+        	int rgb = (pColor.getRed() + pColor.getGreen() + pColor.getBlue());
+        	standardDeviation += Math.pow(rgb - mean, 2);
+        }
+
+        standardDeviation = Math.sqrt(standardDeviation / (pixels.size() - 1));
+		
+		return standardDeviation;
 	}
 
 	public int getWidth() {
@@ -20,10 +63,6 @@ public class ColorSegment {
 
 	public int getHeight() {
 		return top - bottom;
-	}
-
-	public boolean isValid() {
-		return (left != Integer.MAX_VALUE) && (right != -1) && (bottom != Integer.MAX_VALUE) && (top != -1);
 	}
 
 	public int getId() {
@@ -64,5 +103,13 @@ public class ColorSegment {
 
 	public void setBottom(int bottom) {
 		this.bottom = bottom;
+	}
+
+	public List<Pixel> getPixels() {
+		return pixels;
+	}
+
+	public void setPixels(List<Pixel> pixels) {
+		this.pixels = pixels;
 	}
 }

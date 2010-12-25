@@ -12,7 +12,7 @@ public class Starter {
 		app.start();
 		
 		MainFrame frmMain = (MainFrame) app.getBean("mainFrame");
-		frmMain.setSize(950, 700);
+		frmMain.setSize(1050, 650);
 		frmMain.setVisible(true);
 		
 		System.out.println("//////////  Image Collector Application Started ///////////");

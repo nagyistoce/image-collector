@@ -1,4 +1,4 @@
-package team.nm.nnet.app.imageCollector.basis;
+package team.nm.nnet.app.imageCollector.bo;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
