@@ -39,15 +39,13 @@ public class SegmentFaceDetector extends Thread {
         // Mark this thread is running
         state = true;
         lblProcess.setIcon(new ImageIcon(Const.CURRENT_DIRECTORY + Const.RESOURCE_PATH + "waiting.gif"));
-        System.out.println("Face Detection Thread running...");
         
         findCandidates(bufferedImage);
         
         // Finish detecting
-        lblProcess.setIcon(new ImageIcon(Const.CURRENT_DIRECTORY + Const.RESOURCE_PATH + "check.gif"));
+        lblProcess.setIcon(new ImageIcon(Const.CURRENT_DIRECTORY + Const.RESOURCE_PATH + "check.png"));
         state = false;
         System.gc();
-        System.out.println("Face Detection Thread finished!");
     }
     
     public boolean isDetecting() {
@@ -56,7 +54,6 @@ public class SegmentFaceDetector extends Thread {
 
     public void requestStop() {
         state = false;
-        System.out.println("----Thread stopped");
     }
 
     public boolean isCandidate(ColorSegment colorSegment) {
@@ -115,16 +112,16 @@ public class SegmentFaceDetector extends Thread {
     	
     	float max = 0;
     	BufferedImage candidate = null;
-    	float[] scales = {1, 2/3, 1/2, 1/4};
-    	for(float scale : scales){
+    	double[] scales = {1, 0.6, 0.5, 0.25};
+    	for(double scale : scales){
     		int w = (int) (width * scale), h = (int) (height * scale);
-    		for(int i = 0; i <= width - w; i += Const.JUMP_LENGHT) {
-    			for(int j = 0; j <= height - h; j += Const.JUMP_LENGHT) {
+    		for(int i = 0, ww = width - w; i <= ww; i += Const.JUMP_LENGHT) {
+    			for(int j = 0, hh = height - h; j <= hh; j += Const.JUMP_LENGHT) {
     				BufferedImage subBuff = segmentBuff.getSubimage(i, j, w, h);
     				subBuff = ImageUtils.resize(subBuff, Const.FACE_WIDTH, Const.FACE_HEIGHT);
-    				FacePanel fp = new FacePanel(pnlFaces, ImageUtils.toImage(subBuff));
-	                fp.setFaceName((float)segment.getWidth() / segment.getHeight() + " : " + segment.getWidth() + " x " + segment.getHeight());
-	                addFaceCandidates(fp);
+//    				FacePanel fp = new FacePanel(pnlFaces, ImageUtils.toImage(subBuff));
+//	                fp.setFaceName((float)segment.getWidth() / segment.getHeight() + " : " + segment.getWidth() + " x " + segment.getHeight());
+//	                addFaceCandidates(fp);
     				float outVal = neuralNetwork.gfncGetWinner(subBuff);
     				if((outVal > Const.NETWORK_FACE_VALIDATION_THRESHOLD) && (outVal > max)) {
     					max = outVal;

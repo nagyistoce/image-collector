@@ -10,7 +10,6 @@ import java.io.File;
 import java.util.List;
 
 import javax.swing.ImageIcon;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -24,7 +23,6 @@ import org.springframework.beans.factory.annotation.Required;
 import team.nm.nnet.app.imageCollector.bo.ImageDB;
 import team.nm.nnet.app.imageCollector.bo.SegmentFaceDetector;
 import team.nm.nnet.app.imageCollector.support.ImageFilter;
-import team.nm.nnet.app.imageCollector.support.ImagePreviewPanel;
 import team.nm.nnet.app.imageCollector.support.NMFileFilter;
 import team.nm.nnet.app.imageCollector.utils.Chooser;
 import team.nm.nnet.app.imageCollector.utils.ColorSpace;
@@ -362,6 +360,19 @@ public class MainFrame extends JFrame {
         jMenu1.add(smnOpen_Image);
 
         jMenu3.setText("Cơ Sở Dữ Liệu Ảnh");
+        jMenu3.addMenuListener(new javax.swing.event.MenuListener() {
+            public void menuCanceled(javax.swing.event.MenuEvent evt) {
+            }
+            public void menuDeselected(javax.swing.event.MenuEvent evt) {
+            }
+            public void menuSelected(javax.swing.event.MenuEvent evt) {
+            	boolean isOn = imageDB.getFiles().size() > 0;
+            	smnDB_Show.setEnabled(isOn);
+            	smnDB_Clear.setEnabled(isOn);
+            	smnDB_Add.setEnabled(isOn);
+            	smnDB_Save.setEnabled(isOn);
+            }
+        });
         
         smnDB_New.setText("Tạo mới");
         smnDB_New.addActionListener(new java.awt.event.ActionListener() {
@@ -369,7 +380,7 @@ public class MainFrame extends JFrame {
                 List<File> files = Chooser.getMultiFiles("Tạo mới CSDL ảnh", new ImageFilter());
                 if(CollectionUtils.isNotEmpty(files)) {
                 	imageDB.setFiles(files);
-                	JOptionPane.showMessageDialog(null, "CSDL ảnh đã được tạo!", "Succeed", JOptionPane.INFORMATION_MESSAGE);
+                	JOptionPane.showMessageDialog(null, files.size() + " ảnh đã được nạp vào CSDL!", "Succeed", JOptionPane.INFORMATION_MESSAGE);
                 }
             }
         });
@@ -392,19 +403,17 @@ public class MainFrame extends JFrame {
         jMenu3.add(new JSeparator());
         
         smnDB_Show.setText("Xem");
+        smnDB_Show.setEnabled(false);
         smnDB_Show.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	if(imageDB.getFiles().size() > 0) {
-            		new DBViewer(imageDB).setVisible(true);
-            	} else {
-            		JOptionPane.showMessageDialog(null, "Chưa có ảnh nào trong CSDL!", "Empty!", JOptionPane.ERROR_MESSAGE);
-            	}
+            	new DBViewer(imageDB).setVisible(true);
             }
         });
         jMenu3.add(smnDB_Show);
         jMenu3.add(new JSeparator());
         
         smnDB_Clear.setText("Xóa");
+        smnDB_Clear.setEnabled(false);
         smnDB_Clear.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
             	int confirm = JOptionPane.showConfirmDialog(null, "Bạn có chắc muốn xóa CSDL ảnh không!", "Clear image DB?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
@@ -416,6 +425,7 @@ public class MainFrame extends JFrame {
         jMenu3.add(smnDB_Clear);
         
         smnDB_Add.setText("Thêm");
+        smnDB_Add.setEnabled(false);
         smnDB_Add.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
             	List<File> files = Chooser.getMultiFiles("Thêm ảnh vào CSDL", new ImageFilter());
@@ -428,6 +438,7 @@ public class MainFrame extends JFrame {
         jMenu3.add(smnDB_Add);
         
         smnDB_Save.setText("Lưu lại");
+        smnDB_Save.setEnabled(false);
         smnDB_Save.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 File file = Chooser.save("Lưu CSDL ảnh", new NMFileFilter());
@@ -513,6 +524,7 @@ public class MainFrame extends JFrame {
 		BufferedImage y2CBuff = ColorSpace.toYCbCr(bufferedImage);
 		
     	JFrame frm = new JFrame("Binary Image");
+    	frm.setIconImage(new ImageIcon(Const.CURRENT_DIRECTORY + Const.RESOURCE_PATH + "icon.png").getImage());
 		JLabel lbl = new JLabel(new ImageIcon(ImageUtils.toImage(y2CBuff)));
 		frm.add(lbl);
 		frm.setSize(y2CBuff.getWidth(null), y2CBuff.getHeight(null));

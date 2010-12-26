@@ -9,7 +9,7 @@ public class AboutUs extends javax.swing.JFrame {
 	private static final long serialVersionUID = 6546434093998651359L;
 	
 	private static final String message = "<html><div style=\"font-family:Arial;font-size:12px;\"><p align=center style=\"text-align:center;line-height:normal\">Ứng dụng là phần hiện thực từ đề tài tốt nghiệp \"<b><span style=\"color:red\">Dò tìm và nhận dạng khuôn mặt</span></b>\" của <span style=\"color:#E36C0A\">nhóm NM</span>,<br/> được thực hiện từ 10/2010 đến 1/2011 với sự tham gia của các cá nhân sau:</p><br/>" +
-			"<table border=1 cellspacing=0 cellpadding=0 style=\"border-collapse:collapse;border:none\">" +
+			"<table align=center border=1 cellspacing=0 cellpadding=0 style=\"border-collapse:collapse;border:none\">" +
 			"<tr><td width=638 colspan=2 valign=top style=\"border:solid #4BACC6 1px;background:#4BACC6;\"><p align=center style=\"text-align:center;line-height:normal\"><b><span style=\"color:white\">Giáo viên hướng dẫn</span></b></p></td></tr>" +
 			"<tr><td width=638 colspan=2 valign=top style=\"border:solid #4BACC6 1px;\">" +
 			"<p align=center style=\"text-align:center;line-height:normal\"><b>CN. Mai Ngọc Thu</b></p>" +
