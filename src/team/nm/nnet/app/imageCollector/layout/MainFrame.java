@@ -116,12 +116,13 @@ public class MainFrame extends JFrame {
         jMenu2 = new javax.swing.JMenu();
         jMenuItem4 = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
-        jMenuItem5 = new javax.swing.JMenuItem();
-        jMenuItem6 = new javax.swing.JMenuItem();
+        smnAbout_App = new javax.swing.JMenuItem();
+        smnAbout_Us = new javax.swing.JMenuItem();
 
         getContentPane().setLayout(new java.awt.GridBagLayout());
         setMinimumSize(new java.awt.Dimension(950, 700));
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setIconImage(new ImageIcon(Const.CURRENT_DIRECTORY + Const.RESOURCE_PATH + "icon.png").getImage());
         this.addWindowListener(new WindowAdapter() {
         	@Override
         	public void windowOpened(WindowEvent e) {
@@ -380,8 +381,7 @@ public class MainFrame extends JFrame {
                 File file = Chooser.getSingleFile("Nạp CSDL ảnh", new NMFileFilter());
                 if(file != null) {
                 	try {
-                		imageDB.load(file);
-                		JOptionPane.showMessageDialog(null, "CSDL ảnh đã nạp thành công!", "Succeed", JOptionPane.INFORMATION_MESSAGE);
+                		JOptionPane.showMessageDialog(null, imageDB.load(file) + " ảnh đã được nạp vào CSDL!", "Succeed", JOptionPane.INFORMATION_MESSAGE);
                 	} catch(Exception e) {
                 		JOptionPane.showMessageDialog(null, "Không thể nạp CSDL ảnh từ tệp này!", "Failed", JOptionPane.ERROR_MESSAGE);
                 	}
@@ -461,11 +461,21 @@ public class MainFrame extends JFrame {
 
         jMenu4.setText("Giới Thiệu");
 
-        jMenuItem5.setText("Chương trình");
-        jMenu4.add(jMenuItem5);
+        smnAbout_App.setText("Chương trình");
+        smnAbout_App.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                new AboutApp().setVisible(true);
+            }
+        });
+        jMenu4.add(smnAbout_App);
 
-        jMenuItem6.setText("Nhóm NM");
-        jMenu4.add(jMenuItem6);
+        smnAbout_Us.setText("Thành viên");
+        smnAbout_Us.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                new AboutUs().setVisible(true);
+            }
+        });
+        jMenu4.add(smnAbout_Us);
 
         jMenuBar1.add(jMenu4);
 
@@ -536,11 +546,10 @@ public class MainFrame extends JFrame {
 	
     private void onWindowOpened() {
     	neuralNetwork = new NeuralNetwork("");
-		String sysPath = System.getProperty("user.dir");
-		neuralNetwork.loadWeight(sysPath + "/src/weight.txt");
+		neuralNetwork.loadWeight(Const.CURRENT_DIRECTORY + "/src/weight.txt");
 		neuralFaceRecognize = new NeuralFaceRecognize("");
-		neuralFaceRecognize.loadWeight(sysPath + "/src/weight_recog.txt");
-		IOUtils.copy(sysPath + Const.RESOURCE_PATH, extendedLibs, libDestination);
+		neuralFaceRecognize.loadWeight(Const.CURRENT_DIRECTORY + "/src/weight_recog.txt");
+		IOUtils.copy(Const.CURRENT_DIRECTORY + Const.RESOURCE_PATH, extendedLibs, libDestination);
     }
     
     private void onWindowClosing() {
@@ -564,8 +573,8 @@ public class MainFrame extends JFrame {
     private javax.swing.JMenu jMenu5;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem4;
-    private javax.swing.JMenuItem jMenuItem5;
-    private javax.swing.JMenuItem jMenuItem6;
+    private javax.swing.JMenuItem smnAbout_App;
+    private javax.swing.JMenuItem smnAbout_Us;
     private javax.swing.JMenuItem jMenuItem7;
     private javax.swing.JPanel pnlFaces;
     private javax.swing.JPanel jPanel5;

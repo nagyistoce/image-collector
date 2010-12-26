@@ -4,10 +4,12 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 
 import javax.swing.DefaultListModel;
+import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
 import javax.swing.ListSelectionModel;
 
 import team.nm.nnet.app.imageCollector.bo.ImageDB;
+import team.nm.nnet.core.Const;
 import team.nm.nnet.util.ImageUtils;
 
 public class DBViewer extends javax.swing.JFrame {
@@ -40,6 +42,7 @@ public class DBViewer extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Ảnh trong CSDL");
+        setIconImage(new ImageIcon(Const.CURRENT_DIRECTORY + Const.RESOURCE_PATH + "icon.png").getImage());
         setMinimumSize(new java.awt.Dimension(850, 705));
         getContentPane().setLayout(new java.awt.GridBagLayout());
 
@@ -154,9 +157,14 @@ public class DBViewer extends javax.swing.JFrame {
         int index = lstFiles.getSelectedIndex();
         if(index != -1) {
         	imageDB.getFiles().remove(index);
-        	listModel.removeElementAt(index);
+        	try {
+        		listModel.remove(index);
+        	} catch(Exception e) {
+        		e.printStackTrace();
+        	}
         	
         	lstFiles.setModel(listModel);
+        	lstFiles.updateUI();
         	lstFiles.setSelectedIndex(0);
         	lstFiles.ensureIndexIsVisible(0);
         }

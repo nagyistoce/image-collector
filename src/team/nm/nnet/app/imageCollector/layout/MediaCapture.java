@@ -166,7 +166,7 @@ public class MediaCapture extends Panel implements ActionListener {
 			com.lti.civil.CaptureDeviceInfo civilInfo = (com.lti.civil.CaptureDeviceInfo) list.get(i);
 			
 			{
-				if(civilInfo.getDescription().compareToIgnoreCase("Video WebCam") == 0) {
+				if(civilInfo.getDeviceID().startsWith("\\\\?\\usb#vid_064e")) {
 					try
 					{
 						containerPlayer = new ContainerPlayer(getVideoPanel());

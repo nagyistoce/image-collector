@@ -5,7 +5,10 @@ import java.awt.event.ContainerListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+
+import team.nm.nnet.core.Const;
 
 public class Capture {
 
@@ -34,6 +37,7 @@ public class Capture {
 	        });
 	 
 	        frame.setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
+	        frame.setIconImage(new ImageIcon(Const.CURRENT_DIRECTORY + Const.RESOURCE_PATH + "icon.png").getImage());
 	        frame.add("Center", mediaCapture);
 	        //  Resize frame whenever new Component is added
 	        mediaCapture.getVideoPanel().addContainerListener(

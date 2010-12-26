@@ -17,7 +17,7 @@ public class ImageDB {
 	private static Log   log = LogFactory.getLog(ImageDB.class);
 	private List<File> files = new ArrayList<File>();
 
-	public void load(File file) throws Exception {
+	public int load(File file) throws Exception {
 		FileReader fr = new FileReader(file);
 		BufferedReader br = new BufferedReader(fr);
 		String path;
@@ -34,6 +34,7 @@ public class ImageDB {
 			if (fr != null) fr.close();
 			if (br != null) br.close();
 		}
+		return files.size();
 	}
 	
 	public void clear() {

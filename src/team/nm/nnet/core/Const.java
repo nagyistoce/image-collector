@@ -7,6 +7,11 @@ package team.nm.nnet.core;
  */
 public class Const {
 	/**
+	 * Thư mục hiện hành
+	 */
+	public static final String CURRENT_DIRECTORY = System.getProperty("user.dir");
+	
+	/**
 	 * Đường dẫn đến thư mục chứa các resource
 	 */
 	public static final String RESOURCE_PATH = "/src/team/nm/nnet/app/imageCollector/resources/";

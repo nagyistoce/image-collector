@@ -36,16 +36,15 @@ public class SegmentFaceDetector extends Thread {
             return;
         }
 
-        String sysPath = System.getProperty("user.dir");
         // Mark this thread is running
         state = true;
-        lblProcess.setIcon(new ImageIcon(sysPath + Const.RESOURCE_PATH + "waiting.gif"));
+        lblProcess.setIcon(new ImageIcon(Const.CURRENT_DIRECTORY + Const.RESOURCE_PATH + "waiting.gif"));
         System.out.println("Face Detection Thread running...");
         
         findCandidates(bufferedImage);
         
         // Finish detecting
-        lblProcess.setIcon(new ImageIcon(sysPath + Const.RESOURCE_PATH + "check.gif"));
+        lblProcess.setIcon(new ImageIcon(Const.CURRENT_DIRECTORY + Const.RESOURCE_PATH + "check.gif"));
         state = false;
         System.gc();
         System.out.println("Face Detection Thread finished!");
@@ -116,12 +115,16 @@ public class SegmentFaceDetector extends Thread {
     	
     	float max = 0;
     	BufferedImage candidate = null;
-    	
-    	for(int w = width, h = height, s = 0; s < 3; s++, w /= 2, h /= 2){
+    	float[] scales = {1, 2/3, 1/2, 1/4};
+    	for(float scale : scales){
+    		int w = (int) (width * scale), h = (int) (height * scale);
     		for(int i = 0; i <= width - w; i += Const.JUMP_LENGHT) {
     			for(int j = 0; j <= height - h; j += Const.JUMP_LENGHT) {
     				BufferedImage subBuff = segmentBuff.getSubimage(i, j, w, h);
     				subBuff = ImageUtils.resize(subBuff, Const.FACE_WIDTH, Const.FACE_HEIGHT);
+    				FacePanel fp = new FacePanel(pnlFaces, ImageUtils.toImage(subBuff));
+	                fp.setFaceName((float)segment.getWidth() / segment.getHeight() + " : " + segment.getWidth() + " x " + segment.getHeight());
+	                addFaceCandidates(fp);
     				float outVal = neuralNetwork.gfncGetWinner(subBuff);
     				if((outVal > Const.NETWORK_FACE_VALIDATION_THRESHOLD) && (outVal > max)) {
     					max = outVal;
@@ -130,7 +133,6 @@ public class SegmentFaceDetector extends Thread {
     			}
     		}
     	}
-    	System.out.println(max);
     	return candidate;
     }
     
