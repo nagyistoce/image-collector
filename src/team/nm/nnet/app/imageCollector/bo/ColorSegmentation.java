@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+import sole.hawking.image.filter.EdgeFilter;
 import team.nm.nnet.app.imageCollector.om.ColorSegment;
 import team.nm.nnet.app.imageCollector.om.Pixel;
 import team.nm.nnet.app.imageCollector.utils.ColorSpace;
@@ -27,6 +28,7 @@ public class ColorSegmentation {
     private final int STACK_PIXEL = -1;
     
     private final int WHITE_COLOR = 0xffffffff;
+    private final int SLOPE_HEIGHT = 5;
     
     public ColorSegmentation() {
         noSegments = 0;
@@ -57,6 +59,7 @@ public class ColorSegmentation {
                     coseg.setStartPoint(new Pixel(x, y));
                     flood(x, y, coseg);
                     if(coseg.isValid()) {
+                    	coseg.setBrokenPoints(getBrokenPoints(coseg));
                     	segments.add(coseg);
                     }
                 }
@@ -139,6 +142,91 @@ public class ColorSegmentation {
 			pushStack(stack, xx, yy - 1);
 			pushStack(stack, xx, yy + 1);
     	}
+    }
+    
+    protected List<Pixel> getBrokenPoints(ColorSegment segment) {
+    	BufferedImage boundary = bufImage.getSubimage(segment.getLeft(), segment.getBottom(), segment.getWidth(), segment.getHeight());
+        EdgeFilter edgeFilter = new EdgeFilter();
+        boundary = edgeFilter.filter(boundary, null);
+        
+    	List<Pixel> brokenPoints = new ArrayList<Pixel>();
+    	int width = segment.getWidth();
+        int height = segment.getHeight();
+        int yStone = segment.getStartPoint().getY();
+        
+    	int bottom_span = 10;
+    	int left_span = width / 6;
+    	int brush_span = 2;
+    	
+    	for(int y = left_span; y < height; y++) {
+    		for(int x = bottom_span; x < width; x++) {
+    			if(boundary.getRGB(x, y) == WHITE_COLOR) {
+    				Pixel cutPoint = null;
+    				int neighbour = 0;
+    				if((x - brush_span >= 0) && (y - brush_span >= 0) && (y + brush_span) < height) {
+    					// Check whether this point is on left side of the start point or on right side.
+    					if(y >= yStone) {
+    						if(boundary.getRGB(x, y - brush_span) == WHITE_COLOR) {
+    							neighbour++;
+    						}
+    					} else {
+    						if(boundary.getRGB(x, y + brush_span) == WHITE_COLOR) {
+    							neighbour++;
+    						}
+    					}
+    					if(boundary.getRGB(x - brush_span, y - brush_span) == WHITE_COLOR) {
+    						neighbour++;
+    						cutPoint = new Pixel(x-brush_span, y-brush_span);
+    					}
+    					if(boundary.getRGB(x - brush_span, y) == WHITE_COLOR) {
+    						neighbour++;
+    						cutPoint = new Pixel(x-brush_span, y);
+    					}
+    					if(boundary.getRGB(x - brush_span, y + brush_span) == WHITE_COLOR) {
+    						neighbour++;
+    						cutPoint = new Pixel(x-brush_span, y+brush_span);
+    					}
+    					if((neighbour == 2) && (boundary.getRGB(x - brush_span, y - brush_span) == 0)) {
+    						if(isSlope(boundary, cutPoint, width, SLOPE_HEIGHT)) {
+    							brokenPoints.add(cutPoint);
+    							// Keep away from this intersection point.
+    							y += SLOPE_HEIGHT;
+    						}
+    					}
+    				}
+    			}
+    		}
+    	}
+    	return brokenPoints;
+    }
+    
+    protected boolean isSlope(BufferedImage boundary, Pixel startPoint, int height, int step) {
+    	int count = 0;
+    	int x = startPoint.getX();
+    	int y = startPoint.getY();
+    	do {
+    		if((x - 1 < 0) || (y - 1 < 0) || (y + 1 >= height)) {
+    			return false;
+    		}
+    		
+    		if(boundary.getRGB(x - 1, y - 1) == WHITE_COLOR) {
+    			count++;
+				x = x - 1;
+				y = y - 1;
+			}
+    		else if(boundary.getRGB(x - 1, y) == WHITE_COLOR) {
+				count++;
+				x = x - 1;
+			}
+    		else if(boundary.getRGB(x - 1, y + 1) == WHITE_COLOR) {
+				count++;
+				x = x - 1;
+				y = y + 1;
+			} else {
+				return false;
+			}
+    	}while(count < step);
+    	return true;
     }
     
     private void pushStack(Stack<Pixel> stack, int x, int y) {

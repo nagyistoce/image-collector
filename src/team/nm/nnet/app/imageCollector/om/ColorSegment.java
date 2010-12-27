@@ -11,6 +11,7 @@ public class ColorSegment {
 	private int left, right;
 	private int top, bottom;
 	private List<Pixel> pixels;
+	private List<Pixel> brokenPoints;
 	private Pixel startPoint;
 
 	public ColorSegment() {
@@ -20,6 +21,13 @@ public class ColorSegment {
 		bottom = Integer.MAX_VALUE;
 		top = -1;
 		pixels = new ArrayList<Pixel>();
+	}
+	
+	public ColorSegment(int left, int top, int right, int bottom) {
+		this.left = left;
+		this.top = top;
+		this.right = right;
+		this.bottom = bottom;
 	}
 	
 	public boolean isValid() {
@@ -121,4 +129,12 @@ public class ColorSegment {
     public void setStartPoint(Pixel startPoint) {
         this.startPoint = startPoint;
     }
+
+	public List<Pixel> getBrokenPoints() {
+		return brokenPoints;
+	}
+
+	public void setBrokenPoints(List<Pixel> brokenPoints) {
+		this.brokenPoints = brokenPoints;
+	}
 }

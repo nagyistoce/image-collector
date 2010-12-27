@@ -3,12 +3,18 @@ package team.nm.nnet.app.imageCollector.layout;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
+import org.springframework.beans.factory.annotation.Required;
 
 import team.nm.nnet.core.Const;
 
 public class FlashScreen extends javax.swing.JFrame {
 	private static final long serialVersionUID = 4016063097351651030L;
 
+	private MainFrame mainFrame;
+	
 	public FlashScreen() {
         setUndecorated(true);
         initComponents();
@@ -29,6 +35,19 @@ public class FlashScreen extends javax.swing.JFrame {
         lblFlashScreen = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        this.addWindowListener(new WindowAdapter() {
+        	@Override
+        	public void windowOpened(WindowEvent e) {
+        		super.windowOpened(e);
+        	}
+        	
+        	@Override
+        	public void windowClosed(WindowEvent e) {
+        		super.windowClosing(e);
+        		mainFrame.setSize(1050, 650);
+        		mainFrame.setVisible(true);
+        	}
+		});
 
         lblFlashScreen.setIcon(new javax.swing.ImageIcon(Const.CURRENT_DIRECTORY + Const.RESOURCE_PATH + "NM.gif")); // NOI18N
         lblFlashScreen.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -60,5 +79,10 @@ public class FlashScreen extends javax.swing.JFrame {
     // Variables declaration - do not modify
     private javax.swing.JLabel lblFlashScreen;
     // End of variables declaration
+
+    @Required
+	public void setMainFrame(MainFrame mainFrame) {
+		this.mainFrame = mainFrame;
+	}
 
 }

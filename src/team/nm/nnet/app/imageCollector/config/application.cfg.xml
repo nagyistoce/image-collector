@@ -23,5 +23,9 @@
     	<property name="imageDB" ref="imageDB"/>
     	<property name="capture" ref="capture"/>
     </bean>
+    <bean 
+        id="flashScreen" class="team.nm.nnet.app.imageCollector.layout.FlashScreen">
+        <property name="mainFrame" ref="mainFrame"/>
+    </bean>
     
 </beans>

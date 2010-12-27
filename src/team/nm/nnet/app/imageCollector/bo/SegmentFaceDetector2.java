@@ -88,23 +88,30 @@ public class SegmentFaceDetector2 extends Thread {
             }
             if (isCandidate(segment)) {
                 try{
-                BufferedImage subBuff = extractSingleFace(segment);
-//              BufferedImage subBuff = bufferedImage.getSubimage(segment.getLeft(), segment.getBottom(), segment.getWidth(), segment.getHeight());
-                if(subBuff != null) {
-//                  subBuff = ImageUtils.resize(subBuff, Const.FACE_WIDTH, Const.FACE_HEIGHT);
-//                  if(neuralNetwork.gfncGetWinner(subBuff) > Const.NETWORK_FACE_VALIDATION_THRESHOLD) {
-    //                  int x = ((segment.getLeft() - Const.SPAN_FACE_BOX) <= 0) ? segment.getLeft() - Const.SPAN_FACE_BOX : segment.getLeft(); 
-    //                  int y = ((segment.getBottom() - Const.SPAN_FACE_BOX) <= 0) ? segment.getBottom() - Const.SPAN_FACE_BOX : segment.getBottom(); 
-    //                  int w = ((segment.getWidth() + Const.SPAN_FACE_BOX) <= bufferedImage.getWidth()) ? segment.getWidth() + Const.SPAN_FACE_BOX : segment.getWidth(); 
-    //                  int h = ((segment.getHeight() + Const.SPAN_FACE_BOX) <= bufferedImage.getHeight()) ? segment.getHeight() + Const.SPAN_FACE_BOX : segment.getHeight(); 
-    //                  
-    //                  subBuff = bufferedImage.getSubimage(x, y, w, h);
-    //                    subBuff = ImageUtils.resize(subBuff, Const.FACE_WIDTH, Const.FACE_HEIGHT);
-                        FacePanel fp = new FacePanel(pnlFaces, ImageUtils.toImage(subBuff));
-                        fp.setFaceName((float)segment.getWidth() / segment.getHeight() + " : " + segment.getWidth() + " x " + segment.getHeight());
-                        addFaceCandidates(fp);
-//                  }
-                }
+                	List<ColorSegment> subSegments = separateRegions(segment);
+                	if(subSegments == null) {
+                		subSegments = new ArrayList<ColorSegment>();
+                		subSegments.add(segment);
+                	}
+                	for(ColorSegment subSegment : subSegments) {
+//		                BufferedImage subBuff = extractSingleFace(subSegment);
+                		BufferedImage subBuff = bufferedImage.getSubimage(subSegment.getLeft(), subSegment.getBottom(), subSegment.getWidth(), subSegment.getHeight());
+		                if(subBuff != null) {
+		//                  subBuff = ImageUtils.resize(subBuff, Const.FACE_WIDTH, Const.FACE_HEIGHT);
+		//                  if(neuralNetwork.gfncGetWinner(subBuff) > Const.NETWORK_FACE_VALIDATION_THRESHOLD) {
+		    //                  int x = ((segment.getLeft() - Const.SPAN_FACE_BOX) <= 0) ? segment.getLeft() - Const.SPAN_FACE_BOX : segment.getLeft(); 
+		    //                  int y = ((segment.getBottom() - Const.SPAN_FACE_BOX) <= 0) ? segment.getBottom() - Const.SPAN_FACE_BOX : segment.getBottom(); 
+		    //                  int w = ((segment.getWidth() + Const.SPAN_FACE_BOX) <= bufferedImage.getWidth()) ? segment.getWidth() + Const.SPAN_FACE_BOX : segment.getWidth(); 
+		    //                  int h = ((segment.getHeight() + Const.SPAN_FACE_BOX) <= bufferedImage.getHeight()) ? segment.getHeight() + Const.SPAN_FACE_BOX : segment.getHeight(); 
+		    //                  
+		    //                  subBuff = bufferedImage.getSubimage(x, y, w, h);
+		    //                    subBuff = ImageUtils.resize(subBuff, Const.FACE_WIDTH, Const.FACE_HEIGHT);
+		                        FacePanel fp = new FacePanel(pnlFaces, ImageUtils.toImage(subBuff));
+		                        fp.setFaceName((float)segment.getWidth() / segment.getHeight() + " : " + segment.getWidth() + " x " + segment.getHeight());
+		                        addFaceCandidates(fp);
+		//                  }
+		                } 
+                	}
                 }catch(Exception e) {
                     System.out.println(String.format("l: %d, r: %d, b: %d, t:%d, w: %d, h: %d", segment.getLeft(), segment.getRight(), segment.getBottom(), segment.getTop(), segment.getWidth(), segment.getHeight()));
                 }
@@ -113,30 +120,20 @@ public class SegmentFaceDetector2 extends Thread {
     }
     
     protected List<ColorSegment> separateRegions(ColorSegment segment) {
-        List<ColorSegment> regions = new ArrayList<ColorSegment>();
-        BufferedImage boundary = ColorSpace.toYCbCr(bufferedImage);
-        EdgeFilter edgeFilter = new EdgeFilter();
-        boundary = edgeFilter.filter(boundary, null);
+    	List<Pixel> brokenPoints = segment.getBrokenPoints(); 
+        if((brokenPoints == null) || (brokenPoints.size() < 1)) {
+        	return null;
+        }
         
-        return regions;
-    }
-    
-    protected List<Pixel> detectBrokenPoints(BufferedImage boundary, ColorSegment segment) {
-        List<Pixel> pixels = new ArrayList<Pixel>();
-        
-        int startX = segment.getStartPoint().getX();
-        int startY = segment.getStartPoint().getY();
+    	List<ColorSegment> regions = new ArrayList<ColorSegment>();
+    	int top = segment.getTop();
+    	int bottom = segment.getBottom();
         int left = segment.getLeft();
-        int right = segment.getRight();
-        int bottom = segment.getBottom();
-        int top = segment.getTop();
-        
-        int x = startX, y = startY;
-        int uphill = 0;
-        
-        
-        
-        return pixels;
+        for(Pixel p : brokenPoints) {
+        	regions.add(new ColorSegment(left, top, p.getX(), bottom));
+        	left = p.getX();
+        }
+        return regions;
     }
     
     protected BufferedImage extractSingleFace(ColorSegment segment) {
