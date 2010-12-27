@@ -54,6 +54,7 @@ public class ColorSegmentation {
                 if ((marks[index] == UNVISITED_PIXEL) && (bufImage.getRGB(x, y) == WHITE_COLOR)) {
                     ColorSegment coseg = new ColorSegment();
                     coseg.setId(noSegments++);
+                    coseg.setStartPoint(new Pixel(x, y));
                     flood(x, y, coseg);
                     if(coseg.isValid()) {
                     	segments.add(coseg);

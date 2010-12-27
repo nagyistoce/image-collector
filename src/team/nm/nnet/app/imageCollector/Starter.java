@@ -19,7 +19,7 @@ public class Starter {
 		frmMain.setSize(1050, 650);
 		
 		final FlashScreen screen = new FlashScreen();
-        screen.setVisible(true);
+//        screen.setVisible(true);
 
         Timer timer = new Timer();
         timer.schedule(new TimerTask() {

@@ -11,6 +11,7 @@ public class ColorSegment {
 	private int left, right;
 	private int top, bottom;
 	private List<Pixel> pixels;
+	private Pixel startPoint;
 
 	public ColorSegment() {
 		id = -1;
@@ -112,4 +113,12 @@ public class ColorSegment {
 	public void setPixels(List<Pixel> pixels) {
 		this.pixels = pixels;
 	}
+
+    public Pixel getStartPoint() {
+        return startPoint;
+    }
+
+    public void setStartPoint(Pixel startPoint) {
+        this.startPoint = startPoint;
+    }
 }

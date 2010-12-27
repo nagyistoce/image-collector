@@ -7,7 +7,8 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import team.nm.nnet.app.imageCollector.basis.ImageStore;
+import team.nm.nnet.app.imageCollector.bo.ImageStore;
+import team.nm.nnet.app.imageCollector.utils.ColorSpace;
 import team.nm.nnet.util.ImageUtils;
 
 public class TestImgageStore extends TestBase {
@@ -34,7 +35,7 @@ public class TestImgageStore extends TestBase {
     	String filename = "ref/imageStore/faces/a.jpg";
         BufferedImage bufferedImage = ImageUtils.load(filename);        
         
-        show(ImageUtils.grayScale(bufferedImage));
+        show(ColorSpace.toGrayScale(bufferedImage));
         
         BufferedImage changedBuffer = ImageUtils.resize(bufferedImage, 300, 200);
         ImageUtils.drawImageToJpgByteStream(changedBuffer, new File(classPath + "/faces/a1.jpg"));

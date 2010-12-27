@@ -20,6 +20,7 @@ import javax.swing.UIManager;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Required;
 
+import sole.hawking.image.filter.EdgeFilter;
 import team.nm.nnet.app.imageCollector.bo.ImageDB;
 import team.nm.nnet.app.imageCollector.bo.SegmentFaceDetector;
 import team.nm.nnet.app.imageCollector.support.ImageFilter;
@@ -522,6 +523,8 @@ public class MainFrame extends JFrame {
     public void showBinaryImage() {
     	BufferedImage bufferedImage = ImageUtils.toBufferedImage(showingImage);
 		BufferedImage y2CBuff = ColorSpace.toYCbCr(bufferedImage);
+		EdgeFilter edgeFilter = new EdgeFilter();
+		y2CBuff = edgeFilter.filter(y2CBuff, null);
 		
     	JFrame frm = new JFrame("Binary Image");
     	frm.setIconImage(new ImageIcon(Const.CURRENT_DIRECTORY + Const.RESOURCE_PATH + "icon.png").getImage());
