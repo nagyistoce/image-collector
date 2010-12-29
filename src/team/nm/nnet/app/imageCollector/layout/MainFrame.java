@@ -22,7 +22,7 @@ import org.springframework.beans.factory.annotation.Required;
 
 import sole.hawking.image.filter.EdgeFilter;
 import team.nm.nnet.app.imageCollector.bo.ImageDB;
-import team.nm.nnet.app.imageCollector.bo.SegmentFaceDetector2;
+import team.nm.nnet.app.imageCollector.bo.SegmentFaceDetector;
 import team.nm.nnet.app.imageCollector.support.ImageFilter;
 import team.nm.nnet.app.imageCollector.support.NMFileFilter;
 import team.nm.nnet.app.imageCollector.utils.Chooser;
@@ -42,7 +42,7 @@ public class MainFrame extends JFrame {
     private NeuralNetwork neuralNetwork;
     private NeuralFaceRecognize neuralFaceRecognize;
     
-    private SegmentFaceDetector2 faceDetector = null;
+    private SegmentFaceDetector faceDetector = null;
     
     public MainFrame() {
         setTitle("Dò Tìm và Nhận Dạng Khuôn Mặt - NM Team");
@@ -522,6 +522,7 @@ public class MainFrame extends JFrame {
     
     public void showBinaryImage() {
     	BufferedImage bufferedImage = ImageUtils.toBufferedImage(showingImage);
+//		BufferedImage y2CBuff = bufferedImage;
 		BufferedImage y2CBuff = ColorSpace.toYCbCr(bufferedImage);
 		EdgeFilter edgeFilter = new EdgeFilter();
 		y2CBuff = edgeFilter.filter(y2CBuff, null);
@@ -552,7 +553,7 @@ public class MainFrame extends JFrame {
         pnlFaces.updateUI();
         System.gc();
         
-        faceDetector = new SegmentFaceDetector2(pnlFaces, lblProcess, showingImage, neuralNetwork);
+        faceDetector = new SegmentFaceDetector(pnlFaces, lblProcess, showingImage, neuralNetwork);
         faceDetector.start();
     }
 

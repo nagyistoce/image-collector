@@ -25,6 +25,8 @@ public class Const {
      * Width of face image
      */
     public static final int FACE_WIDTH = 20;
+    
+    public static final int WHITE_COLOR = 0xffffffff;
 
     /**
      * Number of hidden neural

@@ -1,6 +1,6 @@
 package team.nm.nnet.app.imageCollector.om;
 
-public class Pixel {
+public class Pixel implements Comparable<Pixel> {
 	int x, y;
 
 	public Pixel() {
@@ -28,4 +28,9 @@ public class Pixel {
 	public void setY(int y) {
 		this.y = y;
 	}
+
+    @Override
+    public int compareTo(Pixel o) {
+        return this.x - o.x;
+    }
 }
