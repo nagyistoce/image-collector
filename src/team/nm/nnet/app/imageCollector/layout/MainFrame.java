@@ -523,13 +523,19 @@ public class MainFrame extends JFrame {
     public void showBinaryImage() {
     	BufferedImage bufferedImage = ImageUtils.toBufferedImage(showingImage);
 //		BufferedImage y2CBuff = bufferedImage;
-		BufferedImage y2CBuff = ColorSpace.toYCbCr(bufferedImage);
-		EdgeFilter edgeFilter = new EdgeFilter();
-		y2CBuff = edgeFilter.filter(y2CBuff, null);
+		final BufferedImage y2CBuff = ColorSpace.toYCbCr(bufferedImage);
 		
     	JFrame frm = new JFrame("Binary Image");
     	frm.setIconImage(new ImageIcon(Const.CURRENT_DIRECTORY + Const.RESOURCE_PATH + "icon.png").getImage());
-		JLabel lbl = new JLabel(new ImageIcon(ImageUtils.toImage(y2CBuff)));
+		final JLabel lbl = new JLabel(new ImageIcon(ImageUtils.toImage(y2CBuff)));
+		lbl.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				if(e.getButton() == MouseEvent.BUTTON1) {
+					EdgeFilter edgeFilter = new EdgeFilter();
+					lbl.setIcon(new ImageIcon(ImageUtils.toImage(edgeFilter.filter(y2CBuff, null))));
+				}
+			}
+		});
 		frm.add(lbl);
 		frm.setSize(y2CBuff.getWidth(null), y2CBuff.getHeight(null));
 		frm.setVisible(true);
