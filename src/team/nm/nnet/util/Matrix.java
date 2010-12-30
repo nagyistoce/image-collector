@@ -2,63 +2,66 @@ package team.nm.nnet.util;
 
 public class Matrix<E> {
 
-	/**
-	 * Giá trị của ma trận
-	 */
-	private E[][] value;
-	
-	/**
-	 * Chiều rộng của matran
-	 */
-	private int width;
-	
-	/**
-	 * Chiều cao của matran
-	 */
-	private int height;
-	
-	/**
-	 * Phương thức khởi tạo cho matran
-	 * @param value Giá trị của ma tran
-	 * @param width Chiều rộng ma tran
-	 * @param height Chiều cao ma tran
-	 */
-	public Matrix(E[][] value, int width, int height) {
-		this.value = value;
-		this.width = width;
-		this.height = height;
-	}
+    /**
+     * Giá trị của ma trận
+     */
+    private E[][] values;
+    
+    /**
+     * Chiều rộng của matran
+     */
+    private int width;
+    
+    /**
+     * Chiều cao của matran
+     */
+    private int height;
+    
+    /**
+     * Phương thức khởi tạo cho matran
+     * @param value Giá trị của ma tran
+     * @param width Chiều rộng ma tran
+     * @param height Chiều cao ma tran
+     */
+    public Matrix(int width, int height, E[][] values) {
+        this.values = values;
+        this.width = width;
+        this.height = height;
+    }
 
-	public void setValue(E[][] value) {
-		this.value = value;
-	}
+    public void setValues(E[][] values) {
+        this.values = values;
+    }
 
-	public E[][] getValue() {
-		return value;
-	}
-	
-	public E getValue(int row, int col) {
-	    if((row > width) || (col > height)) {
-	        return null;
-	    }
-	    return value[row][col];
-	}
+    public E[][] getValues() {
+        return values;
+    }
+    
+    public E get(int x, int y) {
+        if((x > width) || (y > height)) {
+            return null;
+        }
+        return values[x][y];
+    }
+    
+    public void set(int x, int y, E value) {
+        values[x][y] = value;
+    }
 
-	public void setWidth(int width) {
-		this.width = width;
-	}
+    public void setWidth(int width) {
+        this.width = width;
+    }
 
-	public int getWidth() {
-		return width;
-	}
+    public int getWidth() {
+        return width;
+    }
 
-	public void setHeight(int height) {
-		this.height = height;
-	}
+    public void setHeight(int height) {
+        this.height = height;
+    }
 
-	public int getHeight() {
-		return height;
-	}
-	
-	
+    public int getHeight() {
+        return height;
+    }
+    
 }

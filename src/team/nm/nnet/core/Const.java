@@ -1,5 +1,7 @@
 package team.nm.nnet.core;
 
+import team.nm.nnet.util.Matrix;
+
 /**
  * Store all constraints
  * @author MinhNhat
@@ -84,6 +86,14 @@ public class Const {
      */
     public static final int SPAN_FACE_BOX = 5;
     
+    /**
+     * Structural element of image processing
+     */
+    public static final Matrix<Integer> KERNEL = new Matrix<Integer>(3, 3, new Integer[][] {
+            {0, 1, 0},
+            {1, 1, 1},
+            {0, 1, 0}
+    });
     /**
      * Mang luu mask cua he thong
      */

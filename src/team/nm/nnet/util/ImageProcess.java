@@ -100,7 +100,7 @@ public class ImageProcess {
                 r[i][j] = new Double((sample[0] + sample[1] + sample[2]) / 3);
             }
         }
-        Matrix<Double> result = new Matrix<Double>(r, width, height);
+        Matrix<Double> result = new Matrix<Double>(width, height, r);
         return result;
     }
 	
@@ -110,7 +110,7 @@ public class ImageProcess {
 	 * @return Kết quả chuyển
 	 */
 	public static double[] matrixToArray(Matrix<Double> matrix) {
-        Double[][] a = matrix.getValue();
+        Double[][] a = matrix.getValues();
         int width = matrix.getWidth();
         int height = matrix.getHeight();
         double[] result = new double[height * width];
@@ -134,7 +134,7 @@ public class ImageProcess {
 		Double[][] result = new Double[height][width]; 
 		for (int i = 0; i < height; i ++) {
 			for (int j = 0; j < width; j ++) {
-				if (matrix.getValue()[i][j] > 127) {
+				if (matrix.getValues()[i][j] > 127) {
 					result[i][j] = new Double(0);
 				}
 				else {
@@ -142,7 +142,7 @@ public class ImageProcess {
 				}
 			}
 		}
-		return new Matrix<Double>(result, width, height);
+		return new Matrix<Double>(width, height, result);
 	}
 	
 	/**

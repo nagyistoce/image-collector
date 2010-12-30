@@ -23,6 +23,8 @@ import org.springframework.beans.factory.annotation.Required;
 import sole.hawking.image.filter.EdgeFilter;
 import team.nm.nnet.app.imageCollector.bo.ImageDB;
 import team.nm.nnet.app.imageCollector.bo.SegmentFaceDetector;
+import team.nm.nnet.app.imageCollector.filter.BinaryImage;
+import team.nm.nnet.app.imageCollector.filter.OpenFilter;
 import team.nm.nnet.app.imageCollector.support.ImageFilter;
 import team.nm.nnet.app.imageCollector.support.NMFileFilter;
 import team.nm.nnet.app.imageCollector.utils.Chooser;
@@ -521,7 +523,7 @@ public class MainFrame extends JFrame {
     }
     
     public void showBinaryImage() {
-    	BufferedImage bufferedImage = ImageUtils.toBufferedImage(showingImage);
+    	final BufferedImage bufferedImage = ImageUtils.toBufferedImage(showingImage);
 //		BufferedImage y2CBuff = bufferedImage;
 		final BufferedImage y2CBuff = ColorSpace.toYCbCr(bufferedImage);
 		
@@ -531,9 +533,13 @@ public class MainFrame extends JFrame {
 		lbl.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				if(e.getButton() == MouseEvent.BUTTON1) {
-					EdgeFilter edgeFilter = new EdgeFilter();
-					lbl.setIcon(new ImageIcon(ImageUtils.toImage(edgeFilter.filter(y2CBuff, null))));
-				}
+					BinaryImage binaryImage = new BinaryImage(bufferedImage);
+					binaryImage = OpenFilter.filter(binaryImage, Const.KERNEL, 1);
+					lbl.setIcon(new ImageIcon(ImageUtils.toImage(binaryImage.getBinaryBuffer())));
+				} else if(e.getButton() == MouseEvent.BUTTON3) {
+				    EdgeFilter edgeFilter = new EdgeFilter();
+				    lbl.setIcon(new ImageIcon(ImageUtils.toImage(edgeFilter.filter(y2CBuff, null))));
+                }
 			}
 		});
 		frm.add(lbl);

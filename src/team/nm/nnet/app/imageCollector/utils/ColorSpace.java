@@ -57,14 +57,6 @@ public class ColorSpace {
                 }
             }
         }
-        MedianFilter medianFilter = new MedianFilter();
-        yCbCrBufImage = medianFilter.filter(yCbCrBufImage, null);
-        ErodeFilter erodeFilter = new ErodeFilter();
-        erodeFilter.setThreshold(9);
-        yCbCrBufImage = erodeFilter.filter(yCbCrBufImage, null);
-//        DilateFilter dilateFilter = new DilateFilter();
-//		dilateFilter.setThreshold(10);
-//		yCbCrBufImage = dilateFilter.filter(yCbCrBufImage, null);
         return yCbCrBufImage;
     }
 	
@@ -89,7 +81,7 @@ public class ColorSpace {
                 integral[i][j] = integral[i - 1][j] + integral[i][j - 1] - integral[i - 1][j - 1] + (pixelColour.getBlue() / 255);
             }
         }
-        return new Matrix<Integer>(integral, width, height);
+        return new Matrix<Integer>(width, height, integral);
     }
 	
 	/**

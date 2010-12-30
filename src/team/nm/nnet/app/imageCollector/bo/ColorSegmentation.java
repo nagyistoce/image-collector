@@ -5,9 +5,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
+import team.nm.nnet.app.imageCollector.filter.BinaryImage;
+import team.nm.nnet.app.imageCollector.filter.OpenFilter;
 import team.nm.nnet.app.imageCollector.om.ColorSegment;
 import team.nm.nnet.app.imageCollector.om.Pixel;
-import team.nm.nnet.app.imageCollector.utils.ColorSpace;
 import team.nm.nnet.core.Const;
 
 public class ColorSegmentation {
@@ -37,7 +38,9 @@ public class ColorSegmentation {
         if(bufferedImage == null) {
             return null;
         }
-        bufImage = ColorSpace.toYCbCr(bufferedImage);
+        BinaryImage binaryImage = new BinaryImage(bufferedImage);
+        binaryImage = OpenFilter.filter(binaryImage, Const.KERNEL, 1);
+        bufImage = binaryImage.getBinaryBuffer();
         width = bufferedImage.getWidth();
         height = bufferedImage.getHeight();
         
