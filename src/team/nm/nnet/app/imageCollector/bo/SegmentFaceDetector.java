@@ -10,7 +10,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import team.nm.nnet.app.imageCollector.layout.FacePanel;
+import team.nm.nnet.app.imageCollector.layout.ExtractedFacePanel;
 import team.nm.nnet.app.imageCollector.om.ColorSegment;
 import team.nm.nnet.app.imageCollector.om.Pixel;
 import team.nm.nnet.core.Const;
@@ -90,8 +90,8 @@ public class SegmentFaceDetector extends Thread {
                         subSegments.add(segment);
                     }
                     for(ColorSegment subSegment : subSegments) {
-//                      BufferedImage subBuff = extractSingleFace(subSegment);
-                        BufferedImage subBuff = bufferedImage.getSubimage(subSegment.getLeft(), subSegment.getBottom(), subSegment.getWidth(), subSegment.getHeight());
+                      BufferedImage subBuff = extractSingleFace(subSegment);
+//                        BufferedImage subBuff = bufferedImage.getSubimage(subSegment.getLeft(), subSegment.getBottom(), subSegment.getWidth(), subSegment.getHeight());
                         if(subBuff != null) {
         //                  subBuff = ImageUtils.resize(subBuff, Const.FACE_WIDTH, Const.FACE_HEIGHT);
         //                  if(neuralNetwork.gfncGetWinner(subBuff) > Const.NETWORK_FACE_VALIDATION_THRESHOLD) {
@@ -102,7 +102,7 @@ public class SegmentFaceDetector extends Thread {
             //                  
             //                  subBuff = bufferedImage.getSubimage(x, y, w, h);
             //                    subBuff = ImageUtils.resize(subBuff, Const.FACE_WIDTH, Const.FACE_HEIGHT);
-                                FacePanel fp = new FacePanel(pnlFaces, ImageUtils.toImage(subBuff));
+                                ExtractedFacePanel fp = new ExtractedFacePanel(pnlFaces, ImageUtils.toImage(subBuff));
                                 fp.setFaceName((float)segment.getWidth() / segment.getHeight() + " : " + segment.getWidth() + " x " + segment.getHeight());
                                 addFaceCandidates(fp);
         //                  }
@@ -164,7 +164,7 @@ public class SegmentFaceDetector extends Thread {
         return candidate;
     }
     
-    protected void addFaceCandidates(FacePanel facePanel) {
+    protected void addFaceCandidates(ExtractedFacePanel facePanel) {
         pnlFaces.add(facePanel);
         pnlFaces.updateUI();
     }

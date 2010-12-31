@@ -9,11 +9,11 @@ import javax.swing.JPanel;
 import team.nm.nnet.core.Const;
 import team.nm.nnet.util.ImageUtils;
 
-public class FacePanel extends javax.swing.JPanel {
+public class ExtractedFacePanel extends javax.swing.JPanel {
 
 	private static final long serialVersionUID = 8434384268590865473L;
 	
-    public FacePanel(JPanel parent, Image faceImage) {
+    public ExtractedFacePanel(JPanel parent, Image faceImage) {
         initComponents();
         this.parent = parent;
         setFaceImage(faceImage);

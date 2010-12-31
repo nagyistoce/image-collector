@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Required;
 
 import sole.hawking.image.filter.EdgeFilter;
 import team.nm.nnet.app.imageCollector.bo.ImageDB;
+import team.nm.nnet.app.imageCollector.bo.Searcher;
 import team.nm.nnet.app.imageCollector.bo.SegmentFaceDetector;
 import team.nm.nnet.app.imageCollector.filter.BinaryImage;
 import team.nm.nnet.app.imageCollector.filter.OpenFilter;
@@ -44,6 +45,7 @@ public class MainFrame extends JFrame {
     private NeuralNetwork neuralNetwork;
     private NeuralFaceRecognize neuralFaceRecognize;
     
+    private Searcher searcher = null;
     private SegmentFaceDetector faceDetector = null;
     
     public MainFrame() {
@@ -499,10 +501,11 @@ public class MainFrame extends JFrame {
     }
 
     private void btnSearchInDBActionPerformed(java.awt.event.ActionEvent evt) {
-        /*
-         * frmResult frm = new frmResult(); frm.setTitle("Kết Quả Tìm Kiếm");
-         * frm.setVisible(true);
-         */
+    	if((searcher != null) && (searcher.isDetecting())) {
+    		searcher.requestStop();
+        }
+    	searcher = new Searcher();
+    	searcher.start();
     }
 
     private void smnOpen_ImageActionPerformed(java.awt.event.ActionEvent evt) {
@@ -527,16 +530,18 @@ public class MainFrame extends JFrame {
 //		BufferedImage y2CBuff = bufferedImage;
 		final BufferedImage y2CBuff = ColorSpace.toYCbCr(bufferedImage);
 		
-    	JFrame frm = new JFrame("Binary Image");
+    	final JFrame frm = new JFrame("Binary Image - YCbCr Model");
     	frm.setIconImage(new ImageIcon(Const.CURRENT_DIRECTORY + Const.RESOURCE_PATH + "icon.png").getImage());
 		final JLabel lbl = new JLabel(new ImageIcon(ImageUtils.toImage(y2CBuff)));
 		lbl.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				if(e.getButton() == MouseEvent.BUTTON1) {
+					frm.setTitle("Binary Image - Opening processing");
 					BinaryImage binaryImage = new BinaryImage(bufferedImage);
 					binaryImage = OpenFilter.filter(binaryImage, Const.KERNEL, 1);
 					lbl.setIcon(new ImageIcon(ImageUtils.toImage(binaryImage.getBinaryBuffer())));
 				} else if(e.getButton() == MouseEvent.BUTTON3) {
+					frm.setTitle("Binary Image - Edge filtering");
 				    EdgeFilter edgeFilter = new EdgeFilter();
 				    lbl.setIcon(new ImageIcon(ImageUtils.toImage(edgeFilter.filter(y2CBuff, null))));
                 }
