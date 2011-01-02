@@ -148,6 +148,9 @@ public class SegmentFaceDetector extends Thread {
             int w = (int) (width * scale), h = (int) (height * scale);
             for(int i = 0, ww = width - w; i <= ww; i += Const.JUMP_LENGHT) {
                 for(int j = 0, hh = height - h; j <= hh; j += Const.JUMP_LENGHT) {
+                	if(!state) {
+                        return null;
+                    }
                     BufferedImage subBuff = segmentBuff.getSubimage(i, j, w, h);
                     subBuff = ImageUtils.resize(subBuff, Const.FACE_WIDTH, Const.FACE_HEIGHT);
 //                  FacePanel fp = new FacePanel(pnlFaces, ImageUtils.toImage(subBuff));

@@ -27,6 +27,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -140,6 +141,20 @@ public class ImageUtils {
 		Image image = null;
 		try {
 			image = ImageIO.read(file);
+			if (image != null) {
+				return toBufferedImage(image);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public static BufferedImage loadURL(String url) {
+		Image image = null;
+		try {
+			URL link = new URL(url);
+			image = ImageIO.read(link);
 			if (image != null) {
 				return toBufferedImage(image);
 			}

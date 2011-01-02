@@ -18,6 +18,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Required;
 
 import sole.hawking.image.filter.EdgeFilter;
@@ -98,6 +99,7 @@ public class MainFrame extends JFrame {
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         btnSysFile = new javax.swing.JButton();
+        btnURLFile = new javax.swing.JButton();
         btnWebcam = new javax.swing.JButton();
         lblProcess = new javax.swing.JLabel();
         lblImgView = new javax.swing.JLabel();
@@ -217,6 +219,14 @@ public class MainFrame extends JFrame {
                 btnSysFileActionPerformed(evt);
             }
         });
+        
+        btnURLFile.setText("Từ Internet");
+        btnURLFile.setToolTipText("From internet file");
+        btnURLFile.addActionListener(new java.awt.event.ActionListener() {
+        	public void actionPerformed(java.awt.event.ActionEvent evt) {
+        		btnURLFileActionPerformed(evt);
+        	}
+        });
 
         btnWebcam.setText("Từ webcam");
         btnWebcam.setToolTipText("From webcam");
@@ -259,9 +269,9 @@ public class MainFrame extends JFrame {
                                                                         .createSequentialGroup()
                                                                         .addComponent(
                                                                                 jLabel2)
-                                                                        .addGap(130,
-                                                                                130,
-                                                                                130)
+                                                                        .addGap(80,
+                                                                                80,
+                                                                                80)
                                                                         .addComponent(
                                                                                 btnSysFile,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE,
@@ -270,6 +280,14 @@ public class MainFrame extends JFrame {
                                                                         .addGap(109,
                                                                                 109,
                                                                                 109)
+                                                                        .addComponent(
+                                                                        		btnURLFile,
+                                                                        		javax.swing.GroupLayout.PREFERRED_SIZE,
+                                                                        		118,
+                                                                        		javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                		.addGap(109,
+                                                                				109,
+                                                                				109)
                                                                         .addComponent(
                                                                                 btnWebcam,
                                                                                 javax.swing.GroupLayout.PREFERRED_SIZE,
@@ -321,6 +339,7 @@ public class MainFrame extends JFrame {
                                                                 javax.swing.GroupLayout.Alignment.BASELINE)
                                                         .addComponent(jLabel2)
                                                         .addComponent(btnWebcam)
+                                                        .addComponent(btnURLFile)
                                                         .addComponent(
                                                                 btnSysFile))
                                         .addPreferredGap(
@@ -519,6 +538,13 @@ public class MainFrame extends JFrame {
                     selectedFile.getName(), selectedFile.length());
         }
     }
+    
+    private void btnURLFileActionPerformed(java.awt.event.ActionEvent evt) {
+    	String url = JOptionPane.showInputDialog(this, "Đường link đến ảnh", "Lấy ảnh mẫu", JOptionPane.QUESTION_MESSAGE);
+    	if(StringUtils.isNotBlank(url) && url.startsWith("http")) {
+    		displayImage(ImageUtils.loadURL(url), url.substring(url.lastIndexOf("/") + 1), 0);
+    	}
+    }
 
     private void btnWebcamActionPerformed(java.awt.event.ActionEvent evt) {
         capture.setParent(this);
@@ -593,6 +619,7 @@ public class MainFrame extends JFrame {
     // Variables declaration
     private javax.swing.JButton btnSearchInDB;
     private javax.swing.JButton btnSysFile;
+    private javax.swing.JButton btnURLFile;
     private javax.swing.JButton btnWebcam;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
