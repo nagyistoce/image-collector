@@ -111,7 +111,7 @@ public class ImageProcess {
 		int[] mask = Const.MASK;
 		for (int i = 0; i < len; i ++) {
 			if (mask[i] == 1) {
-				array[i] = - 1;
+				array[i] = 0;
 			}
 		}
 		return array;
