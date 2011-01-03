@@ -84,7 +84,7 @@ public class Const {
     /**
      * Độ giãn giữa tọa độ thật với độ tọa đóng khung khuôn mặt
      */
-    public static final int SPAN_FACE_BOX = 5;
+    public static final int SPAN_FACE_BOX = 10;
     
     /**
      * Structural element of image processing
