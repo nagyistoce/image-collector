@@ -35,7 +35,7 @@ public class NeuralNetwork implements Runnable{
     /**
      * So luong output
      */
-    private final int CintNumberOfOutput = 20; //
+    private final int CintNumberOfOutput = 2; //
 
     /**
      * So luong neural an
