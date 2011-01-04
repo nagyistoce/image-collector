@@ -346,6 +346,7 @@ public class NeuralFaceRecognize implements Runnable{
     		}
     	}
     	System.out.println("Max: " + max);
+    	System.out.println("Name: " + lstListName.get(index));
     	return index;
     }
 
@@ -499,7 +500,7 @@ public class NeuralFaceRecognize implements Runnable{
 			}
 		}
 		psubInitNeural(listNumberFolder.size());
-		int numberOfOutput = listNumberFolder.size() + 1;
+		int numberOfOutput = listNumberFolder.size();
 		this.numberOfOutput = numberOfOutput;
 		for (int i = 0; i < listNumberFolder.size(); i ++) {
 			int index = Integer.parseInt(listNumberFolder.get(i).substring(0, listNumberFolder.get(i).indexOf("_") - 1));
