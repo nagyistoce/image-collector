@@ -345,8 +345,9 @@ public class NeuralFaceRecognize implements Runnable{
     			index = i;
     		}
     	}
-    	System.out.println("Max: " + max);
-    	System.out.println("Name: " + lstListName.get(index));
+    	//System.out.println("Max: " + max);
+    	//System.out.println("Name: " + lstListName.get(index));
+    	System.out.println("Index: " + index);
     	return index;
     }
 
@@ -438,6 +439,10 @@ public class NeuralFaceRecognize implements Runnable{
 			FileOutputStream fos = new FileOutputStream(filename, false);
 			PrintWriter pw = new PrintWriter(fos);
 			pw.println(numberOfOutput);
+			pw.println(lstListName.size());
+			for (int i = 0; i < lstListName.size(); i ++) {
+				pw.println(lstListName.get(i));
+			}
 			for (int i = 1; i < CintNuberOflayers; i++) {
 				for (int j = 0; j < pintNeural[i]; j++) {
 					for (int k = 0; k < pintNeural[i - 1]; k++) {
@@ -460,6 +465,11 @@ public class NeuralFaceRecognize implements Runnable{
 			FileReader fr = new FileReader(filename);
 			BufferedReader br = new BufferedReader(fr);
 			numberOfOutput = Integer.parseInt(br.readLine());
+			lstListName = new ArrayList<String>();
+			int size = Integer.parseInt(br.readLine());
+			for (int i = 0; i < size; i ++ ) {
+				lstListName.add(br.readLine());
+			}
 			psubInitNeural(numberOfOutput);
 			for (int i = 1; i < CintNuberOflayers; i++) {
 				for (int j = 0; j < pintNeural[i]; j++) {
@@ -489,7 +499,7 @@ public class NeuralFaceRecognize implements Runnable{
 			String name = "";
 			int indexOf_ = listSubFolder.get(i).indexOf("_");
 			if(indexOf_ >= 0) {
-				number = listSubFolder.get(i).substring(0, indexOf_ - 1);
+				number = listSubFolder.get(i).substring(0, indexOf_);
 				name = listSubFolder.get(i).substring(indexOf_ + 1);
 				
 				if (LogicUtils.isNumber(number) 
@@ -503,7 +513,7 @@ public class NeuralFaceRecognize implements Runnable{
 		int numberOfOutput = listNumberFolder.size();
 		this.numberOfOutput = numberOfOutput;
 		for (int i = 0; i < listNumberFolder.size(); i ++) {
-			int index = Integer.parseInt(listNumberFolder.get(i).substring(0, listNumberFolder.get(i).indexOf("_") - 1));
+			int index = Integer.parseInt(listNumberFolder.get(i).substring(0, listNumberFolder.get(i).indexOf("_")));
 			List<String> listFile = 
 				IOUtils.listFileName(folderPath + "\\" + listNumberFolder.get(i));
 			for (int j = 0; j < listFile.size(); j ++) {
