@@ -350,6 +350,10 @@ public class NeuralFaceRecognize implements Runnable{
     	System.out.println("Index: " + index);
     	return index;
     }
+    
+    public String getName(int index) {
+    	return arrayName[index];
+    }
 
     @Override
     public void run() {
