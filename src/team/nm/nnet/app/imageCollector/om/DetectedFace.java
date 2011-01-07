@@ -5,7 +5,8 @@ import java.awt.image.BufferedImage;
 public class DetectedFace {
 
 	private BufferedImage bufferedImage;
-	private String faceId;
+	private int faceId;
+	private String faceName;
 	private String filePath;
 	
 	public DetectedFace() {}
@@ -15,17 +16,12 @@ public class DetectedFace {
 		this.filePath = filePath;
 	}
 	
-	public DetectedFace(BufferedImage bufferedImage, String filePath, String faceId) {
+	public DetectedFace(BufferedImage bufferedImage, String filePath, int faceId, String faceName) {
 		this(bufferedImage, filePath);
 		this.faceId = faceId;
+		this.faceName = faceName;
 	}
 
-	public String getFaceId() {
-		return faceId;
-	}
-	public void setFaceId(String faceId) {
-		this.faceId = faceId;
-	}
 	public String getFilePath() {
 		return filePath;
 	}
@@ -39,6 +35,22 @@ public class DetectedFace {
 
 	public void setBufferedImage(BufferedImage bufferedImage) {
 		this.bufferedImage = bufferedImage;
+	}
+
+	public int getFaceId() {
+		return faceId;
+	}
+
+	public void setFaceId(int faceId) {
+		this.faceId = faceId;
+	}
+
+	public String getFaceName() {
+		return faceName;
+	}
+
+	public void setFaceName(String faceName) {
+		this.faceName = faceName;
 	}
 	
 }

@@ -97,7 +97,7 @@ public class MainFrame extends FaceList {
 		BufferedImage bufImg = face.getBufferedImage();
         
 		ExtractedFacePanel facePanel = new ExtractedFacePanel(pnlFaces, ImageUtils.toImage(bufImg));
-		facePanel.setFaceName(face.getFaceId());
+		facePanel.setFaceName(face.getFaceName());
 		pnlFaces.add(facePanel);
 		pnlFaces.updateUI();
 	}

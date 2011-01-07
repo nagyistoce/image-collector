@@ -67,7 +67,8 @@ public class FaceRecognitor extends FaceList {
 			return;
 		}
 		if(index > 0) {
-			face.setFaceId(String.valueOf(index));
+			face.setFaceId(index);
+			face.setFaceName(neuralRecognition.getName(index));
 			faceResults.addFace(face);
 		}
 		if(++completedAddingThreads >= addingThreads) {
