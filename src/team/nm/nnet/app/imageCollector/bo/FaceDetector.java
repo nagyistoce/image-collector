@@ -113,8 +113,8 @@ public class FaceDetector {
                         if(candidate != null) {
                         	int x = ((candidate.getLeft() - Const.SPAN_FACE_BOX) > segment.getLeft()) ? candidate.getLeft() - Const.SPAN_FACE_BOX : segment.getLeft(); 
                             int y = ((candidate.getBottom() - Const.SPAN_FACE_BOX) > segment.getBottom()) ? candidate.getBottom() - Const.SPAN_FACE_BOX : segment.getBottom(); 
-                            int w = ((candidate.getRight() + Const.SPAN_FACE_BOX) <= segment.getRight()) ? candidate.getWidth() + Const.SPAN_FACE_BOX : candidate.getWidth(); 
-                            int h = ((candidate.getTop() + Const.SPAN_FACE_BOX) <= segment.getTop()) ? candidate.getHeight() + Const.SPAN_FACE_BOX : candidate.getHeight();
+                            int w = ((candidate.getWidth() + Const.SPAN_FACE_BOX) <= segment.getWidth()) ? candidate.getWidth() + Const.SPAN_FACE_BOX : candidate.getWidth(); 
+                            int h = ((candidate.getHeight() + Const.SPAN_FACE_BOX) <= segment.getHeight()) ? candidate.getHeight() + Const.SPAN_FACE_BOX : candidate.getHeight();
                         	
                             BufferedImage bufImg = bufferedImage.getSubimage(x, y, w, h);
                             DetectedFace face = new DetectedFace(bufImg, filePath);
