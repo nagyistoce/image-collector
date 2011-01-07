@@ -130,8 +130,8 @@ public class NeuralFaceRecognize implements Runnable{
      */
     private List<int[]> lstListDesireOutput = new ArrayList<int[]>();
     
-    private List<String> lstListName = new ArrayList<String>();
-
+    private String[] arrayName;
+    
     /**
      * Khoi tao doi tuong random cho viec hoc cac ki tu
      */
@@ -346,7 +346,7 @@ public class NeuralFaceRecognize implements Runnable{
     		}
     	}
     	//System.out.println("Max: " + max);
-    	//System.out.println("Name: " + lstListName.get(index));
+    	System.out.println("Name: " + arrayName[index]);
     	System.out.println("Index: " + index);
     	return index;
     }
@@ -439,9 +439,9 @@ public class NeuralFaceRecognize implements Runnable{
 			FileOutputStream fos = new FileOutputStream(filename, false);
 			PrintWriter pw = new PrintWriter(fos);
 			pw.println(numberOfOutput);
-			pw.println(lstListName.size());
-			for (int i = 0; i < lstListName.size(); i ++) {
-				pw.println(lstListName.get(i));
+			pw.println(arrayName.length);
+			for (int i = 0; i < arrayName.length; i ++) {
+				pw.println(arrayName[i]);
 			}
 			for (int i = 1; i < CintNuberOflayers; i++) {
 				for (int j = 0; j < pintNeural[i]; j++) {
@@ -465,10 +465,10 @@ public class NeuralFaceRecognize implements Runnable{
 			FileReader fr = new FileReader(filename);
 			BufferedReader br = new BufferedReader(fr);
 			numberOfOutput = Integer.parseInt(br.readLine());
-			lstListName = new ArrayList<String>();
 			int size = Integer.parseInt(br.readLine());
+			arrayName = new String[size];
 			for (int i = 0; i < size; i ++ ) {
-				lstListName.add(br.readLine());
+				arrayName[i] = br.readLine();
 			}
 			psubInitNeural(numberOfOutput);
 			for (int i = 1; i < CintNuberOflayers; i++) {
@@ -494,6 +494,7 @@ public class NeuralFaceRecognize implements Runnable{
 		List<String> listSubFolder = IOUtils.listSubFolder(folderPath);
 		//Chua duong dan thu muc la so va chua anh
 		List<String> listNumberFolder = new ArrayList<String>();
+		arrayName = new String[listSubFolder.size()];
 		for (int i = 0; i < listSubFolder.size(); i ++) {
 			String number = "";
 			String name = "";
@@ -505,7 +506,8 @@ public class NeuralFaceRecognize implements Runnable{
 				if (LogicUtils.isNumber(number) 
 						&& IOUtils.hasFile(folderPath + "\\" + listSubFolder.get(i))) {
 					listNumberFolder.add(listSubFolder.get(i));
-					lstListName.add(name);
+					int index = Integer.parseInt(number);
+					arrayName[index] = name;
 				}
 			}
 		}
