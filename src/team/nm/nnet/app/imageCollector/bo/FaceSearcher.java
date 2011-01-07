@@ -21,6 +21,7 @@ public class FaceSearcher extends FaceList {
 	private volatile int addingThreads;
 	private volatile int completedAddingThreads;
 	private int completedFile, sumFaces;
+	private int currentProcessId;
 	
 	private NeuralFaceRecognize neuralRecognition;
 	private FaceDetector faceDetector;
@@ -28,7 +29,6 @@ public class FaceSearcher extends FaceList {
 	
 	private List<File> files;
 	private List<String> expectedOutput;
-	private int currentProcessId;
 	
 
 	public FaceSearcher () {
@@ -46,11 +46,11 @@ public class FaceSearcher extends FaceList {
 	}
 
 	public void search(List<File> files, List<String> expectedOutput) {
-		this.files = files;
-		this.expectedOutput = expectedOutput;
 		if((files == null) || (files.size() < 1)) {
 			return;
 		}
+		this.files = files;
+		this.expectedOutput = expectedOutput;
 		
 		faceDetector.setFaceResults(this);
 		for(int i = 0; i <2; i++) {

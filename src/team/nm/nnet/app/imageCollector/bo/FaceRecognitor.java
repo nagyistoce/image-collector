@@ -66,11 +66,13 @@ public class FaceRecognitor extends FaceList {
 		if(!state) {
 			return;
 		}
+		face.setFaceId(index);
 		if(index > 0) {
-			face.setFaceId(index);
 			face.setFaceName(neuralRecognition.getName(index));
-			faceResults.addFace(face);
+		} else {
+			face.setFaceName("Chưa biết");
 		}
+		faceResults.addFace(face);
 		if(++completedAddingThreads >= addingThreads) {
 			faceResults.onFulfiling();
 		}
