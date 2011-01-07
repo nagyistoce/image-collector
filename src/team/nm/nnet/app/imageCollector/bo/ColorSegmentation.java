@@ -7,14 +7,14 @@ import java.util.Stack;
 
 import team.nm.nnet.app.imageCollector.filter.BinaryImage;
 import team.nm.nnet.app.imageCollector.filter.OpenFilter;
-import team.nm.nnet.app.imageCollector.om.ColorSegment;
+import team.nm.nnet.app.imageCollector.om.Region;
 import team.nm.nnet.app.imageCollector.om.Pixel;
 import team.nm.nnet.core.Const;
 
 public class ColorSegmentation {
 
 	private int noSegments;
-    private List<ColorSegment> segments;
+    private List<Region> segments;
     private BufferedImage bufImage;
     private int width, height;
     private volatile boolean state = false;
@@ -31,10 +31,10 @@ public class ColorSegmentation {
 
     public ColorSegmentation() {
         noSegments = 0;
-        segments = new ArrayList<ColorSegment>();
+        segments = new ArrayList<Region>();
     }
     
-    public List<ColorSegment> segment(BufferedImage bufferedImage) {
+    public List<Region> segment(BufferedImage bufferedImage) {
         if(bufferedImage == null) {
             return null;
         }
@@ -55,22 +55,22 @@ public class ColorSegmentation {
             	}
                 int index = x * height + y;
                 if ((marks[index] == UNVISITED_PIXEL) && (bufImage.getRGB(x, y) == Const.WHITE_COLOR)) {
-                    ColorSegment coseg = new ColorSegment();
-                    coseg.setId(noSegments++);
-                    flood(x, y, coseg);
-                    if(coseg.isValid()) {
-                        coseg.setStartPoint(new Pixel(x - coseg.getLeft(), y - coseg.getBottom()));
+                    Region region = new Region();
+                    region.setId(noSegments++);
+                    flood(x, y, region);
+                    if(region.isValid()) {
+                        region.setStartPoint(new Pixel(x - region.getLeft(), y - region.getBottom()));
                         
-                        int value = coseg.getBottom();
-                        coseg.setBottom((value > 0) ? value - 1 : value);
-                        value = coseg.getLeft();
-                        coseg.setLeft((value > 0) ? value - 1 : value);
-                        value = coseg.getTop();
-                        coseg.setTop((value + 1 < height) ? value + 1 : value);
-                        value = coseg.getRight();
-                        coseg.setRight((value + 1 < width) ? value + 1 : value);
+                        int value = region.getBottom();
+                        region.setBottom((value > 0) ? value - 1 : value);
+                        value = region.getLeft();
+                        region.setLeft((value > 0) ? value - 1 : value);
+                        value = region.getTop();
+                        region.setTop((value + 1 < height) ? value + 1 : value);
+                        value = region.getRight();
+                        region.setRight((value + 1 < width) ? value + 1 : value);
                         
-                    	segments.add(coseg);
+                    	segments.add(region);
                     }
                 }
             }
@@ -93,7 +93,7 @@ public class ColorSegmentation {
         return noSegments;
     }
 
-    public List<ColorSegment> getSegments() {
+    public List<Region> getSegments() {
         return segments;
     }
     
@@ -104,7 +104,7 @@ public class ColorSegmentation {
         }
     }
 
-    protected void flood(int x, int y, ColorSegment colorSegment) {
+    protected void flood(int x, int y, Region region) {
     	Stack<Pixel> stack = new Stack<Pixel>();
     	pushStack(stack, x, y);
     	
@@ -113,19 +113,19 @@ public class ColorSegmentation {
     		int xx = p.getX();
     		int yy = p.getY();
     		
-    		marks[xx * height + yy] = colorSegment.getId();
-    		colorSegment.addPixel(new Pixel(xx, yy));
+    		marks[xx * height + yy] = region.getId();
+    		region.addPixel(new Pixel(xx, yy));
 
     		// Cập nhật lại các cận của phân vùng
-			if(xx < colorSegment.getLeft()) {
-				colorSegment.setLeft(xx);
-			} else if(xx > colorSegment.getRight()) {
-				colorSegment.setRight(xx);
+			if(xx < region.getLeft()) {
+				region.setLeft(xx);
+			} else if(xx > region.getRight()) {
+				region.setRight(xx);
 			}
-			if(yy < colorSegment.getBottom()) {
-				colorSegment.setBottom(yy);
-			} else if(yy > colorSegment.getTop()) {
-				colorSegment.setTop(yy);
+			if(yy < region.getBottom()) {
+				region.setBottom(yy);
+			} else if(yy > region.getTop()) {
+				region.setTop(yy);
 			}
 			
 			// Loang hướng lên trên

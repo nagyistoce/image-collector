@@ -12,7 +12,7 @@ import sole.hawking.image.filter.EdgeFilter;
 import team.nm.nnet.app.imageCollector.utils.ColorSpace;
 import team.nm.nnet.core.Const;
 
-public class ColorSegment {
+public class Region {
     
     private final int BRUSH_WIDTH = 2;
     private final int SLOPE_HEIGHT = 6;
@@ -25,7 +25,7 @@ public class ColorSegment {
 	private List<Pixel> brokenPoints;
 	private Pixel startPoint;
 
-	public ColorSegment() {
+	public Region() {
 		id = -1;
 		left = Integer.MAX_VALUE;
 		right = -1;
@@ -34,7 +34,7 @@ public class ColorSegment {
 		pixels = new ArrayList<Pixel>();
 	}
 	
-	public ColorSegment(int left, int top, int right, int bottom) {
+	public Region(int left, int top, int right, int bottom) {
 		this.left = left;
 		this.top = top;
 		this.right = right;

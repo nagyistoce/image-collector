@@ -1,6 +1,8 @@
 package team.nm.nnet.app.imageCollector.layout;
 
+import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -8,11 +10,19 @@ import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
@@ -22,113 +32,122 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Required;
 
 import sole.hawking.image.filter.EdgeFilter;
+import team.nm.nnet.app.imageCollector.bo.FaceRecognitor;
 import team.nm.nnet.app.imageCollector.bo.ImageDB;
-import team.nm.nnet.app.imageCollector.bo.Searcher;
-import team.nm.nnet.app.imageCollector.bo.SegmentFaceDetector;
 import team.nm.nnet.app.imageCollector.filter.BinaryImage;
 import team.nm.nnet.app.imageCollector.filter.OpenFilter;
+import team.nm.nnet.app.imageCollector.om.DetectedFace;
+import team.nm.nnet.app.imageCollector.om.FaceList;
 import team.nm.nnet.app.imageCollector.support.ImageFilter;
 import team.nm.nnet.app.imageCollector.support.NMFileFilter;
 import team.nm.nnet.app.imageCollector.utils.Chooser;
 import team.nm.nnet.app.imageCollector.utils.ColorSpace;
 import team.nm.nnet.core.Const;
-import team.nm.nnet.tmp.NeuralFaceRecognize;
-import team.nm.nnet.tmp.NeuralNetwork;
 import team.nm.nnet.util.IOUtils;
 import team.nm.nnet.util.ImageUtils;
 
-public class MainFrame extends JFrame {
+public class MainFrame extends FaceList {
 
-    private static final long serialVersionUID = -5480005990507067644L;
+    private static final long serialVersionUID = 1L;
+    
+    private static MainFrame instance = null;
+    private JFrame frame;
+    
     private Capture capture;
+    private SearchResult searchResult;
     private ImageDB imageDB;
-    private Image showingImage = new javax.swing.ImageIcon(System.getProperty("user.dir") + Const.RESOURCE_PATH + "authors.jpg").getImage();
-    private NeuralNetwork neuralNetwork;
-    private NeuralFaceRecognize neuralFaceRecognize;
+    private Image showingImage = new javax.swing.ImageIcon(Const.CURRENT_DIRECTORY + Const.RESOURCE_PATH + "authors.jpg").getImage();
     
-    private Searcher searcher = null;
-    private SegmentFaceDetector faceDetector = null;
+    static ExecutorService executorService = Executors.newCachedThreadPool();
+    private FaceRecognitor fileRecognitor;
     
-    public MainFrame() {
-        setTitle("Dò Tìm và Nhận Dạng Khuôn Mặt - NM Team");
+    private MainFrame() {
+    	frame = new JFrame("Dò Tìm và Nhận Dạng Khuôn Mặt - NM Team");
         initComponents();
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            SwingUtilities.updateComponentTreeUI(this);
+            SwingUtilities.updateComponentTreeUI(frame);
         }
         catch (Exception ex) {
             throw new RuntimeException("Không thể 'look and feel'.");
         }
 
+    	// Get the size of the screen
+        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+
+        // Determine the new location of the window
+        int w = frame.getSize().width;
+        int h = frame.getSize().height;
+        int x = (dim.width-w)/2;
+        int y = (dim.height-h)/2;
+        frame.setLocation(x, y);
     }
+    
+    public static MainFrame getInstance() {
+    	if(instance == null) {
+    		instance = new MainFrame();
+    	}
+    	return instance;
+    }
+    
+
+	@Override
+	public void onAddingFace(DetectedFace face) {
+
+		BufferedImage bufImg = face.getBufferedImage();
+        
+		ExtractedFacePanel facePanel = new ExtractedFacePanel(pnlFaces, ImageUtils.toImage(bufImg));
+		facePanel.setFaceName(face.getFaceId());
+		pnlFaces.add(facePanel);
+		pnlFaces.updateUI();
+	}
+	
+	@Override
+	public void onFulfiling() {
+		lblProcess.setIcon(new ImageIcon(Const.CURRENT_DIRECTORY + Const.RESOURCE_PATH + "check.png"));
+	}
+
+	public void show(int width, int height) {
+		if(frame == null) {
+			return;
+		}
+		if(width > 1) {
+			frame.setSize(width, frame.getHeight());
+		} 
+		if(height > 1) {
+			frame.setSize(frame.getWidth(), height);
+		}
+		frame.setVisible(true);
+	}
 
     public void displayImage(Image image, String imgName, long imgLength) {
-        if (image == null) {
-        	JOptionPane.showMessageDialog(this, "Không thể hiển thị ảnh này!", "Failed", JOptionPane.ERROR_MESSAGE);
+    	BufferedImage bufferedImage = null;
+    	if ((image == null) || (image.getWidth(null) < 1) || ((bufferedImage = ImageUtils.toBufferedImage(image)) == null)) {
+        	JOptionPane.showMessageDialog(frame, "Không thể hiển thị ảnh này!", "Failed", JOptionPane.ERROR_MESSAGE);
             return;
-        }
-
-        BufferedImage bufferedImage = ImageUtils.toBufferedImage(image);
-        if (bufferedImage == null) {
-        	JOptionPane.showMessageDialog(this, "Không thể hiển thị ảnh này!", "Failed", JOptionPane.ERROR_MESSAGE);
         } else {
             showingImage = fitView(bufferedImage, lblImgView.getWidth(),
                     lblImgView.getHeight());
-            lblImgView.setIcon(new javax.swing.ImageIcon(showingImage));
             lblImgName.setText(imgName);
             lblImgSize.setText(bufferedImage.getWidth(null) + "x"
                     + bufferedImage.getHeight(null) + " pixels");
             lblImgCap.setText(imgLength / 1024 + " KB");
 
-            detectFaceCandidates();
+            detectFaces();
         }
+    	lblImgView.setIcon(new javax.swing.ImageIcon(showingImage));
     }
 
     // construct form view
     private void initComponents() {
+    	
         java.awt.GridBagConstraints gridBagConstraints;
 
-        jPanel5 = new javax.swing.JPanel();
-        jLabel3 = new javax.swing.JLabel();
-        splFaces = new javax.swing.JScrollPane();
-        pnlFaces = new javax.swing.JPanel();
-        btnSearchInDB = new javax.swing.JButton();
-        jPanel7 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel4 = new javax.swing.JLabel();
-        jLabel5 = new javax.swing.JLabel();
-        jLabel6 = new javax.swing.JLabel();
-        btnSysFile = new javax.swing.JButton();
-        btnURLFile = new javax.swing.JButton();
-        btnWebcam = new javax.swing.JButton();
-        lblProcess = new javax.swing.JLabel();
-        lblImgView = new javax.swing.JLabel();
-        lblImgName = new javax.swing.JLabel();
-        lblImgSize = new javax.swing.JLabel();
-        lblImgCap = new javax.swing.JLabel();
-        jMenuBar1 = new javax.swing.JMenuBar();
-        jMenu1 = new javax.swing.JMenu();
-        smnOpen_Image = new javax.swing.JMenuItem();
-        jMenu3 = new javax.swing.JMenu();
-        smnDB_New = new javax.swing.JMenuItem();
-        smnDB_Load = new javax.swing.JMenuItem();
-        smnDB_Show = new javax.swing.JMenuItem();
-        smnDB_Clear = new javax.swing.JMenuItem();
-        smnDB_Add = new javax.swing.JMenuItem();
-        smnDB_Save = new javax.swing.JMenuItem();
-        jMenu5 = new javax.swing.JMenu();
-        jMenuItem7 = new javax.swing.JMenuItem();
-        jMenu2 = new javax.swing.JMenu();
-        jMenuItem4 = new javax.swing.JMenuItem();
-        jMenu4 = new javax.swing.JMenu();
-        smnAbout_App = new javax.swing.JMenuItem();
-        smnAbout_Us = new javax.swing.JMenuItem();
-
-        getContentPane().setLayout(new java.awt.GridBagLayout());
-        setMinimumSize(new java.awt.Dimension(950, 700));
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setIconImage(new ImageIcon(Const.CURRENT_DIRECTORY + Const.RESOURCE_PATH + "icon.png").getImage());
-        this.addWindowListener(new WindowAdapter() {
+        frame.getContentPane().setLayout(new java.awt.GridBagLayout());
+        frame.setMinimumSize(new java.awt.Dimension(950, 700));
+        frame.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        frame.setIconImage(new ImageIcon(Const.CURRENT_DIRECTORY + Const.RESOURCE_PATH + "icon.png").getImage());
+        frame.addWindowListener(new WindowAdapter() {
         	@Override
         	public void windowOpened(WindowEvent e) {
         		super.windowOpened(e);
@@ -193,7 +212,7 @@ public class MainFrame extends JFrame {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(11, 6, 0, 0);
-        getContentPane().add(jPanel5, gridBagConstraints);
+        frame.getContentPane().add(jPanel5, gridBagConstraints);
 
         lblImgView.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblImgView.setIcon(new javax.swing.ImageIcon(showingImage));
@@ -371,7 +390,7 @@ public class MainFrame extends JFrame {
         gridBagConstraints.ipadx = 100;
         gridBagConstraints.ipady = 6;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
-        getContentPane().add(jPanel7, gridBagConstraints);
+        frame.getContentPane().add(jPanel7, gridBagConstraints);
 
         jMenu1.setText("Tài Liệu");
 
@@ -404,7 +423,7 @@ public class MainFrame extends JFrame {
                 List<File> files = Chooser.getMultiFiles("Tạo mới CSDL ảnh", new ImageFilter());
                 if(CollectionUtils.isNotEmpty(files)) {
                 	imageDB.setFiles(files);
-                	JOptionPane.showMessageDialog(null, files.size() + " ảnh đã được nạp vào CSDL!", "Succeed", JOptionPane.INFORMATION_MESSAGE);
+                	JOptionPane.showMessageDialog(frame, files.size() + " ảnh đã được nạp vào CSDL!", "Succeed", JOptionPane.INFORMATION_MESSAGE);
                 }
             }
         });
@@ -416,9 +435,9 @@ public class MainFrame extends JFrame {
                 File file = Chooser.getSingleFile("Nạp CSDL ảnh", new NMFileFilter());
                 if(file != null) {
                 	try {
-                		JOptionPane.showMessageDialog(null, imageDB.load(file) + " ảnh đã được nạp vào CSDL!", "Succeed", JOptionPane.INFORMATION_MESSAGE);
+                		JOptionPane.showMessageDialog(frame, imageDB.load(file) + " ảnh đã được nạp vào CSDL!", "Succeed", JOptionPane.INFORMATION_MESSAGE);
                 	} catch(Exception e) {
-                		JOptionPane.showMessageDialog(null, "Không thể nạp CSDL ảnh từ tệp này!", "Failed", JOptionPane.ERROR_MESSAGE);
+                		JOptionPane.showMessageDialog(frame, "Không thể nạp CSDL ảnh từ tệp này!", "Failed", JOptionPane.ERROR_MESSAGE);
                 	}
                 }
             }
@@ -440,7 +459,7 @@ public class MainFrame extends JFrame {
         smnDB_Clear.setEnabled(false);
         smnDB_Clear.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-            	int confirm = JOptionPane.showConfirmDialog(null, "Bạn có chắc muốn xóa CSDL ảnh không!", "Clear image DB?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+            	int confirm = JOptionPane.showConfirmDialog(frame, "Bạn có chắc muốn xóa CSDL ảnh không!", "Clear image DB?", JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
             	if(confirm == JOptionPane.YES_OPTION) {
             		imageDB.clear();
             	}
@@ -455,7 +474,7 @@ public class MainFrame extends JFrame {
             	List<File> files = Chooser.getMultiFiles("Thêm ảnh vào CSDL", new ImageFilter());
                 if(CollectionUtils.isNotEmpty(files)) {
                 	imageDB.add(files);
-                	JOptionPane.showMessageDialog(null, "CSDL ảnh đã được cập nhật!", "Succeed", JOptionPane.INFORMATION_MESSAGE);
+                	JOptionPane.showMessageDialog(frame, "CSDL ảnh đã được cập nhật!", "Succeed", JOptionPane.INFORMATION_MESSAGE);
                 }
             }
         });
@@ -469,9 +488,9 @@ public class MainFrame extends JFrame {
                 if(file != null) {
                 	try {
                 		imageDB.save(file);
-                		JOptionPane.showMessageDialog(null, "CSDL ảnh đã lưu thành công!", "Succeed", JOptionPane.INFORMATION_MESSAGE);
+                		JOptionPane.showMessageDialog(frame, "CSDL ảnh đã lưu thành công!", "Succeed", JOptionPane.INFORMATION_MESSAGE);
                 	} catch(Exception e) {
-                		JOptionPane.showMessageDialog(null, "không thể lưu CSDL ảnh!", "Failed", JOptionPane.ERROR_MESSAGE);
+                		JOptionPane.showMessageDialog(frame, "không thể lưu CSDL ảnh!", "Failed", JOptionPane.ERROR_MESSAGE);
                 	}
                 }
             }
@@ -499,7 +518,7 @@ public class MainFrame extends JFrame {
         smnAbout_App.setText("Chương trình");
         smnAbout_App.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                new AboutApp().setVisible(true);
+                AboutApp.getInstance().setVisible(true);
             }
         });
         jMenu4.add(smnAbout_App);
@@ -507,24 +526,21 @@ public class MainFrame extends JFrame {
         smnAbout_Us.setText("Thành viên");
         smnAbout_Us.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                new AboutUs().setVisible(true);
+                AboutUs.getInstance().setVisible(true);
             }
         });
         jMenu4.add(smnAbout_Us);
 
         jMenuBar1.add(jMenu4);
 
-        setJMenuBar(jMenuBar1);
+        frame.setJMenuBar(jMenuBar1);
 
-        pack();
+        frame.pack();
     }
-
+    
     private void btnSearchInDBActionPerformed(java.awt.event.ActionEvent evt) {
-    	if((searcher != null) && (searcher.isDetecting())) {
-    		searcher.requestStop();
-        }
-    	searcher = new Searcher();
-    	searcher.start();
+		searchResult.search(imageDB.getFiles(), null);
+    	searchResult.setVisible(true);
     }
 
     private void smnOpen_ImageActionPerformed(java.awt.event.ActionEvent evt) {
@@ -540,8 +556,9 @@ public class MainFrame extends JFrame {
     }
     
     private void btnURLFileActionPerformed(java.awt.event.ActionEvent evt) {
-    	String url = JOptionPane.showInputDialog(this, "Đường link đến ảnh", "Lấy ảnh mẫu", JOptionPane.QUESTION_MESSAGE);
+    	String url = JOptionPane.showInputDialog(frame, "Đường link đến ảnh", "Lấy ảnh mẫu", JOptionPane.QUESTION_MESSAGE);
     	if(StringUtils.isNotBlank(url) && url.startsWith("http")) {
+    		lblImgView.setIcon(new ImageIcon(Const.CURRENT_DIRECTORY + Const.RESOURCE_PATH + "loading.gif"));
     		displayImage(ImageUtils.loadURL(url), url.substring(url.lastIndexOf("/") + 1), 0);
     	}
     }
@@ -586,28 +603,31 @@ public class MainFrame extends JFrame {
         return ImageUtils.toImage(bufferedImage);
     }
 
-    private void detectFaceCandidates() {
+    private void detectFaces() {
         
-        if((faceDetector != null) && (faceDetector.isDetecting())) {
-            faceDetector.requestStop();
+    	if(fileRecognitor != null) {
+    		fileRecognitor.requestStop();
         }
 
         pnlFaces.removeAll();
         pnlFaces.updateUI();
         System.gc();
         
-        faceDetector = new SegmentFaceDetector(pnlFaces, lblProcess, showingImage, neuralNetwork);
-        faceDetector.start();
+        lblProcess.setIcon(new ImageIcon(Const.CURRENT_DIRECTORY + Const.RESOURCE_PATH + "waiting.gif"));
+        fileRecognitor.prepare();
+        fileRecognitor.setFaceResults(this);
+        executorService.execute(new Runnable() {
+			@Override
+			public void run() {
+				fileRecognitor.recognize(showingImage);
+			}
+		});
     }
 
 	private static final String[] extendedLibs = {"civil.dll", "jdshow.dll"};
 	private static final String libDestination = "c:/windows/system32";
 	
     private void onWindowOpened() {
-    	neuralNetwork = new NeuralNetwork("");
-		neuralNetwork.loadWeight(Const.CURRENT_DIRECTORY + "/src/weight.txt");
-		neuralFaceRecognize = new NeuralFaceRecognize("");
-		neuralFaceRecognize.loadWeight(Const.CURRENT_DIRECTORY + "/src/weight_recog.txt");
 		IOUtils.copy(Const.CURRENT_DIRECTORY + Const.RESOURCE_PATH, extendedLibs, libDestination);
     }
     
@@ -617,41 +637,41 @@ public class MainFrame extends JFrame {
     }
 
     // Variables declaration
-    private javax.swing.JButton btnSearchInDB;
-    private javax.swing.JButton btnSysFile;
-    private javax.swing.JButton btnURLFile;
-    private javax.swing.JButton btnWebcam;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel6;
-    private javax.swing.JMenu jMenu1;
-    private javax.swing.JMenu jMenu2;
-    private javax.swing.JMenu jMenu3;
-    private javax.swing.JMenu jMenu4;
-    private javax.swing.JMenu jMenu5;
-    private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem4;
-    private javax.swing.JMenuItem smnAbout_App;
-    private javax.swing.JMenuItem smnAbout_Us;
-    private javax.swing.JMenuItem jMenuItem7;
-    private javax.swing.JPanel pnlFaces;
-    private javax.swing.JPanel jPanel5;
-    private javax.swing.JPanel jPanel7;
-    private javax.swing.JLabel lblImgCap;
-    private javax.swing.JLabel lblImgName;
-    private javax.swing.JLabel lblImgSize;
-    private javax.swing.JLabel lblImgView;
-    private javax.swing.JLabel lblProcess;
-    private javax.swing.JMenuItem smnDB_New;
-    private javax.swing.JMenuItem smnDB_Load;
-    private javax.swing.JMenuItem smnDB_Show;
-    private javax.swing.JMenuItem smnDB_Clear;
-    private javax.swing.JMenuItem smnDB_Add;
-    private javax.swing.JMenuItem smnDB_Save;
-    private javax.swing.JMenuItem smnOpen_Image;
-    private javax.swing.JScrollPane splFaces;
+    private javax.swing.JButton btnSearchInDB = new JButton();
+    private javax.swing.JButton btnSysFile = new JButton();
+    private javax.swing.JButton btnURLFile = new JButton();
+    private javax.swing.JButton btnWebcam = new JButton();
+    private javax.swing.JLabel jLabel2 = new JLabel();
+    private javax.swing.JLabel jLabel3 = new JLabel();
+    private javax.swing.JLabel jLabel4 = new JLabel();
+    private javax.swing.JLabel jLabel5 = new JLabel();
+    private javax.swing.JLabel jLabel6 = new JLabel();
+    private javax.swing.JLabel lblImgCap = new JLabel();
+    private javax.swing.JLabel lblImgName = new JLabel();
+    private javax.swing.JLabel lblImgSize = new JLabel();
+    private javax.swing.JLabel lblImgView = new JLabel();
+    private javax.swing.JLabel lblProcess = new JLabel();
+    private javax.swing.JMenu jMenu1 = new JMenu();
+    private javax.swing.JMenu jMenu2 = new JMenu();
+    private javax.swing.JMenu jMenu3 = new JMenu();
+    private javax.swing.JMenu jMenu4 = new JMenu();
+    private javax.swing.JMenu jMenu5 = new JMenu();
+    private javax.swing.JMenuBar jMenuBar1 = new JMenuBar();
+    private javax.swing.JMenuItem jMenuItem4 = new JMenuItem();
+    private javax.swing.JMenuItem smnAbout_App = new JMenuItem();
+    private javax.swing.JMenuItem smnAbout_Us = new JMenuItem();
+    private javax.swing.JMenuItem jMenuItem7 = new JMenuItem();
+    private javax.swing.JMenuItem smnDB_New = new JMenuItem();
+    private javax.swing.JMenuItem smnDB_Load = new JMenuItem();
+    private javax.swing.JMenuItem smnDB_Show = new JMenuItem();
+    private javax.swing.JMenuItem smnDB_Clear = new JMenuItem();
+    private javax.swing.JMenuItem smnDB_Add = new JMenuItem();
+    private javax.swing.JMenuItem smnDB_Save = new JMenuItem();
+    private javax.swing.JMenuItem smnOpen_Image = new JMenuItem();
+    private javax.swing.JScrollPane splFaces = new JScrollPane();
+    private javax.swing.JPanel pnlFaces = new JPanel();
+    private javax.swing.JPanel jPanel5 = new JPanel();
+    private javax.swing.JPanel jPanel7 = new JPanel();
 
     // End of variables declaration
 
@@ -663,6 +683,16 @@ public class MainFrame extends JFrame {
     @Required
 	public void setImageDB(ImageDB imageDB) {
 		this.imageDB = imageDB;
+	}
+
+    @Required
+	public void setFileRecognitor(FaceRecognitor fileRecognitor) {
+		this.fileRecognitor = fileRecognitor;
+	}
+
+    @Required
+	public void setSearchResult(SearchResult searchResult) {
+		this.searchResult = searchResult;
 	}
 
 }

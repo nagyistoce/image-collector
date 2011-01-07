@@ -44,8 +44,7 @@ public class FlashScreen extends javax.swing.JFrame {
         	@Override
         	public void windowClosed(WindowEvent e) {
         		super.windowClosing(e);
-        		mainFrame.setSize(1050, 650);
-        		mainFrame.setVisible(true);
+        		mainFrame.show(1050, 650);
         	}
 		});
 

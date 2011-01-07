@@ -3,7 +3,17 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
     xsi:schemaLocation="http://www.springframework.org/schema/beans
            http://www.springframework.org/schema/beans/spring-beans-2.5.xsd">
-
+           
+    <bean id="fileDetector" class="team.nm.nnet.app.imageCollector.bo.FaceDetector" />
+    <bean id="dbDetector" class="team.nm.nnet.app.imageCollector.bo.FaceDetector" />
+    
+    <bean id="fileRecognitor" class="team.nm.nnet.app.imageCollector.bo.FaceRecognitor" >
+        <property name="faceDetector" ref="fileDetector"/>
+    </bean>
+    <bean id="dbSearcher" class="team.nm.nnet.app.imageCollector.bo.FaceSearcher" >
+        <property name="faceDetector" ref="dbDetector"/>
+    </bean>
+    
     <bean 
     	id="imageStore" class="team.nm.nnet.app.imageCollector.bo.ImageStore">
     	<property name="frameWidth" value="${store.image.frame.width}"/>
@@ -22,6 +32,12 @@
     	id="mainFrame" class="team.nm.nnet.app.imageCollector.layout.MainFrame">
     	<property name="imageDB" ref="imageDB"/>
     	<property name="capture" ref="capture"/>
+    	<property name="searchResult" ref="searchResult"/>
+    	<property name="fileRecognitor" ref="fileRecognitor"/>
+    </bean>
+    <bean 
+        id="searchResult" class="team.nm.nnet.app.imageCollector.layout.SearchResult" factory-method="getInstance">
+        <property name="dbSearcher" ref="dbSearcher"/>
     </bean>
     <bean 
         id="flashScreen" class="team.nm.nnet.app.imageCollector.layout.FlashScreen">

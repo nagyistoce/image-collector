@@ -1,6 +1,7 @@
 package team.nm.nnet.app.imageCollector.layout;
 
 import java.awt.Desktop;
+import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.MouseEvent;
@@ -8,9 +9,11 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+import javax.swing.ImageIcon;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 
+import team.nm.nnet.core.Const;
 import team.nm.nnet.util.ImageUtils;
 
 public class SearchedFacePanel extends javax.swing.JPanel {
@@ -22,10 +25,17 @@ public class SearchedFacePanel extends javax.swing.JPanel {
     public SearchedFacePanel(BufferedImage imgBuffer, String imgPath) {
         this.imgPath = imgPath;
         initPopup();
-        initComponents(imgBuffer);
+        initComponents();
+        setFaceImage(imgBuffer);
+    }
+    
+    public void setFaceImage(BufferedImage imgBuffer) {
+    	imgBuffer = ImageUtils.resize(imgBuffer, Const.SHOWING_FACE_WIDTH, Const.SHOWING_FACE_HEIGHT);
+        Image faceImage = ImageUtils.toImage(imgBuffer);
+        lblImgView.setIcon(new ImageIcon(faceImage));
     }
 
-    private void initComponents(BufferedImage imgBuffer) {
+    private void initComponents() {
 
         jLayeredPane1 = new javax.swing.JLayeredPane();
         chbChoose = new javax.swing.JCheckBox();
@@ -38,7 +48,6 @@ public class SearchedFacePanel extends javax.swing.JPanel {
         jLayeredPane1.add(chbChoose, javax.swing.JLayeredPane.DEFAULT_LAYER);
 
         lblImgView.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblImgView.setIcon(new javax.swing.ImageIcon(ImageUtils.toImage(imgBuffer)));
         lblImgView.setAutoscrolls(true);
         lblImgView.setComponentPopupMenu(lblImgView.getComponentPopupMenu());
         lblImgView.addMouseListener(new java.awt.event.MouseAdapter() {

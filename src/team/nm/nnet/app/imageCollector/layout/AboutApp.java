@@ -1,24 +1,44 @@
 package team.nm.nnet.app.imageCollector.layout;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
+
 import javax.swing.ImageIcon;
 
 import team.nm.nnet.app.imageCollector.support.NMHyperlinkListener;
 import team.nm.nnet.core.Const;
 
-public class AboutApp extends javax.swing.JFrame {
+public class AboutApp extends javax.swing.JDialog {
 
-	private static final long serialVersionUID = 2285681537240165512L;
+	private static final long serialVersionUID = 1L;
 	
 	private static final String message = "<HTML><div style=\"font-family:Arial;font-size:12px;\">" +
 			"<p>Chương trình được <span style='color:#FF6600'><b>nhóm NM</b></span> xây dựng và phát triển, <br/> " +
 			"dựa trên nền tảng chính là <span style='color:#B00000'><i>mạng thần kinh (neural network).</i></span><br/>" +
 			"</p><br/><p>Tham khảo mã nguồn tại: <a href='http://code.google.com/p/image-collector/'><u>image-collector</u></a></p></div></HTML>";
     
-	public AboutApp() {
+	private static AboutApp instance = new AboutApp();
+	
+	private AboutApp() {
         initComponents();
-    }
 
+    	// Get the size of the screen
+        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+
+        // Determine the new location of the window
+        int w = this.getSize().width;
+        int h = this.getSize().height;
+        int x = (dim.width-w)/2;
+        int y = (dim.height-h)/2;
+        this.setLocation(x, y);
+    }
+	
+	public static AboutApp getInstance() {
+		return instance;
+	}
+	
     private void initComponents() {
+    	
         java.awt.GridBagConstraints gridBagConstraints;
 
         jPanel1 = new javax.swing.JPanel();
@@ -28,6 +48,7 @@ public class AboutApp extends javax.swing.JFrame {
         jEditorPane1 = new javax.swing.JEditorPane();
         btnClose = new javax.swing.JButton();
 
+        setModal(true);
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Thông tin ứng dụng");
         setIconImage(new ImageIcon(Const.CURRENT_DIRECTORY + Const.RESOURCE_PATH + "icon.png").getImage());

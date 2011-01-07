@@ -24,7 +24,7 @@ public class ImageDB {
 		try{
 			while((path = br.readLine()) != null) {
 				if(StringUtils.isNotBlank(path)) {
-					files.add(new File(path));
+					files.add(new File(path.trim()));
 				}
 			}
 		} catch(Exception e) {

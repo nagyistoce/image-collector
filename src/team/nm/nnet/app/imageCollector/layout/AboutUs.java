@@ -1,11 +1,14 @@
 package team.nm.nnet.app.imageCollector.layout;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
+
 import javax.swing.ImageIcon;
 
 import team.nm.nnet.app.imageCollector.support.NMHyperlinkListener;
 import team.nm.nnet.core.Const;
 
-public class AboutUs extends javax.swing.JFrame {
+public class AboutUs extends javax.swing.JDialog {
 	private static final long serialVersionUID = 6546434093998651359L;
 	
 	private static final String message = "<html><div style=\"font-family:Arial;font-size:12px;\"><p align=center style=\"text-align:center;line-height:normal\">Ứng dụng là phần hiện thực từ đề tài tốt nghiệp \"<b><span style=\"color:red\">Dò tìm và nhận dạng khuôn mặt</span></b>\" của <span style=\"color:#E36C0A\">nhóm NM</span>,<br/> được thực hiện từ 10/2010 đến 1/2011 với sự tham gia của các cá nhân sau:</p><br/>" +
@@ -25,9 +28,25 @@ public class AboutUs extends javax.swing.JFrame {
 			"<p><b>Lê Chí Mừng</b></p><p>Mã số: 106102208</p><p>Email: <a href=\"mailto:chimung.hutech@gmail.com\">chimung.hutech@gmail.com</a></p><br/></td>" +
 			"</tr></table></div></html>";
 
-	public AboutUs() {
+	private static AboutUs instance = new AboutUs();
+	
+	private AboutUs() {
         initComponents();
+
+    	// Get the size of the screen
+        Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
+
+        // Determine the new location of the window
+        int w = this.getSize().width;
+        int h = this.getSize().height;
+        int x = (dim.width-w)/2;
+        int y = (dim.height-h)/2;
+        this.setLocation(x, y);
     }
+	
+	public static AboutUs getInstance() {
+		return instance;
+	}
 
     private void initComponents() {
         java.awt.GridBagConstraints gridBagConstraints;
@@ -38,6 +57,7 @@ public class AboutUs extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
         btnClose = new javax.swing.JButton();
 
+        setModal(true);
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Thông tin thành viên");
         setIconImage(new ImageIcon(Const.CURRENT_DIRECTORY + Const.RESOURCE_PATH + "icon.png").getImage());

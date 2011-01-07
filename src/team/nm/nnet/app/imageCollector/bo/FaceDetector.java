@@ -1,144 +1,73 @@
 package team.nm.nnet.app.imageCollector.bo;
-/*
-package team.nm.nnet.app.imageCollector.basis;
 
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-import javax.swing.JPanel;
-
-import team.nm.nnet.app.imageCollector.layout.FacePanel;
-import team.nm.nnet.app.imageCollector.utils.ColorDetection;
+import team.nm.nnet.app.imageCollector.om.DetectedFace;
+import team.nm.nnet.app.imageCollector.om.FaceList;
+import team.nm.nnet.app.imageCollector.om.Pixel;
+import team.nm.nnet.app.imageCollector.om.Region;
 import team.nm.nnet.core.Const;
 import team.nm.nnet.tmp.NeuralNetwork;
 import team.nm.nnet.util.ImageUtils;
-import team.nm.nnet.util.Matrix;
 
-public class FaceDetector extends Thread {
+public class FaceDetector {
     
     private volatile boolean state = false;
-    private JPanel pnlFaces;
-    private Image image;
     private NeuralNetwork neuralNetwork;
+    private BufferedImage bufferedImage;
+    private FaceList faceResults;
+    private String filePath;
     
-    public FaceDetector(JPanel pnlFaces, Image image, NeuralNetwork neuralNetwork) {
-        this.pnlFaces = pnlFaces;
-        this.image = image;
-        this.neuralNetwork = neuralNetwork;
+    public FaceDetector () {
+    	neuralNetwork = new NeuralNetwork("");
+    	neuralNetwork.loadWeight(Const.CURRENT_DIRECTORY + "/src/weight.txt");
     }
-
+    
+    public void detect(File file) {
+    	if(file == null) {
+    		return;
+    	}
+    	bufferedImage = ImageUtils.load(file);
+    	filePath = file.getPath();
+    	run();
+    }
+    
+    public void detect(Image image, String filePath) {
+    	if(image == null) {
+    		return;
+    	}
+    	this.filePath = filePath;
+    	bufferedImage = ImageUtils.toBufferedImage(image);
+    	run();
+    }
+    
+    public void detect(BufferedImage bufferedImage, String filePath) {
+    	if(bufferedImage == null) {
+    		return;
+    	}
+    	this.filePath = filePath;
+    	this.bufferedImage = bufferedImage;
+    	run();
+    }
+    
     public void run() {
-        if(image == null) {
-            return;
-        }
-        
-        BufferedImage bufferedImage = ImageUtils.toBufferedImage(image);
-        if(bufferedImage == null) {
+        if((bufferedImage == null) || (faceResults == null)) {
             return;
         }
 
         // Mark this thread is running
         state = true;
-        System.out.println("Face Detection Thread running...");
         
-        findCandidates(bufferedImage);
+        findCandidates();
         
         // Finish detecting
         state = false;
         System.gc();
-        System.out.println("Face Detection Thread finished!");
-    }
-
-    private void findCandidates2(BufferedImage bufferedImage) {
-//        int detectorWidth = Const.FACE_WIDTH;
-//        int detectorHeight = Const.FACE_HEIGHT;
-    	
-    	int detectorWidth = 68;
-        int detectorHeight = 83;
-        int width = bufferedImage.getWidth(null);
-        int height = bufferedImage.getHeight(null);
-
-        do {
-            for (int i = 1; i < width; i += detectorWidth / 2) {
-                for (int j = 1; j < height; j += detectorHeight / 2) {
-                    if(!state) {
-                        return;
-                    }
-                    
-                    if ((i + detectorWidth < width) && (j + detectorHeight < height)) {
-	                    BufferedImage subBuff = bufferedImage.getSubimage(i, j, detectorWidth, detectorHeight);
-	                    
-	                	if(neuralNetwork.gfncGetWinner(subBuff)) {
-	                		ImageUtils.saveToJpg(subBuff, new File("D:\\" + i + j + ".jpg"));
-	                		FacePanel fp = new FacePanel(pnlFaces, ImageUtils.toImage(subBuff));
-	                		fp.setFaceName(String.valueOf(i + " x " + j));
-	                		addFaceCandidates(fp);
-	                    }
-                    }
-                	System.out.println(i + " x " + j);
-                }
-                System.gc();
-            }
-            
-            break;
-//            if ((detectorWidth < width) && (detectorHeight < height)) {
-//                detectorWidth += Const.SCANNER_GROWTH;
-//                detectorHeight += Const.SCANNER_GROWTH;
-//            	
-//            } else {
-//                break;
-//            }
-        } while ((detectorWidth < width) && (detectorHeight < height));
-    }
-    
-    private void findCandidates(BufferedImage bufferedImage) {
-    	Matrix<Integer> integralImg = ColorDetection.getIntegralMatrix(bufferedImage);
-    	int detectorWidth = Const.FACE_WIDTH;
-    	int detectorHeight = Const.FACE_HEIGHT;
-    	int width = integralImg.getWidth();
-    	int height = integralImg.getHeight();
-    	
-    	do {
-    		for (int i = 1; i < width; i += Const.JUMP_LENGHT) {
-    			for (int j = 1; j < height; j += Const.JUMP_LENGHT) {
-    				if(!state) {
-    					return;
-    				}
-    				
-    				if ((i + detectorWidth < width) && (j + detectorHeight < height)) {
-    					int a = integralImg.getValue(i - 1, j - 1);
-    					int b = integralImg.getValue(i - 1, j + detectorHeight);
-    					int c = integralImg.getValue(i + detectorWidth, j - 1);
-    					int d = integralImg.getValue(i + detectorWidth, j + detectorHeight);
-    					int whitePixelSum = d - (b + c) + a;
-    					float rate = (float) whitePixelSum / ((detectorWidth + 1) * (detectorHeight + 1));
-    					System.out.println(String
-    							.format("width=%d, height=%d, sWidth=%d, sHeight=%d, pos[%d][%d]: d=%d, c=%d, b=%d, a=%d, wiSum=%d, rate=%f",
-    									width, height, detectorWidth, detectorHeight,
-    									i, j, d, c, b, a,
-    									whitePixelSum, rate));
-    					if (rate > Const.SCANNER_RATE_THRESHOLD) {
-    						BufferedImage subBuff = bufferedImage.getSubimage(i, j, detectorWidth, detectorHeight);
-    						ImageUtils.saveToJpg(subBuff, new File("D:\\" + i + "-" + j + ".jpg"));
-    						if(neuralNetwork.gfncGetWinner(subBuff)) {
-    							FacePanel fp = new FacePanel(pnlFaces, ImageUtils.toImage(subBuff));
-    							fp.setFaceName(String.valueOf(rate));
-    							addFaceCandidates(fp);
-    						}
-    					}
-    				}
-    			}
-    			System.gc();
-    		}
-    		
-    		if ((detectorWidth < width) && (detectorHeight < height)) {
-    			detectorWidth += Const.SCANNER_GROWTH;
-    			detectorHeight += Const.SCANNER_GROWTH;
-    		} else {
-    			break;
-    		}
-    	} while ((detectorWidth < width) && (detectorHeight < height));
     }
     
     public boolean isDetecting() {
@@ -147,12 +76,116 @@ public class FaceDetector extends Thread {
 
     public void requestStop() {
         state = false;
-        System.out.println("----Thread stopped");
+    }
+
+    public boolean isCandidate(Region colorSegment) {
+        if(colorSegment.getPixels().size() < Const.MINIMUM_SKIN_PIXEL_THRESHOLD) {
+            return false;
+        }
+        float whiteRatio = (float) colorSegment.getPixels().size() / (colorSegment.getWidth() * colorSegment.getHeight());
+        if(whiteRatio < Const.WHITE_RATIO_THRESHOLD) {
+            return false;
+        }
+
+        return true;
     }
     
-    private void addFaceCandidates(FacePanel facePanel) {
-        pnlFaces.add(facePanel);
-        pnlFaces.updateUI();
+    protected void findCandidates() {
+        ColorSegmentation colorSegmentation = new ColorSegmentation();
+        List<Region> segments = colorSegmentation.segment(bufferedImage);
+        if(segments == null) {
+            return;
+        }
+        for(Region segment : segments) {
+            if(!state) {
+                colorSegmentation.requestStop();
+                return;
+            }
+            if (isCandidate(segment)) {
+                try{
+                    List<Region> subSegments = separateRegions(segment);
+                    if(subSegments == null) {
+                        subSegments = new ArrayList<Region>();
+                        subSegments.add(segment);
+                    }
+                    for(Region subSegment : subSegments) {
+                    	Region candidate = extractSingleFace(subSegment);
+                        if(candidate != null) {
+                        	int x = ((candidate.getLeft() - Const.SPAN_FACE_BOX) > segment.getLeft()) ? candidate.getLeft() - Const.SPAN_FACE_BOX : segment.getLeft(); 
+                            int y = ((candidate.getBottom() - Const.SPAN_FACE_BOX) > segment.getBottom()) ? candidate.getBottom() - Const.SPAN_FACE_BOX : segment.getBottom(); 
+                            int w = ((candidate.getRight() + Const.SPAN_FACE_BOX) <= segment.getRight()) ? candidate.getWidth() + Const.SPAN_FACE_BOX : candidate.getWidth(); 
+                            int h = ((candidate.getTop() + Const.SPAN_FACE_BOX) <= segment.getTop()) ? candidate.getHeight() + Const.SPAN_FACE_BOX : candidate.getHeight();
+                        	
+                            BufferedImage bufImg = bufferedImage.getSubimage(x, y, w, h);
+                            DetectedFace face = new DetectedFace(bufImg, filePath);
+                            faceResults.addFace(face);
+                        } 
+                    }
+                }catch(Exception e) {
+                    System.out.println(String.format("l: %d, r: %d, b: %d, t:%d, w: %d, h: %d", segment.getLeft(), segment.getRight(), segment.getBottom(), segment.getTop(), segment.getWidth(), segment.getHeight()));
+                }
+            }
+        }
+        faceResults.onFulfiling();
     }
+    
+    protected List<Region> separateRegions(Region segment) {
+        List<Pixel> brokenPoints = segment.getBrokenPoints(bufferedImage); 
+        if((brokenPoints == null) || (brokenPoints.size() < 1)) {
+            return null;
+        }
+        Collections.sort(brokenPoints);
+        
+        List<Region> regions = new ArrayList<Region>();
+        int top = segment.getTop();
+        int bottom = segment.getBottom();
+        int left = segment.getLeft();
+        for(Pixel p : brokenPoints) {
+            regions.add(new Region(left, top, p.getX(), bottom));
+            left = p.getX();
+        }
+        
+        // Add the last region
+        regions.add(new Region(left, top, segment.getRight(), bottom));
+        return regions;
+    }
+    
+    protected Region extractSingleFace(Region segment) {
+        int width = segment.getWidth();
+        int height = segment.getHeight();
+        int left = segment.getLeft();
+        int bottom = segment.getBottom();
+        BufferedImage segmentBuff = bufferedImage.getSubimage(left, bottom, width, height);
+        
+        float max = 0;
+        Region candidate = null;
+        double[] scales = {1, 0.8, 0.6, 0.4};
+        for(double scale : scales){
+            int w = (int) (width * scale), h = (int) (height * scale);
+            for(int i = 0, ww = width - w; i <= ww; i += Const.JUMP_LENGHT) {
+                for(int j = 0, hh = height - h; j <= hh; j += Const.JUMP_LENGHT) {
+                	if(!state) {
+                        return null;
+                    }
+                    BufferedImage subBuff = segmentBuff.getSubimage(i, j, w, h);
+                    subBuff = ImageUtils.resize(subBuff, Const.FACE_WIDTH, Const.FACE_HEIGHT);
+                    
+                    float outVal = neuralNetwork.gfncGetWinner(subBuff);
+                    if((outVal > Const.NETWORK_FACE_VALIDATION_THRESHOLD) && (outVal > max)) {
+                        max = outVal;
+                        candidate = new Region(left + i, bottom + j + h, left + i + w, bottom + j);
+                    }
+                }
+            }
+        }
+        return candidate;
+    }
+
+	public FaceList getFaceResults() {
+		return faceResults;
+	}
+
+	public void setFaceResults(FaceList faceResults) {
+		this.faceResults = faceResults;
+	}
 }
-*/

@@ -35,7 +35,7 @@ public class Capture {
 	            	super.windowClosing(e);
 	            }
 	        });
-	 
+
 	        frame.setDefaultCloseOperation(javax.swing.WindowConstants.HIDE_ON_CLOSE);
 	        frame.setIconImage(new ImageIcon(Const.CURRENT_DIRECTORY + Const.RESOURCE_PATH + "icon.png").getImage());
 	        frame.add("Center", mediaCapture);
@@ -56,6 +56,7 @@ public class Capture {
 		} else {
 			mediaCapture.play();
 		}
+        
         frame.setVisible(true);
 	}
 	

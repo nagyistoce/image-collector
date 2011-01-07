@@ -61,9 +61,9 @@ public class Const {
     public static final int SCANNER_GROWTH = 10;
     
     /**
-     * Ngưỡng để xác định một khung hình có khả năng là khuôn mặt hay không
+     * Ngưỡng quy quy định số điểm trắng để xác định một khung hình có khả năng là khuôn mặt hay không
      */
-    public static final double SCANNER_RATE_THRESHOLD = 0.6;
+    public static final double WHITE_RATIO_THRESHOLD = 0.4;
     
     /**
      * Số lượng pixel thấp nhất mà một vùng còn được xem là vùng khuôn mặt 
@@ -81,6 +81,11 @@ public class Const {
      */
     public static final float NETWORK_FACE_VALIDATION_THRESHOLD = (float) 0.75;
     
+    /**
+     * Kích thước khuôn mặt hiển thị đến người dùng
+     */
+    public static final int SHOWING_FACE_WIDTH = 120;
+    public static final int SHOWING_FACE_HEIGHT = 160;
     /**
      * Độ giãn giữa tọa độ thật với độ tọa đóng khung khuôn mặt
      */
