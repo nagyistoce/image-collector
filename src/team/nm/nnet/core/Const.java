@@ -134,4 +134,9 @@ public class Const {
     	1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,
     	1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,
     };
+    
+    /**
+     * Nguong qui dinh anh co trong data base hay khong.
+     */
+    public static final  float RECONIZE_THRESHOLD = 0.8F; 
 }
