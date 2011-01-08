@@ -19,7 +19,7 @@ import team.nm.nnet.util.ImageUtils;
 public class SearchedFacePanel extends javax.swing.JPanel {
 
 	private static final long serialVersionUID = 748605111312762257L;
-	private static JPopupMenu popupMenu;
+	private JPopupMenu popupMenu;
     private String imgPath;
 
     public SearchedFacePanel(BufferedImage imgBuffer, String imgPath) {
@@ -132,6 +132,10 @@ public class SearchedFacePanel extends javax.swing.JPanel {
 
     public boolean isSelected() {
         return chbChoose.isSelected();
+    }
+    
+    public String getFilePath() {
+    	return imgPath;
     }
 
     // Variables declaration - do not modify

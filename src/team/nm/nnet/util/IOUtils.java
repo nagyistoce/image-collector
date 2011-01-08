@@ -82,50 +82,110 @@ public class IOUtils {
     	return listSubFolder;
     }
     
-    public static void copy(String sourcePath, String[] fileNames, String destPath) {
-		File dest = new File(destPath);
+    public static int copy(String sourcePath, String[] fileNames, String destPath) {
+		int count = 0;
+    	File dest = new File(destPath);
 		if(!dest.exists()) {
 			log.error("Destination doesn't exist!");
-			return;
+			return -1;
 		}
 		
 		for(String fileName : fileNames) {
 			File file = new File(sourcePath + fileName);
 			File destFile = new File(destPath, fileName);
 			if(!destFile.exists()) {
-				InputStream in;
-				try {
-					in = new FileInputStream(file);
-				
-					//For Overwrite the file.
-					OutputStream out = new FileOutputStream(destFile);
-	
-					byte[] buf = new byte[1024];
-					int len;
-					while ((len = in.read(buf)) > 0){
-						out.write(buf, 0, len);
-					}
-					in.close();
-					out.close();
-				} catch (Exception e) {
-					log.error(e.getMessage());
+				if(copy(file, destFile)) {
+					count++;
 				}
 			}
 		}
+		return count;
 	}
-	
-    public static void delete(String sourcePath, String[] fileNames) {
-		File dest = new File(sourcePath);
+    
+    public static int copy(String[] filePaths, String destPath) {
+    	int count = 0;
+    	File dest = new File(destPath);
+    	if(!dest.exists()) {
+    		log.error("Destination doesn't exist!");
+    		return -1;
+    	}
+    	
+    	for(String path : filePaths) {
+    		File file = new File(path);
+    		File destFile = new File(destPath, file.getName());
+    		if(!destFile.exists()) {
+    			if(copy(file, destFile)) {
+    				count++;
+    			}
+    		}
+    	}
+    	return count;
+    }
+    
+    static boolean copy(File file, File destFile) {
+    	InputStream in;
+		try {
+			in = new FileInputStream(file);
+		
+			//For Overwrite the file.
+			OutputStream out = new FileOutputStream(destFile);
+
+			byte[] buf = new byte[1024];
+			int len;
+			while ((len = in.read(buf)) > 0){
+				out.write(buf, 0, len);
+			}
+			in.close();
+			out.close();
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			return false;
+		}
+		return true;
+    }
+    public static int move(String[] filePaths, String destPath) {
+    	int count = 0;
+    	// Destination directory
+		File dest = new File(destPath);
 		if(!dest.exists()) {
 			log.error("Destination doesn't exist!");
-			return;
+			return -1;
+		}
+		
+		for(String path : filePaths) {
+			File file = new File(path);
+		    
+		    // Move file to new directory
+			File newFile = new File(destPath, file.getName());
+		    boolean success = file.renameTo(newFile);
+		    if (success) {
+		    	count++;
+		    } else {
+		    	log.error("File was not successfully moved");
+		    }
+		}
+		return count;
+	}
+	
+    public static int delete(String sourcePath, String[] fileNames) {
+		int count = -1;
+    	File dest = new File(sourcePath);
+		if(!dest.exists()) {
+			log.error("Destination doesn't exist!");
+			return count;
 		}
 		
 		for(String fileName : fileNames) {
 			File destFile = new File(sourcePath, fileName);
 			if(destFile.exists()) {
-				destFile.delete();
+				boolean success = destFile.delete();
+				if (success) {
+			    	count++;
+			    } else {
+			    	log.error("File was not successfully deleted");
+			    }
 			}
 		}
+		return count;
 	}
 }

@@ -76,4 +76,18 @@ public class Chooser extends JFileChooser {
         }
         return null;
     }
+    
+    public static File getDirectory(String caption) {
+        final JFileChooser chooser = new JFileChooser(curPath);
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        chooser.setAcceptAllFileFilterUsed(false);
+        chooser.setDialogTitle(caption);
+        int returnVal = chooser.showSaveDialog(null);
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+        	File selectedFile = chooser.getSelectedFile();
+    		curPath = selectedFile.getPath();
+    		return selectedFile;
+        }
+        return null;
+    }
 }

@@ -29,6 +29,10 @@ public class ExtractedFacePanel extends javax.swing.JPanel {
     public void displayCheckbox(boolean visible) {
     	chbChoose.setVisible(visible);
     }
+    
+    public boolean isSelected() {
+    	return chbChoose.isSelected();
+    }
 
     // <editor-fold>
     private void initComponents() {
@@ -104,6 +108,7 @@ public class ExtractedFacePanel extends javax.swing.JPanel {
     
     private String facePath;
     private String faceName;
+    private int faceId;
     private JPanel parent;
     // End of variables declaration
 
@@ -122,6 +127,15 @@ public class ExtractedFacePanel extends javax.swing.JPanel {
 	public void setFaceName(String faceName) {
 		this.faceName = faceName;
 		txtFaceName.setText(faceName);
+	}
+
+	public int getFaceId() {
+		return faceId;
+	}
+
+	public void setFaceId(int faceId) {
+		this.faceId = faceId;
+		chbChoose.setEnabled(faceId > 0);
 	}
 
 }

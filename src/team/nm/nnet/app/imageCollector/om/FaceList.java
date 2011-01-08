@@ -12,11 +12,11 @@ public abstract class FaceList {
 	protected List<DetectedFace> faceList = new ArrayList<DetectedFace>();
 	
 	public void addFace(final DetectedFace face) {
+		faceList.add(face);
 		executorService.execute(new Runnable() {
 			
 			@Override
 			public void run() {
-				faceList.add(face);
 				onAddingFace(face);
 			}
 		});

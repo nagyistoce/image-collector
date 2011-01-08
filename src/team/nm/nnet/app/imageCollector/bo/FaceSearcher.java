@@ -19,16 +19,15 @@ public class FaceSearcher extends FaceList {
 	
 	private volatile boolean state = false;
 	private volatile int addingThreads;
+	private volatile int currentProcessId;
 	private volatile int completedAddingThreads;
-	private int completedFile, sumFaces;
-	private int currentProcessId;
 	
 	private NeuralFaceRecognize neuralRecognition;
 	private FaceDetector faceDetector;
 	private FaceList faceResults;
 	
 	private List<File> files;
-	private List<String> expectedOutput;
+	private List<Integer> expectedOutput;
 	
 
 	public FaceSearcher () {
@@ -39,22 +38,26 @@ public class FaceSearcher extends FaceList {
 	public void prepare() {
 		addingThreads = Integer.MAX_VALUE;
 		completedAddingThreads = 0;
-		completedFile = 0;
-		sumFaces = 0;
 		currentProcessId = -1;
 		clear();
 	}
 
-	public void search(List<File> files, List<String> expectedOutput) {
+	public void search(List<File> files, List<Integer> expectedOutput) {
 		if((files == null) || (files.size() < 1)) {
 			return;
 		}
 		this.files = files;
 		this.expectedOutput = expectedOutput;
 		
+		state = true;
 		faceDetector.setFaceResults(this);
-		for(int i = 0; i <2; i++) {
-			nextProcessing();
+		for(int i = 0; i < 1; i++) {
+			executorService.execute(new Runnable() {
+				@Override
+				public void run() {
+					nextProcessing();
+				}
+			});
 		}
 	}
 	
@@ -62,29 +65,25 @@ public class FaceSearcher extends FaceList {
 		if(++currentProcessId >= files.size()) {
 			return;
 		}
-		executorService.execute(new Runnable() {
-			@Override
-			public void run() {
-				faceDetector.detect(files.get(currentProcessId));
-			}
-		});
+		faceDetector.detect(files.get(currentProcessId));
 	}
 	
 	@Override
 	public void onAddingFace(DetectedFace face) {
-		faceResults.addFace(face);
+//		faceResults.addFace(face);
 		
-		/*BufferedImage bufImg = face.getBufferedImage();
+		BufferedImage bufImg = face.getBufferedImage();
 		int index = neuralRecognition.gfncGetWinner(bufImg);
 		if(!state) {
 			return;
 		}
+		System.out.println(expectedOutput.contains(index) + ": " + index + " - " + expectedOutput);
 		if(index > 0) {
 			if(expectedOutput.contains(index)) {
 				faceResults.addFace(face);
 			}
 		}
-		*/
+		
 		if(++completedAddingThreads >= addingThreads) {
 			faceResults.onFulfiling();
 		}
@@ -93,10 +92,9 @@ public class FaceSearcher extends FaceList {
 	@Override
 	public void onFulfiling() {
 		nextProcessing();
-		if(++completedFile == files.size()) {
-			addingThreads = sumFaces;
+		if(currentProcessId >= files.size()) {
+			addingThreads = getSize();
 		}
-		sumFaces += getSize();
 		if(completedAddingThreads >= addingThreads) {
 			faceResults.onFulfiling();
 		}

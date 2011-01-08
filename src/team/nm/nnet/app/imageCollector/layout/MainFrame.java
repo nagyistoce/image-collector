@@ -1,5 +1,6 @@
 package team.nm.nnet.app.imageCollector.layout;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -9,6 +10,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -97,6 +99,7 @@ public class MainFrame extends FaceList {
 		BufferedImage bufImg = face.getBufferedImage();
         
 		ExtractedFacePanel facePanel = new ExtractedFacePanel(pnlFaces, ImageUtils.toImage(bufImg));
+		facePanel.setFaceId(face.getFaceId());
 		facePanel.setFaceName(face.getFaceName());
 		pnlFaces.add(facePanel);
 		pnlFaces.updateUI();
@@ -104,6 +107,7 @@ public class MainFrame extends FaceList {
 	
 	@Override
 	public void onFulfiling() {
+		lblProcess.setText("<html>Tìm thấy <span style='color:#FF0000'><b>" + getSize() + "</b></span> khuôn mặt</html>");
 		lblProcess.setIcon(new ImageIcon(Const.CURRENT_DIRECTORY + Const.RESOURCE_PATH + "check.png"));
 	}
 
@@ -163,14 +167,16 @@ public class MainFrame extends FaceList {
 
         jPanel5.setLayout(new java.awt.GridBagLayout());
 
-        jLabel3.setText("Các khuôn mặt được tìm thấy");
+        lblProcess.setText("Các khuôn mặt được tìm thấy");
+        lblProcess.setHorizontalTextPosition(javax.swing.SwingConstants.LEADING);
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.gridwidth = 2;
+        gridBagConstraints.fill = java.awt.GridBagConstraints.HORIZONTAL;
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(11, 10, 0, 0);
-        jPanel5.add(jLabel3, gridBagConstraints);
+        jPanel5.add(lblProcess, gridBagConstraints);
 
         pnlFaces.setToolTipText("The face are detected");
         pnlFaces.setBackground(new java.awt.Color(255, 255, 255));
@@ -205,7 +211,6 @@ public class MainFrame extends FaceList {
         gridBagConstraints.anchor = java.awt.GridBagConstraints.NORTHWEST;
         gridBagConstraints.insets = new java.awt.Insets(16, 20, 0, 0);
         jPanel5.add(btnSearchInDB, gridBagConstraints);
-        jPanel5.add(lblProcess, new java.awt.GridBagConstraints());
 
         gridBagConstraints = new java.awt.GridBagConstraints();
         gridBagConstraints.gridx = 1;
@@ -539,8 +544,17 @@ public class MainFrame extends FaceList {
     }
     
     private void btnSearchInDBActionPerformed(java.awt.event.ActionEvent evt) {
-		searchResult.search(imageDB.getFiles(), null);
-    	searchResult.setVisible(true);
+		List<Integer> wantedFaces = getWantedFace();
+		List<File> inputs = imageDB.getFiles();
+		
+		if((inputs == null) || (inputs.size() < 1)){
+			JOptionPane.showMessageDialog(frame, "Cơ sở dữ liệu ảnh chưa được chỉ định!", "Empty image database!", JOptionPane.ERROR_MESSAGE);
+		} else if((wantedFaces == null) || (wantedFaces.size() < 1)){
+			JOptionPane.showMessageDialog(frame, "Không có khuôn mặt nào được chỉ định!", "Not specified yet!", JOptionPane.ERROR_MESSAGE);
+		} else {
+			searchResult.search(imageDB.getFiles(), wantedFaces);
+			searchResult.setVisible(true);
+		}
     }
 
     private void smnOpen_ImageActionPerformed(java.awt.event.ActionEvent evt) {
@@ -568,7 +582,7 @@ public class MainFrame extends FaceList {
         capture.show();
     }
     
-    public void showBinaryImage() {
+    protected void showBinaryImage() {
     	final BufferedImage bufferedImage = ImageUtils.toBufferedImage(showingImage);
 //		BufferedImage y2CBuff = bufferedImage;
 		final BufferedImage y2CBuff = ColorSpace.toYCbCr(bufferedImage);
@@ -609,10 +623,12 @@ public class MainFrame extends FaceList {
     		fileRecognitor.requestStop();
         }
 
+    	clear();
         pnlFaces.removeAll();
         pnlFaces.updateUI();
         System.gc();
         
+        lblProcess.setText("Đang tìm...");
         lblProcess.setIcon(new ImageIcon(Const.CURRENT_DIRECTORY + Const.RESOURCE_PATH + "waiting.gif"));
         fileRecognitor.prepare();
         fileRecognitor.setFaceResults(this);
@@ -622,6 +638,18 @@ public class MainFrame extends FaceList {
 				fileRecognitor.recognize(showingImage);
 			}
 		});
+    }
+    
+    protected List<Integer> getWantedFace() {
+    	List<Integer> list = new ArrayList<Integer>();
+    	Component[] components = pnlFaces.getComponents();
+        for(Component comp : components) {
+            ExtractedFacePanel item = (ExtractedFacePanel) comp;
+            if(item.isSelected()) {
+                list.add(item.getFaceId());
+            }
+        }
+        return list;
     }
 
 	private static final String[] extendedLibs = {"civil.dll", "jdshow.dll"};
@@ -642,7 +670,7 @@ public class MainFrame extends FaceList {
     private javax.swing.JButton btnURLFile = new JButton();
     private javax.swing.JButton btnWebcam = new JButton();
     private javax.swing.JLabel jLabel2 = new JLabel();
-    private javax.swing.JLabel jLabel3 = new JLabel();
+    private javax.swing.JLabel lblProcess = new JLabel();
     private javax.swing.JLabel jLabel4 = new JLabel();
     private javax.swing.JLabel jLabel5 = new JLabel();
     private javax.swing.JLabel jLabel6 = new JLabel();
@@ -650,7 +678,6 @@ public class MainFrame extends FaceList {
     private javax.swing.JLabel lblImgName = new JLabel();
     private javax.swing.JLabel lblImgSize = new JLabel();
     private javax.swing.JLabel lblImgView = new JLabel();
-    private javax.swing.JLabel lblProcess = new JLabel();
     private javax.swing.JMenu jMenu1 = new JMenu();
     private javax.swing.JMenu jMenu2 = new JMenu();
     private javax.swing.JMenu jMenu3 = new JMenu();
