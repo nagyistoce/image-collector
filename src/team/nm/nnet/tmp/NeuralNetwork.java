@@ -40,7 +40,7 @@ public class NeuralNetwork implements Runnable{
     /**
      * So luong neural an
      */
-    private final int CintNumberOfHiddenNeural = 800;
+    private final int CintNumberOfHiddenNeural = 1000;
 
     /**
      * Gia tri bias
@@ -65,7 +65,7 @@ public class NeuralNetwork implements Runnable{
     /**
      * So lan hoc
      */
-    private final int CintEpochs = 800;
+    private final int CintEpochs = 1200;
 
     /**
      * Nguong sai cuc tieu
