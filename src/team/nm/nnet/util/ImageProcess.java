@@ -218,9 +218,61 @@ public class ImageProcess {
 		return bi;
 	}
 	
+	public static BufferedImage createHorizoneRandomImage(int width, int height) {
+		BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		Random rand = new Random();
+		for (int i = 0; i < width; i ++) {
+			int r = rand.nextInt(255);
+			int g = rand.nextInt(255);
+			int b = rand.nextInt(255);
+			Color color = new Color(r, g, b);
+			for (int j = 0; j < height; j ++) {
+				bi.setRGB(i, j, color.getRGB());
+			}
+		}
+		return bi;
+	}
+	
+	public static BufferedImage createVerticalRandomImage(int width, int height) {
+		BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		Random rand = new Random();
+		for (int i = 0; i < height; i ++) {
+			int r = rand.nextInt(255);
+			int g = rand.nextInt(255);
+			int b = rand.nextInt(255);
+			Color color = new Color(r, g, b);
+			for (int j = 0; j < width; j ++) {
+				bi.setRGB(j, i, color.getRGB());
+			}
+		}
+		return bi;
+	}
+	
+	public static void createAllColorImage(int width, int height, int numOfImage) {
+		Random random = new Random(); 
+		for (int i = 0; i < numOfImage; i ++) {
+			int r = random.nextInt(255);
+			int g = random.nextInt(255);
+			int b = random.nextInt(255);
+			Color color = new Color(r,g,b);
+			BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+			for (int w = 0; w < width; w ++) {
+				for (int h = 0; h < height; h ++) {
+					bi.setRGB(w, h, color.getRGB());
+				}
+			}
+			ImageUtils.saveToJpg(bi, new File("D:\\random" + i + ".jpg"));
+		}
+	}
+	
 	public static void main(String[] args ) {
-		BufferedImage bi = createRandomImage(200, 300);
-		ImageUtils.saveToPng(bi, new File("D:/random.jpg"));
+		BufferedImage bi = createHorizoneRandomImage(20, 30);
+		ImageUtils.saveToJpg(bi, new File("D:/random51.jpg"));
+		bi = createVerticalRandomImage(20, 30);
+		ImageUtils.saveToJpg(bi, new File("D:/random52.jpg"));
+		bi = createRandomImage(20, 30);
+		ImageUtils.saveToJpg(bi, new File("D:/random53.jpg"));
+		createAllColorImage(20, 30, 50);
 		System.out.println("finished");
 	}
 	
