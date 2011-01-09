@@ -49,7 +49,7 @@ public class NeuralFaceRecognize implements Runnable{
     /**
      * So luong neural o layer an
      */
-    private final int CintNumberOfHiddenNeural = 800;
+    private final int CintNumberOfHiddenNeural = 1100;
 
     /**
      * Gia tri bias
@@ -74,7 +74,7 @@ public class NeuralFaceRecognize implements Runnable{
     /**
      * So luong hoc
      */
-    private final int CintEpochs = 800;
+    private final int CintEpochs = 1200;
 
     /**
      * Nguong sai gioi hang
