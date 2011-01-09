@@ -8,6 +8,7 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.io.File;
+import java.util.Random;
 
 import javax.imageio.ImageIO;
 
@@ -199,6 +200,28 @@ public class ImageProcess {
 			}
 		}
 		return result;
+	}
+	
+	public static BufferedImage createRandomImage(int width, int height) {
+		BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		Random random = new Random();
+		for (int i = 0; i < height; i ++) {
+			for (int j = 0; j < width; j ++) {
+				
+				int r = random.nextInt(255);
+				int g = random.nextInt(255);
+				int b =random.nextInt(255);
+				Color color = new Color(r, g, b);
+				bi.setRGB(j, i, color.getRGB());
+			}
+		}
+		return bi;
+	}
+	
+	public static void main(String[] args ) {
+		BufferedImage bi = createRandomImage(200, 300);
+		ImageUtils.saveToPng(bi, new File("D:/random.jpg"));
+		System.out.println("finished");
 	}
 	
 
