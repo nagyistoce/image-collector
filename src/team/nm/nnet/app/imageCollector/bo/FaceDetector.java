@@ -12,7 +12,7 @@ import team.nm.nnet.app.imageCollector.om.FaceList;
 import team.nm.nnet.app.imageCollector.om.Pixel;
 import team.nm.nnet.app.imageCollector.om.Region;
 import team.nm.nnet.core.Const;
-import team.nm.nnet.tmp.NeuralNetwork;
+import team.nm.nnet.core.NeuralNetwork;
 import team.nm.nnet.util.ImageUtils;
 
 public class FaceDetector {
@@ -129,7 +129,7 @@ public class FaceDetector {
                     			int h = ((candidate.getHeight() + Const.SPAN_FACE_BOX) <= segment.getHeight()) ? candidate.getHeight() + Const.SPAN_FACE_BOX : candidate.getHeight();
                     			
                     			BufferedImage buff = bufferedImage.getSubimage(candidate.getLeft(), candidate.getBottom(), candidate.getWidth(), candidate.getHeight());
-                    			ImageUtils.saveToPng(buff, new File("D:/" + System.currentTimeMillis() + ".png"));
+                    			ImageUtils.drawImageToJpgByteStream(buff, new File("D:/" + System.currentTimeMillis() + ".jpg"));
                     			
                     			BufferedImage bufImg = bufferedImage.getSubimage(x, y, w, h);
                     			DetectedFace face = new DetectedFace(bufImg, filePath);

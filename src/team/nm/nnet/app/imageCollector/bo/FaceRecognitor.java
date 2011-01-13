@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Required;
 import team.nm.nnet.app.imageCollector.om.DetectedFace;
 import team.nm.nnet.app.imageCollector.om.FaceList;
 import team.nm.nnet.core.Const;
-import team.nm.nnet.tmp.NeuralFaceRecognize;
+import team.nm.nnet.core.NeuralFaceRecognize;
 
 public class FaceRecognitor extends FaceList {
 
