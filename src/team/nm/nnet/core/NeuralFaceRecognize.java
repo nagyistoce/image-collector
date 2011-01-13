@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Random;
 
 import team.nm.nnet.app.imageCollector.bo.Parameter;
-import team.nm.nnet.core.Const;
 import team.nm.nnet.util.IOUtils;
 import team.nm.nnet.util.LogicUtils;
 

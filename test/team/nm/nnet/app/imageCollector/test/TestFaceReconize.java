@@ -2,8 +2,8 @@ package team.nm.nnet.app.imageCollector.test;
 
 import java.awt.image.BufferedImage;
 
-import team.nm.nnet.core.ImageProcess;
 import team.nm.nnet.core.NeuralFaceRecognize;
+import team.nm.nnet.util.ImageProcess;
 
 public class TestFaceReconize {
 	public static void main(String[] args) {
