@@ -2,7 +2,6 @@ package team.nm.nnet.app.imageCollector.test;
 
 
 import team.nm.nnet.app.imageCollector.bo.Parameter;
-import team.nm.nnet.tmp.NeuralFaceRecognize;
 
 public class TestFunction {
 

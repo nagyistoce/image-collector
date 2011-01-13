@@ -3,8 +3,8 @@ package team.nm.nnet.app.imageCollector.test;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
-import team.nm.nnet.tmp.ImageProcess;
-import team.nm.nnet.tmp.NeuralNetwork;
+import team.nm.nnet.core.ImageProcess;
+import team.nm.nnet.core.NeuralNetwork;
 import team.nm.nnet.util.IOUtils;
 
 
