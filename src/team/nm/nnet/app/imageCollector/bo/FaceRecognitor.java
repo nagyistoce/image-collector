@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Required;
 import team.nm.nnet.app.imageCollector.om.DetectedFace;
 import team.nm.nnet.app.imageCollector.om.FaceList;
 import team.nm.nnet.core.Const;
+import team.nm.nnet.core.LearnFace;
 import team.nm.nnet.core.NeuralFaceRecognize;
 
 public class FaceRecognitor extends FaceList {
@@ -21,6 +22,7 @@ public class FaceRecognitor extends FaceList {
 	private volatile int addingThreads;
 	private volatile int completedAddingThreads;
 	private NeuralFaceRecognize neuralRecognition;
+	private LearnFace learnFace;
 	private FaceDetector faceDetector;
 	private FaceList faceResults;
 	
@@ -33,6 +35,7 @@ public class FaceRecognitor extends FaceList {
 	public FaceRecognitor () {
 		neuralRecognition = new NeuralFaceRecognize("");
 		neuralRecognition.loadWeight(Const.CURRENT_DIRECTORY + "/src/weight_recog.txt");
+		learnFace = LearnFace.getInstance();
 	}
 	
 	public void recognize(final Image image) {
@@ -62,16 +65,20 @@ public class FaceRecognitor extends FaceList {
 //		faceResults.addFace(face);
 
 		BufferedImage bufImg = face.getBufferedImage();
+		String name = "Chưa biết";
 		int index = neuralRecognition.gfncGetWinner(bufImg);
+		if(index > 0) {
+			name = neuralRecognition.getName(index);
+		} else {
+			index = learnFace.gfncGetWinner(bufImg);
+			name = (index > 0) ? learnFace.getName(index) : name;
+		}
 		if(!state) {
 			return;
 		}
+
 		face.setFaceId(index);
-		if(index > 0) {
-			face.setFaceName(neuralRecognition.getName(index));
-		} else {
-			face.setFaceName("Chưa biết");
-		}
+		face.setFaceName(name);
 		faceResults.addFace(face);
 		if(++completedAddingThreads >= addingThreads) {
 			faceResults.onFulfiling();

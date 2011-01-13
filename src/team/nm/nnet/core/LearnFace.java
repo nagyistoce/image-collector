@@ -35,7 +35,7 @@ public class LearnFace implements Runnable {
 	/**
 	 * Luu duong dan de luu file weight.
 	 */
-	private String strFilename = "";
+	private String strFilename = Const.CURRENT_DIRECTORY + "/src/weight_learn.txt";
 	
 	/**
 	 * So luong input
@@ -75,7 +75,7 @@ public class LearnFace implements Runnable {
     /**
      * So luong hoc
      */
-    private final int CintEpochs = 800;
+    private final int CintEpochs = 100;
 
     /**
      * Nguong sai gioi hang
@@ -128,6 +128,15 @@ public class LearnFace implements Runnable {
      * Khoi tao doi tuong random cho viec hoc cac ki tu
      */
     private Random rnd = new Random();
+    
+    private static LearnFace instance = new LearnFace();
+    private LearnFace() {
+    	loadWeight(strFilename);
+    }
+    
+    public static LearnFace getInstance() {
+    	return instance;
+    }
 
     /**
      * Khoi tao mang neural chi dinh so phan tu output
@@ -161,19 +170,6 @@ public class LearnFace implements Runnable {
         }
 
     }
-    
-    /**
-     * Contructor khoi tao doi tuong
-     * @param strFilename Duong dan luu file weight 
-     * chi can thiet khi hoc
-     */
-    public LearnFace(String strFilename) {
-		// TODO Auto-generated constructor stub
-    	this.strFilename = strFilename;
-    	//psubInitNeural();
-    	//psubInitWeight();
-    }
-    
    
     /**
      * Them du lieu vao bo train
@@ -514,6 +510,7 @@ public class LearnFace implements Runnable {
 		psubInitNeural(listNumberFolder.size());
 		int numberOfOutput = listNumberFolder.size();
 		this.numberOfOutput = numberOfOutput;
+		
 		for (int i = 0; i < listNumberFolder.size(); i ++) {
 			int index = Integer.parseInt(listNumberFolder.get(i).substring(0, listNumberFolder.get(i).indexOf("_")));
 			List<String> listFile = 

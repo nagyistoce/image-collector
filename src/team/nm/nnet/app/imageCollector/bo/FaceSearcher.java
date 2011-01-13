@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Required;
 import team.nm.nnet.app.imageCollector.om.DetectedFace;
 import team.nm.nnet.app.imageCollector.om.FaceList;
 import team.nm.nnet.core.Const;
+import team.nm.nnet.core.LearnFace;
 import team.nm.nnet.core.NeuralFaceRecognize;
 
 public class FaceSearcher extends FaceList {
@@ -23,6 +24,7 @@ public class FaceSearcher extends FaceList {
 	private volatile int completedAddingThreads;
 	
 	private NeuralFaceRecognize neuralRecognition;
+	private LearnFace learnFace;
 	private FaceDetector faceDetector;
 	private FaceList faceResults;
 	
@@ -33,6 +35,7 @@ public class FaceSearcher extends FaceList {
 	public FaceSearcher () {
 		neuralRecognition = new NeuralFaceRecognize("");
 		neuralRecognition.loadWeight(Const.CURRENT_DIRECTORY + "/src/weight_recog.txt");
+		learnFace = LearnFace.getInstance();
 	}
 	
 	public void prepare() {
@@ -74,6 +77,9 @@ public class FaceSearcher extends FaceList {
 		int index = neuralRecognition.gfncGetWinner(bufImg);
 		if(!state) {
 			return;
+		}
+		if(index < 0) {
+			index = learnFace.gfncGetWinner(bufImg);
 		}
 		if(index > 0) {
 			if(expectedOutput.contains(index)) {

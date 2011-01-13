@@ -2,16 +2,22 @@ package team.nm.nnet.app.imageCollector.layout;
 
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
+import org.apache.commons.lang.StringUtils;
+
 import team.nm.nnet.core.Const;
+import team.nm.nnet.core.LearnFace;
 import team.nm.nnet.util.ImageUtils;
 
 public class ExtractedFacePanel extends javax.swing.JPanel {
 
 	private static final long serialVersionUID = 8434384268590865473L;
+	static ExecutorService executorService = Executors.newCachedThreadPool();
 	
     public ExtractedFacePanel(JPanel parent, Image faceImage) {
         initComponents();
@@ -90,7 +96,21 @@ public class ExtractedFacePanel extends javax.swing.JPanel {
     }
 
     private void btnUpdateActionPerformed(java.awt.event.ActionEvent evt) {
-        faceName = txtFaceName.getText();
+    	String name = txtFaceName.getText();
+    	if(StringUtils.isBlank(name)) {
+    		return;
+    	}
+        faceName = name;
+        
+        final LearnFace learnFace = LearnFace.getInstance();
+        learnFace.addImageToTrainFolder("D:/Images/trainFolder", ImageUtils.iconToBufferedImage(lblFaceView.getIcon()), name);
+        executorService.execute(new Runnable() {
+			@Override
+			public void run() {
+				learnFace.run();
+			}
+		});
+        chbChoose.setEnabled(true);
     }
 
     private void btnRemoveActionPerformed(java.awt.event.ActionEvent evt) {
