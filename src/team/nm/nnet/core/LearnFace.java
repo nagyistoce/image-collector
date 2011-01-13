@@ -545,13 +545,24 @@ public class LearnFace implements Runnable {
 				}
 			}
 		}
-		arrayName[listNumberFolder.size()] = nameOfImage;
-		String newFolderPath = folderPath + "\\" + listNumberFolder.size() + "_" + nameOfImage;
-		ImageProcess.createFolder(newFolderPath);
-		for (int i = 0; i < 10; i ++) {
-			ImageUtils.saveToJpg(inputImage, new File(newFolderPath + "\\" + i + ".jpg"));
+		String resultCheck = checkNameInArray(arrayName, nameOfImage);
+		if (resultCheck != "") {
+			for (int i = 0; i < 10; i ++) {
+				ImageUtils.saveToJpg(inputImage, new File(folderPath + "\\" + resultCheck + "\\" + System.currentTimeMillis() + ".jpg"));
+			}
 		}
-		listNumberFolder.add(listNumberFolder.size() + "_" + nameOfImage);
+		else {
+			arrayName[listNumberFolder.size()] = nameOfImage;
+			String newFolderPath = folderPath + "\\" + listNumberFolder.size() + "_" + nameOfImage;
+			ImageProcess.createFolder(newFolderPath);
+			for (int i = 0; i < 10; i ++) {
+				ImageUtils.saveToJpg(inputImage, new File(newFolderPath + "\\" + System.currentTimeMillis() + ".jpg"));
+				
+			}
+			listNumberFolder.add(listNumberFolder.size() + "_" + nameOfImage);
+		}
+		
+		
 		psubInitNeural(listNumberFolder.size());
 		int numberOfOutput = listNumberFolder.size();
 		this.numberOfOutput = numberOfOutput;
@@ -566,6 +577,22 @@ public class LearnFace implements Runnable {
 			}
 		}
 		
+	}
+	
+	/**
+	 * Kiem tra ten anh co trong bo train hay khong
+	 * Neu co tra ve duong dan thu muc chua anh
+	 * Neu khong tra ve ""
+	 * @return
+	 */
+	private String checkNameInArray(String[] arrayName, String name) {
+		name = name.toLowerCase();
+		for (int i = 0; i < arrayName.length - 1; i ++) {
+			if (arrayName[i].toLowerCase().equals(name)) {
+				return i + "_" + arrayName[i];
+			}
+		}
+		return "";
 	}
 	
 	
