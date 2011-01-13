@@ -2,6 +2,7 @@ package team.nm.nnet.tmp;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.PrintWriter;
@@ -9,15 +10,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class NeuralNetwork implements Runnable{
+import team.nm.nnet.core.Const;
+import team.nm.nnet.util.IOUtils;
+import team.nm.nnet.util.ImageUtils;
+import team.nm.nnet.util.LogicUtils;
+
+public class LearnFace implements Runnable {
 
 	/**
-	 * Chieu rong anh
+	 * Bien co dung de xac din hoc lai hay la hoc tiep
+	 */
+	private boolean isRetrain = true;
+	
+	/**
+	 * Chieu rong cua anh
 	 */
 	private final int FACE_WIDTH = 20;
 	
 	/**
-	 * Chieu cao anh
+	 * Chieu dai cua anh
 	 */
 	private final int FACE_HEIGHT = 30;
 	
@@ -29,17 +40,17 @@ public class NeuralNetwork implements Runnable{
 	/**
 	 * So luong input
 	 */
-    private final int CintNumberOfInput = FACE_WIDTH * FACE_HEIGHT; // 30 X 20;
+    private final int CintNumberOfInput = 20 * 30; // 30 X 20;
 
     /**
      * So luong output
      */
-    private final int CintNumberOfOutput = 2; //
+    private int numberOfOutput = 20; //
 
     /**
-     * So luong neural an
+     * So luong neural o layer an
      */
-    private final int CintNumberOfHiddenNeural = 1000;
+    private final int CintNumberOfHiddenNeural = 800;
 
     /**
      * Gia tri bias
@@ -62,12 +73,12 @@ public class NeuralNetwork implements Runnable{
     private final float CflLearningRate = 150F;
 
     /**
-     * So lan hoc
+     * So luong hoc
      */
-    private final int CintEpochs = 1200;
+    private final int CintEpochs = 800;
 
     /**
-     * Nguong sai cuc tieu
+     * Nguong sai gioi hang
      */
     private final float CflErrorThreshold = 0.0002F;
 
@@ -77,13 +88,12 @@ public class NeuralNetwork implements Runnable{
     private float[][][] pflWeight = new float[CintNuberOflayers][CintNumberOfHiddenNeural + 100][CintNumberOfHiddenNeural + 100];
 
     /**
-     * So luong neural trong tung layer
+     * Luu so luong weight tren tung layer
      */
     private int[] pintNeural;
 
-
     /**
-     * Luu gia tri xuat ra cua cac neural
+     * Gia tri xuat ra cua cac neural trong tung layer
      */
     private float[][] pflOutputNode = new float[CintNuberOflayers][CintNumberOfHiddenNeural + 100];
 
@@ -93,12 +103,12 @@ public class NeuralNetwork implements Runnable{
     private float[] pintCurInput;
 
     /**
-     * Gia tri mong muon xuat ra trong bo gia tri mong muon xuat ra
+     * Gia tri mong muon xuat ra hien tai trong bo gia tri mong muon xuat ra
      */
     private int[] pintCurDesireOutput;
 
     /**
-     * Gia tri sai khac giu gia tri mong mong muon xuat ra va gia tri xuat ra thuc
+     * Mang luu gia tri sai khac giua ket qua xuat ra voi ket qua mong muon xuat ra
      */
     private float[][] pflError = new float[CintNuberOflayers][CintNumberOfHiddenNeural + 100];
     
@@ -111,21 +121,24 @@ public class NeuralNetwork implements Runnable{
      * Luu gia tri mong muon xuat ra
      */
     private List<int[]> lstListDesireOutput = new ArrayList<int[]>();
-
+    
+    private String[] arrayName;
+    
     /**
      * Khoi tao doi tuong random cho viec hoc cac ki tu
      */
     private Random rnd = new Random();
 
     /**
-     * Khoi tao so luong neural cho mang neural
+     * Khoi tao mang neural chi dinh so phan tu output
+     * @param numberOfOutPut So phan tu output
      */
-    private void psubInitNeural()
+    private void psubInitNeural(int numberOfOutPut)
     {
         pintNeural = new int[CintNuberOflayers];
         pintNeural[0] = CintNumberOfInput;
         pintNeural[1] = CintNumberOfHiddenNeural;
-        pintNeural[2] = CintNumberOfOutput;
+        pintNeural[2] = numberOfOutPut;
     }
 
     /**
@@ -151,46 +164,36 @@ public class NeuralNetwork implements Runnable{
     
     /**
      * Contructor khoi tao doi tuong
-     * @param strFilename Duong dan luu file weight chi can thiet cho viec save file weight
-     * khi hoc xong
+     * @param strFilename Duong dan luu file weight 
+     * chi can thiet khi hoc
      */
-    public NeuralNetwork(String strFilename) {
+    public LearnFace(String strFilename) {
+		// TODO Auto-generated constructor stub
     	this.strFilename = strFilename;
-    	psubInitNeural();
-    	psubInitWeight();
+    	//psubInitNeural();
+    	//psubInitWeight();
     }
     
+   
     /**
-     * Them face vao bo trai
-     * @param image Face can them
+     * Them du lieu vao bo train
+     * @param image Anh can dua vao bo train
+     * @param numberOfOutput So luong output
+     * @param index Vi tri cua anh
      */
-    public void addFace(BufferedImage image) {
+    public void addData(BufferedImage image,int numberOfOutput,int index) {
     	image = ImageProcess.resize(image, FACE_WIDTH, FACE_HEIGHT);
     	float[] input = ImageProcess.imageToArray(image);
     	input = ImageProcess.adaptArray(input);
     	lstListInput.add(input);
-    	int[] intArrDesireOutput = new int[CintNumberOfOutput];
-      	intArrDesireOutput[0] = 1;
+    	int[] intArrDesireOutput = new int[numberOfOutput];
+      	intArrDesireOutput[index] = 1;
     	lstListDesireOutput.add(intArrDesireOutput);
     }
     
     /**
-     * Them noneface vao bo train
-     * @param image Noneface can them
-     */
-    public void addNoneFace(BufferedImage image) {
-    	image = ImageProcess.resize(image, FACE_WIDTH, FACE_HEIGHT);
-    	float[] input = ImageProcess.imageToArray(image);
-    	input = ImageProcess.adaptArray(input);
-    	lstListInput.add(input);
-    	int[] intArrDesireOutput = new int[CintNumberOfOutput];
-    	intArrDesireOutput[1] = 1;
-    	lstListDesireOutput.add(intArrDesireOutput);
-    }
-    
-    /**
-     * Tinh gia tri tangen cho mang
-     * @param flActiveValue Gia tri can tinh tangen
+     * Tinh gia tri tangen
+     * @param flActiveValue Gia tri can tinh
      * @return Ket qua tinh duoc
      */
     private float pfncGetTangen(float flActiveValue)
@@ -203,8 +206,8 @@ public class NeuralNetwork implements Runnable{
     }
     
     /**
-     * Tinh dan xuat cua gia tri tangen
-     * @param fx Gia tri can tinh dan xuat
+     * Tinh dan xuat cua tangen
+     * @param fx Gia tri can tinh
      * @return Ket qua tinh duoc
      */
     private float pfncGetDerivative(float fx)
@@ -214,23 +217,23 @@ public class NeuralNetwork implements Runnable{
     }
     
     /**
-     * Tinh trung binh gia tri sai
+     * Tinh gia tri loi trung binh
      * @return Ket qua tinh duoc
      */
     private float psubGetAvgError()
     {
         float result = 0.0F;
-        for (int i = 0; i < CintNumberOfOutput; i++)
+        for (int i = 0; i < numberOfOutput; i++)
         {
             result = result + pflError[CintNuberOflayers - 1][i];
         }
-        result = result / CintNumberOfOutput;
+        result = result / numberOfOutput;
         result = Math.abs(result);
         return result;
     }
     
     /**
-     * Tinh gia tri xuat ra cua mang
+     * Tinh gia tri xuat ra
      */
     private void psubCalOutput()
     {
@@ -270,12 +273,12 @@ public class NeuralNetwork implements Runnable{
     }
     
     /**
-     * Tinh gia tri sai khac cho mang
+     * Tinh su sai khac
      */
     private void psubCalError()
     {
         float sum = 0.0F;
-        for (int i = 0; i < CintNumberOfOutput; i++)
+        for (int i = 0; i < numberOfOutput; i++)
         {
             pflError[CintNuberOflayers - 1][i] = (float)((pintCurDesireOutput[i] - pflOutputNode[CintNuberOflayers - 1][i]) * pfncGetDerivative(pflOutputNode[CintNuberOflayers - 1][i]));
         }
@@ -297,7 +300,7 @@ public class NeuralNetwork implements Runnable{
     }
     
     /**
-     * Tinh gia tri weight cho mang neural
+     * Tinh gia tri weight
      */
     private void psubCalWeight()
     {
@@ -321,19 +324,49 @@ public class NeuralNetwork implements Runnable{
      * Return true: face
      * Return false: none face
      */
-    public float gfncGetWinner(BufferedImage image) {
+    public int gfncGetWinner(BufferedImage image) {
     	image = ImageProcess.resize(image, FACE_WIDTH, FACE_HEIGHT);
     	float[] input = ImageProcess.imageToArray(image);
     	pintCurInput = ImageProcess.adaptArray(input);
     	psubCalOutput();
-//    	System.out.println(pflOutputNode[CintNuberOflayers - 1][0] + "," + pflOutputNode[CintNuberOflayers - 1][1]);
-
-    	return pflOutputNode[CintNuberOflayers - 1][0];
+    	float max = pflOutputNode[CintNuberOflayers - 1][0];
+    	int index = 0;
+    	for (int i = 1; i < numberOfOutput; i ++) {
+    		if (max < pflOutputNode[CintNuberOflayers - 1][i]) {
+    			max = pflOutputNode[CintNuberOflayers - 1][i];
+    			index = i;
+    		}
+    	}
+    	//System.out.println("Max: " + max);
+    	System.out.println("Name: " + arrayName[index]);
+    	System.out.println("Index: " + index);
+    	System.out.println("Max: " + max);
+    	if (max < Const.RECONIZE_THRESHOLD) {
+    		return - 1;
+    	}
+    	return index;
+    }
+    
+    public String getName(int index) {
+    	return arrayName[index];
     }
 
     @Override
     public void run() {
     	// TODO Auto-generated method stub
+    	if (isRetrain) {
+    		trainAgain();
+    	}
+    	else {
+    		trainContinute();
+    	}
+    	
+    }
+    
+    /**
+     * Phuong thuc train lai tu dau
+     */
+    public void trainAgain() {
     	psubInitWeight();
     	float avgError = 0.0F;
         for (int epoch = 0; epoch <= CintEpochs; epoch++)
@@ -361,8 +394,41 @@ public class NeuralNetwork implements Runnable{
         System.out.println("Saving weight file in " + strFilename);
         saveWeight(strFilename);
         System.out.println("Xong");
-    	
     }
+    
+    /**
+     * Phuong thuc dung de train tiep tuc
+     */
+    public void trainContinute() {
+    	loadWeight(strFilename);
+    	float avgError = 0.0F;
+        for (int epoch = 0; epoch <= CintEpochs / 2; epoch++)
+        {
+            avgError = 0.0F;
+            for (int i = 0; i < lstListDesireOutput.size(); i++)
+            {
+                int index = rnd.nextInt(lstListDesireOutput.size() - 1);
+                pintCurDesireOutput = lstListDesireOutput.get(index);
+                pintCurInput = lstListInput.get(index);
+                psubCalOutput();
+                psubCalError();
+                psubCalWeight();
+                avgError = avgError + psubGetAvgError();
+                
+            }
+            System.out.println("Epoch: " + epoch + " in " + CintEpochs);
+            avgError = avgError / lstListDesireOutput.size();
+            System.out.println("Avgerror: " + avgError);
+            if (avgError < CflErrorThreshold)
+            {
+                epoch = CintEpochs + 1;
+            }
+        }
+        System.out.println("Saving weight file in " + strFilename);
+        saveWeight(strFilename);
+        System.out.println("Xong");
+    }
+    
     
     /**
 	 * Luu file weight xuong file text
@@ -372,6 +438,11 @@ public class NeuralNetwork implements Runnable{
 		try {
 			FileOutputStream fos = new FileOutputStream(filename, false);
 			PrintWriter pw = new PrintWriter(fos);
+			pw.println(numberOfOutput);
+			pw.println(arrayName.length);
+			for (int i = 0; i < arrayName.length; i ++) {
+				pw.println(arrayName[i]);
+			}
 			for (int i = 1; i < CintNuberOflayers; i++) {
 				for (int j = 0; j < pintNeural[i]; j++) {
 					for (int k = 0; k < pintNeural[i - 1]; k++) {
@@ -393,6 +464,13 @@ public class NeuralNetwork implements Runnable{
 		try {
 			FileReader fr = new FileReader(filename);
 			BufferedReader br = new BufferedReader(fr);
+			numberOfOutput = Integer.parseInt(br.readLine());
+			int size = Integer.parseInt(br.readLine());
+			arrayName = new String[size];
+			for (int i = 0; i < size; i ++ ) {
+				arrayName[i] = br.readLine();
+			}
+			psubInitNeural(numberOfOutput);
 			for (int i = 1; i < CintNuberOflayers; i++) {
 				for (int j = 0; j < pintNeural[i]; j++) {
 					for (int k = 0; k < pintNeural[i - 1]; k++) {
@@ -401,10 +479,108 @@ public class NeuralNetwork implements Runnable{
 					}
 				}
 			}
+			br.close();
 		}
 		catch (Exception ex) {
 			System.out.println("File weight bi loi");
 		}
 	}
 	
+	/**
+	 * Cung cap thu muc con chua cac anh de hoc
+	 * @param folderPath Duong dan den thu muc train
+	 */
+	public void addTrainFolder(String folderPath) {
+		List<String> listSubFolder = IOUtils.listSubFolder(folderPath);
+		//Chua duong dan thu muc la so va chua anh
+		List<String> listNumberFolder = new ArrayList<String>();
+		arrayName = new String[listSubFolder.size()];
+		for (int i = 0; i < listSubFolder.size(); i ++) {
+			String number = "";
+			String name = "";
+			int indexOf_ = listSubFolder.get(i).indexOf("_");
+			if(indexOf_ >= 0) {
+				number = listSubFolder.get(i).substring(0, indexOf_);
+				name = listSubFolder.get(i).substring(indexOf_ + 1);
+				
+				if (LogicUtils.isNumber(number) 
+						&& IOUtils.hasFile(folderPath + "\\" + listSubFolder.get(i))) {
+					listNumberFolder.add(listSubFolder.get(i));
+					int index = Integer.parseInt(number);
+					arrayName[index] = name;
+				}
+			}
+		}
+		psubInitNeural(listNumberFolder.size());
+		int numberOfOutput = listNumberFolder.size();
+		this.numberOfOutput = numberOfOutput;
+		for (int i = 0; i < listNumberFolder.size(); i ++) {
+			int index = Integer.parseInt(listNumberFolder.get(i).substring(0, listNumberFolder.get(i).indexOf("_")));
+			List<String> listFile = 
+				IOUtils.listFileName(folderPath + "\\" + listNumberFolder.get(i));
+			for (int j = 0; j < listFile.size(); j ++) {
+				BufferedImage image = 
+					ImageProcess.load(folderPath + "\\" + listNumberFolder.get(i) + "\\" + listFile.get(j));
+				addData(image, numberOfOutput, index);
+			}
+		}
+		
+	}
+	
+	public void addImageToTrainFolder(String folderPath, BufferedImage inputImage, String nameOfImage) {
+		List<String> listSubFolder = IOUtils.listSubFolder(folderPath);
+		//Chua duong dan thu muc la so va chua anh
+		List<String> listNumberFolder = new ArrayList<String>();
+		arrayName = new String[listSubFolder.size() + 1];
+		for (int i = 0; i < listSubFolder.size(); i ++) {
+			String number = "";
+			String name = "";
+			int indexOf_ = listSubFolder.get(i).indexOf("_");
+			if(indexOf_ >= 0) {
+				number = listSubFolder.get(i).substring(0, indexOf_);
+				name = listSubFolder.get(i).substring(indexOf_ + 1);
+				
+				if (LogicUtils.isNumber(number) 
+						&& IOUtils.hasFile(folderPath + "\\" + listSubFolder.get(i))) {
+					listNumberFolder.add(listSubFolder.get(i));
+					int index = Integer.parseInt(number);
+					arrayName[index] = name;
+				}
+			}
+		}
+		arrayName[listNumberFolder.size()] = nameOfImage;
+		String newFolderPath = folderPath + "\\" + listNumberFolder.size() + "_" + nameOfImage;
+		ImageProcess.createFolder(newFolderPath);
+		for (int i = 0; i < 10; i ++) {
+			ImageUtils.saveToJpg(inputImage, new File(newFolderPath + "\\" + i + ".jpg"));
+		}
+		listNumberFolder.add(listNumberFolder.size() + "_" + nameOfImage);
+		psubInitNeural(listNumberFolder.size());
+		int numberOfOutput = listNumberFolder.size();
+		this.numberOfOutput = numberOfOutput;
+		for (int i = 0; i < listNumberFolder.size(); i ++) {
+			int index = Integer.parseInt(listNumberFolder.get(i).substring(0, listNumberFolder.get(i).indexOf("_")));
+			List<String> listFile = 
+				IOUtils.listFileName(folderPath + "\\" + listNumberFolder.get(i));
+			for (int j = 0; j < listFile.size(); j ++) {
+				BufferedImage image = 
+					ImageProcess.load(folderPath + "\\" + listNumberFolder.get(i) + "\\" + listFile.get(j));
+				addData(image, numberOfOutput, index);
+			}
+		}
+		
+	}
+	
+	
+	
+	/**
+	 * Thiet lap train lai hay la train tien
+	 * @param isRetrain True: train lai toan bo, false: train tiep. Neu false thi phải thiet lap duong dang file weight
+	 * @param fileName Duong dan de load file weight
+	 */
+	public void configTrain(boolean isRetrain, String fileName) {
+		this.isRetrain = isRetrain;
+		this.strFilename = fileName;
+	}
+
 }

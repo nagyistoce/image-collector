@@ -116,4 +116,13 @@ public class ImageProcess {
 		}
 		return array;
 	}
+	
+	/**
+	 * Create folder
+	 * @param folderName Name of folder 
+	 */
+	public static void createFolder(String folderName) {
+		File file = new File(folderName);
+		file.mkdir();
+	}
 }

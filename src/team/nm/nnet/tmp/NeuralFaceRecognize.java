@@ -2,7 +2,6 @@ package team.nm.nnet.tmp;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.PrintWriter;
@@ -82,11 +81,6 @@ public class NeuralFaceRecognize implements Runnable{
     private final float CflErrorThreshold = 0.0002F;
 
     /**
-     * Mang tinh hieu nhap vao
-     */
-    private float[][] pintInputSignal;
-
-    /**
      * Mang luu gia tri weight
      */
     private float[][][] pflWeight = new float[CintNuberOflayers][CintNumberOfHiddenNeural + 100][CintNumberOfHiddenNeural + 100];
@@ -95,11 +89,6 @@ public class NeuralFaceRecognize implements Runnable{
      * Luu so luong weight tren tung layer
      */
     private int[] pintNeural;
-
-    /**
-     * Mang luu gia tri mong muon xuat ra
-     */
-    private int[][] pintDesireOutput;
 
     /**
      * Gia tri xuat ra cua cac neural trong tung layer
@@ -210,7 +199,7 @@ public class NeuralFaceRecognize implements Runnable{
         //return (float)(-1 + (2 / (1 + Math.Exp(-2 * flActiveValue))));
         //float flResult = (float)((Math.Exp(2*flActiveValue) - 1) / (Math.Exp(2*flActiveValue) + 1));
         //return flResult;
-         float result = (float)((2 / (1 + Math.exp(-1 * 0.014F * flActiveValue))) - 1);		//Bipolar			
+         float result = (float)((2 / (1 + Math.exp(-1 * slope * flActiveValue))) - 1);		//Bipolar			
         return result;
     }
     
