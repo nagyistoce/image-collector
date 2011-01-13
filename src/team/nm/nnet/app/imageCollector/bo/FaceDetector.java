@@ -78,12 +78,22 @@ public class FaceDetector {
         state = false;
     }
 
-    public boolean isCandidate(Region colorSegment) {
-        if(colorSegment.getPixels().size() < Const.MINIMUM_SKIN_PIXEL_THRESHOLD) {
+    public boolean isCandidate(Region region) {
+        if(region.getPixels().size() < Parameter.minimumSkinPixelThreshold) {
             return false;
         }
-        float whiteRatio = (float) colorSegment.getPixels().size() / (colorSegment.getWidth() * colorSegment.getHeight());
-        if(whiteRatio < Const.WHITE_RATIO_THRESHOLD) {
+        if(region.getWidth() < Parameter.minimumSupportedFaceWidth) {
+        	return false;
+        }
+        if(region.getHeight() < Parameter.minimumSupportedFaceHeight) {
+        	return false;
+        }
+        /*double aspectRatio = region.getHeight() / region.getWidth();
+        if((aspectRatio < Const.MINIMUM_ASPECT_RATIO) || (aspectRatio > Const.MAXIMUM_ASPECT_RATIO)) {
+        	return false;
+        }*/
+        float whiteRatio = (float) region.getPixels().size() / (region.getWidth() * region.getHeight());
+        if(whiteRatio < Parameter.minWhiteRatioThreshold) {
             return false;
         }
 
@@ -101,6 +111,7 @@ public class FaceDetector {
                 colorSegmentation.requestStop();
                 return;
             }
+            
             if (isCandidate(segment)) {
                 try{
                     List<Region> subSegments = separateRegions(segment);
@@ -109,17 +120,20 @@ public class FaceDetector {
                         subSegments.add(segment);
                     }
                     for(Region subSegment : subSegments) {
-                    	Region candidate = extractSingleFace(subSegment);
-                        if(candidate != null) {
-                        	int x = ((candidate.getLeft() - Const.SPAN_FACE_BOX) > segment.getLeft()) ? candidate.getLeft() - Const.SPAN_FACE_BOX : segment.getLeft(); 
-                            int y = ((candidate.getBottom() - Const.SPAN_FACE_BOX) > segment.getBottom()) ? candidate.getBottom() - Const.SPAN_FACE_BOX : segment.getBottom(); 
-                            int w = ((candidate.getWidth() + Const.SPAN_FACE_BOX) <= segment.getWidth()) ? candidate.getWidth() + Const.SPAN_FACE_BOX : candidate.getWidth(); 
-                            int h = ((candidate.getHeight() + Const.SPAN_FACE_BOX) <= segment.getHeight()) ? candidate.getHeight() + Const.SPAN_FACE_BOX : candidate.getHeight();
-                        	
-                            BufferedImage bufImg = bufferedImage.getSubimage(x, y, w, h);
-                            DetectedFace face = new DetectedFace(bufImg, filePath);
-                            faceResults.addFace(face);
-                        } 
+                    	if (isCandidate(segment)) {
+                    		Region candidate = extractSingleFace(subSegment);
+                    		if(candidate != null) {
+                    			int x = ((candidate.getLeft() - Const.SPAN_FACE_BOX) > segment.getLeft()) ? candidate.getLeft() - Const.SPAN_FACE_BOX : segment.getLeft(); 
+                    			int y = ((candidate.getBottom() - Const.SPAN_FACE_BOX) > segment.getBottom()) ? candidate.getBottom() - Const.SPAN_FACE_BOX : segment.getBottom(); 
+                    			int w = ((candidate.getWidth() + Const.SPAN_FACE_BOX) <= segment.getWidth()) ? candidate.getWidth() + Const.SPAN_FACE_BOX : candidate.getWidth(); 
+                    			int h = ((candidate.getHeight() + Const.SPAN_FACE_BOX) <= segment.getHeight()) ? candidate.getHeight() + Const.SPAN_FACE_BOX : candidate.getHeight();
+                    			
+                    			BufferedImage bufImg = bufferedImage.getSubimage(x, y, w, h);
+                    			DetectedFace face = new DetectedFace(bufImg, filePath);
+                    			face.setRegion(new Region(x, y+h, x+w, y));
+                    			faceResults.addFace(face);
+                    		} 
+                    	}
                     }
                 }catch(Exception e) {
                     System.out.println(String.format("l: %d, r: %d, b: %d, t:%d, w: %d, h: %d", segment.getLeft(), segment.getRight(), segment.getBottom(), segment.getTop(), segment.getWidth(), segment.getHeight()));
@@ -127,6 +141,7 @@ public class FaceDetector {
             }
         }
         faceResults.onFulfiling();
+        System.gc();
     }
     
     protected List<Region> separateRegions(Region segment) {
@@ -141,8 +156,11 @@ public class FaceDetector {
         int bottom = segment.getBottom();
         int left = segment.getLeft();
         for(Pixel p : brokenPoints) {
-            regions.add(new Region(left, top, p.getX(), bottom));
-            left = p.getX();
+        	System.out.println("Cut point: " + p.getX() + ", " + p.getY());
+        	if(p.getX() > left + Parameter.minimumSupportedFaceWidth) {
+        		regions.add(new Region(left, top, p.getX(), bottom));
+        		left = p.getX();
+        	}
         }
         
         // Add the last region
@@ -159,25 +177,37 @@ public class FaceDetector {
         
         float max = 0;
         Region candidate = null;
-        double[] scales = {1, 0.8, 0.6, 0.4};
-        for(double scale : scales){
-            int w = (int) (width * scale), h = (int) (height * scale);
-            for(int i = 0, ww = width - w; i <= ww; i += Const.JUMP_LENGHT) {
-                for(int j = 0, hh = height - h; j <= hh; j += Const.JUMP_LENGHT) {
-                	if(!state) {
-                        return null;
-                    }
-                    BufferedImage subBuff = segmentBuff.getSubimage(i, j, w, h);
-                    subBuff = ImageUtils.resize(subBuff, Const.FACE_WIDTH, Const.FACE_HEIGHT);
-                    
-                    float outVal = neuralNetwork.gfncGetWinner(subBuff);
-                    if((outVal > Const.NETWORK_FACE_VALIDATION_THRESHOLD) && (outVal > max)) {
-                        max = outVal;
-                        candidate = new Region(left + i, bottom + j + h, left + i + w, bottom + j);
-                    }
-                }
-            }
+        
+        BufferedImage subBuff = ImageUtils.resize(segmentBuff, Const.FACE_WIDTH, Const.FACE_HEIGHT);
+        float outVal = neuralNetwork.gfncGetWinner(subBuff);
+		if(outVal > Parameter.networkFaceValidationThreshold) {
+			return segment;
+		}
+        
+    	double[] scales = {0.8, 0.5, 0.3};
+    	for(double scale : scales){
+    		int w = (int) (width * scale), h = (int) (height * scale);
+    		for(int i = 0, ww = width - w; i <= ww; i += Const.JUMP_LENGHT) {
+    			for(int j = 0, hh = height - h; j <= hh; j += Const.JUMP_LENGHT) {
+    				if(!state) {
+    					return null;
+    				}
+    				subBuff = segmentBuff.getSubimage(i, j, w, h);
+    				subBuff = ImageUtils.resize(subBuff, Const.FACE_WIDTH, Const.FACE_HEIGHT);
+
+    		        /*DetectedFace face = new DetectedFace(subBuff, filePath);
+    				face.setRegion(new Region(left, bottom+height, left+width, bottom));
+    				faceResults.addFace(face);*/
+    				
+    				outVal = neuralNetwork.gfncGetWinner(subBuff);
+    				if((outVal > Parameter.networkFaceValidationThreshold) && (outVal > max)) {
+    					max = outVal;
+    					candidate = new Region(left + i, bottom + j + h, left + i + w, bottom + j);
+    				}
+    			}
+    		}
         }
+		
         return candidate;
     }
 

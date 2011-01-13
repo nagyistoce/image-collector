@@ -22,6 +22,7 @@ import java.awt.image.ConvolveOp;
 import java.awt.image.DataBuffer;
 import java.awt.image.Kernel;
 import java.awt.image.PixelGrabber;
+import java.awt.image.WritableRaster;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -162,6 +163,13 @@ public class ImageUtils {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	public static BufferedImage clone(BufferedImage source) {
+		ColorModel cm = source.getColorModel();
+        boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+        WritableRaster raster = source.copyData(null);
+        return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
 	}
 
 	/**

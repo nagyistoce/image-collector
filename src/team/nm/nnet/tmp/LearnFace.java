@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import team.nm.nnet.core.Const;
+import team.nm.nnet.app.imageCollector.bo.Parameter;
 import team.nm.nnet.util.IOUtils;
 import team.nm.nnet.util.ImageUtils;
 import team.nm.nnet.util.LogicUtils;
@@ -341,7 +341,7 @@ public class LearnFace implements Runnable {
     	System.out.println("Name: " + arrayName[index]);
     	System.out.println("Index: " + index);
     	System.out.println("Max: " + max);
-    	if (max < Const.RECONIZE_THRESHOLD) {
+    	if (max < Parameter.networkFaceRecognitionThreshold) {
     		return - 1;
     	}
     	return index;

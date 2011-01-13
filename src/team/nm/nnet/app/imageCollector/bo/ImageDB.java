@@ -22,10 +22,14 @@ public class ImageDB {
 		BufferedReader br = new BufferedReader(fr);
 		String path;
 		try{
+			List<File> list = new ArrayList<File>();
 			while((path = br.readLine()) != null) {
 				if(StringUtils.isNotBlank(path)) {
-					files.add(new File(path.trim()));
+					list.add(new File(path.trim()));
 				}
+			}
+			if(list.size() > 1) {
+				files = list;
 			}
 		} catch(Exception e) {
 			log.error(e.getMessage());

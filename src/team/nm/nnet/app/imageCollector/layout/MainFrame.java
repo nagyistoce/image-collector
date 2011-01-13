@@ -1,9 +1,11 @@
 package team.nm.nnet.app.imageCollector.layout;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -40,6 +42,7 @@ import team.nm.nnet.app.imageCollector.filter.BinaryImage;
 import team.nm.nnet.app.imageCollector.filter.OpenFilter;
 import team.nm.nnet.app.imageCollector.om.DetectedFace;
 import team.nm.nnet.app.imageCollector.om.FaceList;
+import team.nm.nnet.app.imageCollector.om.Region;
 import team.nm.nnet.app.imageCollector.support.ImageFilter;
 import team.nm.nnet.app.imageCollector.support.NMFileFilter;
 import team.nm.nnet.app.imageCollector.utils.Chooser;
@@ -58,7 +61,7 @@ public class MainFrame extends FaceList {
     private Capture capture;
     private SearchResult searchResult;
     private ImageDB imageDB;
-    private Image showingImage = new javax.swing.ImageIcon(Const.CURRENT_DIRECTORY + Const.RESOURCE_PATH + "authors.jpg").getImage();
+    private BufferedImage showingImage = ImageUtils.load(Const.CURRENT_DIRECTORY + Const.RESOURCE_PATH + "authors.jpg");
     
     static ExecutorService executorService = Executors.newCachedThreadPool();
     private FaceRecognitor fileRecognitor;
@@ -101,6 +104,8 @@ public class MainFrame extends FaceList {
 		ExtractedFacePanel facePanel = new ExtractedFacePanel(pnlFaces, ImageUtils.toImage(bufImg));
 		facePanel.setFaceId(face.getFaceId());
 		facePanel.setFaceName(face.getFaceName());
+		
+		drawPlus(face.getRegion());
 		pnlFaces.add(facePanel);
 		pnlFaces.updateUI();
 	}
@@ -178,7 +183,7 @@ public class MainFrame extends FaceList {
         gridBagConstraints.insets = new java.awt.Insets(11, 10, 0, 0);
         jPanel5.add(lblProcess, gridBagConstraints);
 
-        pnlFaces.setToolTipText("The face are detected");
+        pnlFaces.setToolTipText("The faces are detected");
         pnlFaces.setBackground(new java.awt.Color(255, 255, 255));
         pnlFaces.setLayout(new javax.swing.BoxLayout(pnlFaces,
                 javax.swing.BoxLayout.PAGE_AXIS));
@@ -508,15 +513,16 @@ public class MainFrame extends FaceList {
 
         jMenu5.setText("Tùy Chọn");
 
-        jMenuItem7.setText("Đang Cập Nhật");
-        jMenu5.add(jMenuItem7);
+        smnOption_Customize.setText("Tùy Chỉnh");
+        smnOption_Customize.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				CustomizeForm.getInstance().setVisible(true);
+			}
+            
+        });
+        jMenu5.add(smnOption_Customize);
 
         jMenuBar1.add(jMenu5);
-
-        jMenuItem4.setText("Đang xây dựng");
-        jMenu2.add(jMenuItem4);
-
-        jMenuBar1.add(jMenu2);
 
         jMenu4.setText("Giới Thiệu");
 
@@ -609,12 +615,12 @@ public class MainFrame extends FaceList {
 		frm.setVisible(true);
     }
 
-    private Image fitView(BufferedImage bufferedImage, int width, int height) {
+    private BufferedImage fitView(BufferedImage bufferedImage, int width, int height) {
         if ((bufferedImage.getWidth(null) > width)
                 || (bufferedImage.getHeight(null)) > height) {
             bufferedImage = ImageUtils.scale(bufferedImage, width, height);
         }
-        return ImageUtils.toImage(bufferedImage);
+        return bufferedImage;
     }
 
     private void detectFaces() {
@@ -651,6 +657,18 @@ public class MainFrame extends FaceList {
         }
         return list;
     }
+    
+    protected void drawPlus(Region region) {
+    	int x = region.getLeft() + region.getWidth() / 2;
+    	int y = region.getBottom() + region.getHeight() / 2;
+    	
+    	for(int i = -2; i < 3; i++) {
+    		for(int j = -2; j < 3; j++) {
+    			showingImage.setRGB(x + i, y + j, Color.RED.getRGB());
+    		}
+    	}
+    	lblImgView.setIcon(new javax.swing.ImageIcon(showingImage));
+    }
 
 	private static final String[] extendedLibs = {"civil.dll", "jdshow.dll"};
 	private static final String libDestination = "c:/windows/system32";
@@ -679,15 +697,13 @@ public class MainFrame extends FaceList {
     private javax.swing.JLabel lblImgSize = new JLabel();
     private javax.swing.JLabel lblImgView = new JLabel();
     private javax.swing.JMenu jMenu1 = new JMenu();
-    private javax.swing.JMenu jMenu2 = new JMenu();
     private javax.swing.JMenu jMenu3 = new JMenu();
     private javax.swing.JMenu jMenu4 = new JMenu();
     private javax.swing.JMenu jMenu5 = new JMenu();
     private javax.swing.JMenuBar jMenuBar1 = new JMenuBar();
-    private javax.swing.JMenuItem jMenuItem4 = new JMenuItem();
     private javax.swing.JMenuItem smnAbout_App = new JMenuItem();
     private javax.swing.JMenuItem smnAbout_Us = new JMenuItem();
-    private javax.swing.JMenuItem jMenuItem7 = new JMenuItem();
+    private javax.swing.JMenuItem smnOption_Customize = new JMenuItem();
     private javax.swing.JMenuItem smnDB_New = new JMenuItem();
     private javax.swing.JMenuItem smnDB_Load = new JMenuItem();
     private javax.swing.JMenuItem smnDB_Show = new JMenuItem();

@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 
 public class DetectedFace {
 
+	private Region region;
 	private BufferedImage bufferedImage;
 	private int faceId;
 	private String faceName;
@@ -51,6 +52,14 @@ public class DetectedFace {
 
 	public void setFaceName(String faceName) {
 		this.faceName = faceName;
+	}
+
+	public Region getRegion() {
+		return region;
+	}
+
+	public void setRegion(Region region) {
+		this.region = region;
 	}
 	
 }

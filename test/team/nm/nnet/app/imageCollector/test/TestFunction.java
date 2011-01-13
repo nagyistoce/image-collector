@@ -1,13 +1,18 @@
 package team.nm.nnet.app.imageCollector.test;
 
 
+import team.nm.nnet.app.imageCollector.bo.Parameter;
 import team.nm.nnet.tmp.NeuralFaceRecognize;
 
 public class TestFunction {
 
 	public static void main(String[] args) {
-		NeuralFaceRecognize nfr = new NeuralFaceRecognize("");
-		nfr.addTrainFolder("D:\\trainFolder");
+//		NeuralFaceRecognize nfr = new NeuralFaceRecognize("");
+//		nfr.addTrainFolder("D:\\trainFolder");
+		System.out.println(Parameter.minimumSkinPixelThreshold);
+		Parameter.minimumSkinPixelThreshold = 400;
+		Parameter.save();
+		System.out.println(Parameter.minimumSkinPixelThreshold);
 	}
 	
 	public static double getDerivativeTangen(double d) {

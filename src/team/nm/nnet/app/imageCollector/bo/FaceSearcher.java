@@ -70,14 +70,11 @@ public class FaceSearcher extends FaceList {
 	
 	@Override
 	public void onAddingFace(DetectedFace face) {
-//		faceResults.addFace(face);
-		
 		BufferedImage bufImg = face.getBufferedImage();
 		int index = neuralRecognition.gfncGetWinner(bufImg);
 		if(!state) {
 			return;
 		}
-		System.out.println(expectedOutput.contains(index) + ": " + index + " - " + expectedOutput);
 		if(index > 0) {
 			if(expectedOutput.contains(index)) {
 				faceResults.addFace(face);

@@ -1,14 +1,12 @@
 package team.nm.nnet.app.imageCollector.om;
 
-import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.WritableRaster;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
 import sole.hawking.image.filter.EdgeFilter;
+import sole.hawking.image.util.ImageUtils;
 import team.nm.nnet.app.imageCollector.utils.ColorSpace;
 import team.nm.nnet.core.Const;
 
@@ -16,13 +14,14 @@ public class Region {
     
     private final int BRUSH_WIDTH = 2;
     private final int SLOPE_HEIGHT = 6;
-    private final int HOLE_DIAMETER = 5;
+    private final int HOLE_DIAMETER = 6;
     
 	private int id;
 	private int left, right;
 	private int top, bottom;
 	private List<Pixel> pixels;
-	private List<Pixel> brokenPoints;
+	private List<Pixel> leftBoundary;
+	private List<Pixel> rightBoundary;
 	private Pixel startPoint;
 
 	public Region() {
@@ -55,20 +54,17 @@ public class Region {
 			return standardDeviation;
 		}
 		
-		Color pColor;
 		// Tính giá trị trung bình
         double mean = 0;
         for(Pixel p : pixels) {
-        	pColor = new Color(bufferedImage.getRGB(p.getX(), p.getY()));
-        	int rgb = (pColor.getRed() + pColor.getGreen() + pColor.getBlue());
+        	int rgb = bufferedImage.getRGB(p.getX(), p.getY());
         	mean += rgb;
         }
         mean /= pixels.size();
         
         // Tính độ lệch tiêu chuẩn
         for(Pixel p : pixels) {
-        	pColor = new Color(bufferedImage.getRGB(p.getX(), p.getY()));
-        	int rgb = (pColor.getRed() + pColor.getGreen() + pColor.getBlue());
+        	int rgb = bufferedImage.getRGB(p.getX(), p.getY());
         	standardDeviation += Math.pow(rgb - mean, 2);
         }
 
@@ -140,10 +136,6 @@ public class Region {
     public void setStartPoint(Pixel startPoint) {
         this.startPoint = startPoint;
     }
-
-	public List<Pixel> getBrokenPoints() {
-	    return brokenPoints;
-	}
 	
 	public List<Pixel> getBrokenPoints(BufferedImage bufferedImage) {
 	    if(bufferedImage != null) {
@@ -152,82 +144,33 @@ public class Region {
         
 	    return null;
 	}
-
-	public void setBrokenPoints(List<Pixel> brokenPoints) {
-	    this.brokenPoints = brokenPoints;
-	}
 	
 	// ----- Internal methods
-
-    private List<Pixel> findBrokenPoints(BufferedImage bufferedImage) {
-        if(!isValid()) {
-            return null;
-        }
-        
-        BufferedImage edgeBuff = bufferedImage.getSubimage(left, bottom, getWidth(), getHeight());
-        edgeBuff = ColorSpace.toYCbCr(edgeBuff);
-        EdgeFilter edgeFilter = new EdgeFilter();
-        edgeBuff = edgeFilter.filter(edgeBuff, null);
-        
-        List<Pixel> brokenPoints = new ArrayList<Pixel>();
+	
+	private List<Pixel> getBoundary(BufferedImage edgeBuffer) {
+		BufferedImage edgeBuff = ImageUtils.cloneImage(edgeBuffer);
+		
         Stack<Pixel> stack = new Stack<Pixel>();
         int w = getWidth();
         int h = getHeight();
-        int width_span = w /6;
-        
-        ColorModel cm = edgeBuff.getColorModel();
-        boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
-        WritableRaster raster = edgeBuff.copyData(null);
-        BufferedImage boundary = new BufferedImage(cm, raster, isAlphaPremultiplied, null);
-        
-        int left_bounder = left + width_span;
-        int right_bounder = w - width_span;
-        
         
         // Walk along left side
-        Pixel passedPoint = new Pixel(-1, -1);
         int x = startPoint.getX();
         int y = startPoint.getY();
         stack.push(new Pixel(x - 1, y));
         
-        int uphill = 0;
-        boolean firstUp = false;
-        Pixel cutPoint = null;
-        
+        leftBoundary = new ArrayList<Pixel>();
         edgeBuff.setRGB(x, y, 0);
-        int xThreshold = Integer.MAX_VALUE;
         while(!stack.isEmpty()) {
             Pixel p = stack.pop();
+            leftBoundary.add(p);
+            
             x = p.getX();
             y = p.getY();
             if((x != startPoint.getX()) && (y != startPoint.getY())) {
-                if((x <= left_bounder) || (x >= right_bounder) || (y <= 0) || (y >= h)) {
+                if((x <= 0) || (x >= w) || (y <= 0) || (y >= h)) {
                     break;
                 }
-            }
-            if(x <= xThreshold) {
-                xThreshold = x;
-                if(y < passedPoint.getY()) {
-                    uphill++;
-                    if(!firstUp) {
-                        cutPoint = p;
-                        firstUp = true;
-                    }
-                } else if(y > passedPoint.getY()) {
-                    uphill = 0;
-                    firstUp = false;
-                }
-                passedPoint = p;
-                if(uphill == SLOPE_HEIGHT) {
-                    if(isBrokenBlock(boundary, cutPoint.getX() + 2, cutPoint.getY() + 2, getWidth())) {
-                        brokenPoints.add(cutPoint);
-                        uphill = 0;
-                        firstUp = false;
-                    }
-                }
-            } else {
-                uphill = 0;
-                firstUp = false;
             }
             
             // Flood on 8 directs to search the next boundary point.
@@ -247,23 +190,117 @@ public class Region {
 
         stack.clear();
         // Walk along right side
-        passedPoint = new Pixel(-1, -1);
         x = startPoint.getX();
         y = startPoint.getY();
         stack.push(new Pixel(x + 1, y));
         
-        uphill = 0;
-        firstUp = false;
-        cutPoint = null;
-        
+        rightBoundary = new ArrayList<Pixel>();
         edgeBuff.setRGB(x, y, 0);
-        xThreshold = Integer.MIN_VALUE;
         while(!stack.isEmpty()) {
             Pixel p = stack.pop();
+            rightBoundary.add(p);
+            
             x = p.getX();
             y = p.getY();
             if((x != startPoint.getX()) && (y != startPoint.getY())) {
-                if((x <= left_bounder) || (x >= right_bounder) || (y <= 0) || (y >= h)) {
+                if((x <= 0) || (x >= w) || (y <= 0) || (y >= h)) {
+                    break;
+                }
+            }
+            
+            // Flood on 8 directs to search the next boundary point.
+            int[] xWay = {-1,  0,  1, -1, 0, 1, -1, 0, 1};
+            int[] yWay = {-1, -1, -1,  0, 0, 0,  1, 1, 1};
+            for(int i = 0, n = xWay.length; i < n; i++) {
+                int xx = x + xWay[i];
+                int yy = y + yWay[i];
+                if((0 <= xx) && (xx < w) && (0 <= yy) && (yy < h)) {
+                    if(edgeBuff.getRGB(xx, yy) == Const.WHITE_COLOR) {
+                        stack.push(new Pixel(xx, yy));
+                        edgeBuff.setRGB(xx, yy, 0);
+                    }
+                }
+            }
+        }
+        
+        List<Pixel> boundary = new ArrayList<Pixel>();
+        boundary.addAll(leftBoundary);
+        boundary.add(startPoint);
+        boundary.addAll(rightBoundary);
+        return boundary;
+	}
+
+    private List<Pixel> findBrokenPoints(BufferedImage bufferedImage) {
+        if(!isValid()) {
+            return null;
+        }
+        
+        BufferedImage edgeBuff = bufferedImage.getSubimage(left, bottom, getWidth(), getHeight());
+        edgeBuff = ColorSpace.toYCbCr(edgeBuff);
+        EdgeFilter edgeFilter = new EdgeFilter();
+        edgeBuff = edgeFilter.filter(edgeBuff, null);
+
+        getBoundary(edgeBuff);
+        List<Pixel> brokenPoints = new ArrayList<Pixel>();
+        
+        int w = getWidth();
+        int h = getHeight();
+        
+        // Walk along left side
+        Pixel passedPoint = new Pixel(-1, -1);
+        int uphill = 0;
+        boolean firstUp = false;
+        Pixel cutPoint = null;
+        int xThreshold = Integer.MAX_VALUE;
+
+        for(Pixel p : leftBoundary) {
+            int x = p.getX();
+            int y = p.getY();
+            if((x != startPoint.getX()) && (y != startPoint.getY())) {
+                if((x <= 0) || (x >= w) || (y <= 0) || (y >= h)) {
+                    break;
+                }
+            }
+            if(x <= xThreshold) {
+                xThreshold = x;
+                if(y < passedPoint.getY()) {
+                    uphill++;
+                    if(!firstUp) {
+                        cutPoint = p;
+                        firstUp = true;
+                    }
+                } else if(y > passedPoint.getY()) {
+                    uphill = 0;
+                    firstUp = false;
+                }
+                passedPoint = p;
+                if(uphill == SLOPE_HEIGHT) {
+                    if(isBrokenBlock(edgeBuff, cutPoint.getX() + 2, cutPoint.getY() + 2, getWidth()) &&
+                		(!isHole(edgeBuff, cutPoint.getX(), cutPoint.getY() - 3, HOLE_DIAMETER) ||
+                		 !isHole(edgeBuff, cutPoint.getX() + 1, cutPoint.getY() - 3, HOLE_DIAMETER))) {
+                        brokenPoints.add(cutPoint);
+                        uphill = 0;
+                        firstUp = false;
+                    }
+                }
+            } else {
+                uphill = 0;
+                firstUp = false;
+            }
+        }
+
+        // Walk along right side
+        passedPoint = new Pixel(-1, -1);
+        uphill = 0;
+        firstUp = false;
+        cutPoint = null;
+        xThreshold = Integer.MIN_VALUE;
+        
+        for(Pixel p : rightBoundary) {
+            int x = p.getX();
+            int y = p.getY();
+            if((x != startPoint.getX()) && (y != startPoint.getY())) {
+                if((x <= 0) || (x >= w) || (y <= 0) || (y >= h)) {
                     break;
                 }
             }
@@ -280,8 +317,11 @@ public class Region {
                     firstUp = false;
                 }
                 passedPoint = p;
+
                 if(uphill == SLOPE_HEIGHT) {
-                    if(isBrokenBlock(boundary, cutPoint.getX() - 2, cutPoint.getY() + 2, getWidth())) {
+                    if(isBrokenBlock(edgeBuff, cutPoint.getX() - 2, cutPoint.getY() + 2, getWidth()) &&
+	            		(!isHole(edgeBuff, cutPoint.getX(), cutPoint.getY() - 3, HOLE_DIAMETER) ||
+	               		 !isHole(edgeBuff, cutPoint.getX() - 1, cutPoint.getY() - 3, HOLE_DIAMETER))) {
                         brokenPoints.add(cutPoint);
                         uphill = 0;
                         firstUp = false;
@@ -290,20 +330,6 @@ public class Region {
             } else {
                 uphill = 0;
                 firstUp = false;
-            }
-            
-            // Flood on 8 directs to search the next boundary point.
-            int[] xWay = {-1,  0,  1, -1, 0, 1, -1, 0, 1};
-            int[] yWay = {-1, -1, -1,  0, 0, 0,  1, 1, 1};
-            for(int i = 0, n = xWay.length; i < n; i++) {
-                int xx = x + xWay[i];
-                int yy = y + yWay[i];
-                if((0 <= xx) && (xx < w) && (0 <= yy) && (yy < h)) {
-                    if(edgeBuff.getRGB(xx, yy) == Const.WHITE_COLOR) {
-                        stack.push(new Pixel(xx, yy));
-                        edgeBuff.setRGB(xx, yy, 0);
-                    }
-                }
             }
         }
         
@@ -323,10 +349,9 @@ public class Region {
             return false;
         }
         
-        boolean flag = isBlock(boundary, x, y, width) && 
-                       isBlock(boundary, x - BRUSH_WIDTH, y - BRUSH_WIDTH, width) && 
-                       isBlock(boundary, x + BRUSH_WIDTH, y - BRUSH_WIDTH, width) && 
-                       isHole(boundary, x, y, HOLE_DIAMETER);
+        boolean flag = isBlock(boundary, x, y, width) &&
+                       isBlock(boundary, x - BRUSH_WIDTH, y - BRUSH_WIDTH, width) &&
+                       isBlock(boundary, x + BRUSH_WIDTH, y - BRUSH_WIDTH, width);
         
         return flag;
     }

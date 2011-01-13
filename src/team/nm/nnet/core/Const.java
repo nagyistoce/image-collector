@@ -53,33 +53,21 @@ public class Const {
     /**
      * Buoc nhay frame anh
      */
-    public static final int JUMP_LENGHT = 5;
+    public static final int JUMP_LENGHT = 10;
     
     /**
      * Độ giãn nở kích thước khung dò khuôn mặt
      */
     public static final int SCANNER_GROWTH = 10;
     
-    /**
-     * Ngưỡng quy quy định số điểm trắng để xác định một khung hình có khả năng là khuôn mặt hay không
-     */
-    public static final double WHITE_RATIO_THRESHOLD = 0.4;
-    
-    /**
-     * Số lượng pixel thấp nhất mà một vùng còn được xem là vùng khuôn mặt 
-     */
-    public static final int MINIMUM_SKIN_PIXEL_THRESHOLD = 100;
+    public static final double MINIMUM_ASPECT_RATIO = 0.6;
+    public static final double MAXIMUM_ASPECT_RATIO = 1.8;
     
     /**
      * Khoảng giá trị của vùng được cho là khuôn mặt 
      */
     public static final int LOWER_STANDARD_DEVIATION = 30;
     public static final int UPPER_STANDARD_DEVIATION = 100;
-    
-    /**
-     * Ngưỡng xác định kết xuất từ neural network là khuôn mặt
-     */
-    public static final float NETWORK_FACE_VALIDATION_THRESHOLD = (float) 0.75;
     
     /**
      * Kích thước khuôn mặt hiển thị đến người dùng
@@ -135,8 +123,4 @@ public class Const {
     	1,1,1,1,1,1,0,0,0,0,0,0,0,0,1,1,1,1,1,1,
     };
     
-    /**
-     * Nguong qui dinh anh co trong data base hay khong.
-     */
-    public static final  float RECONIZE_THRESHOLD = 0.8F; 
 }

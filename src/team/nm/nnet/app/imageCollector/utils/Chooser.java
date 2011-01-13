@@ -73,6 +73,7 @@ public class Chooser extends JFileChooser {
         		curPath = selectedFile.getPath();
         		return selectedFile;
         	}
+        	return new File(selectedFile.getPath() + ".nmt");
         }
         return null;
     }

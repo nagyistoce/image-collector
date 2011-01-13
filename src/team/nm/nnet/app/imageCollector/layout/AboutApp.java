@@ -14,7 +14,7 @@ public class AboutApp extends javax.swing.JDialog {
 	
 	private static final String message = "<HTML><div style=\"font-family:Arial;font-size:12px;\">" +
 			"<p>Chương trình được <span style='color:#FF6600'><b>nhóm NM</b></span> xây dựng và phát triển, <br/> " +
-			"dựa trên nền tảng chính là <span style='color:#B00000'><i>mạng thần kinh (neural network).</i></span><br/>" +
+			"dựa trên nền tảng chính là <span style='color:#B00000'><i>mạng nơ-ron (neural network).</i></span><br/>" +
 			"</p><br/><p>Tham khảo mã nguồn tại: <a href='http://code.google.com/p/image-collector/'><u>image-collector</u></a></p></div></HTML>";
     
 	private static AboutApp instance = new AboutApp();
