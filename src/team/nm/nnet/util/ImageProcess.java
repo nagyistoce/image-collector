@@ -265,16 +265,6 @@ public class ImageProcess {
 		}
 	}
 	
-	public static void main(String[] args ) {
-		BufferedImage bi = createHorizoneRandomImage(20, 30);
-		ImageUtils.saveToJpg(bi, new File("D:/random51.jpg"));
-		bi = createVerticalRandomImage(20, 30);
-		ImageUtils.saveToJpg(bi, new File("D:/random52.jpg"));
-		bi = createRandomImage(20, 30);
-		ImageUtils.saveToJpg(bi, new File("D:/random53.jpg"));
-		createAllColorImage(20, 30, 50);
-		System.out.println("finished");
-	}
 	
-
+	
 }
