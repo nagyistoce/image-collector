@@ -128,9 +128,6 @@ public class FaceDetector {
                     			int w = ((candidate.getWidth() + Const.SPAN_FACE_BOX) <= segment.getWidth()) ? candidate.getWidth() + Const.SPAN_FACE_BOX : candidate.getWidth(); 
                     			int h = ((candidate.getHeight() + Const.SPAN_FACE_BOX) <= segment.getHeight()) ? candidate.getHeight() + Const.SPAN_FACE_BOX : candidate.getHeight();
                     			
-                    			BufferedImage buff = bufferedImage.getSubimage(candidate.getLeft(), candidate.getBottom(), candidate.getWidth(), candidate.getHeight());
-                    			ImageUtils.drawImageToJpgByteStream(buff, new File("D:/" + System.currentTimeMillis() + ".jpg"));
-                    			
                     			BufferedImage bufImg = bufferedImage.getSubimage(x, y, w, h);
                     			DetectedFace face = new DetectedFace(bufImg, filePath);
                     			face.setRegion(new Region(x, y+h, x+w, y));
