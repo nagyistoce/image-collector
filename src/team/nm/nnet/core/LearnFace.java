@@ -547,17 +547,32 @@ public class LearnFace implements Runnable {
 		}
 		String resultCheck = checkNameInArray(arrayName, nameOfImage);
 		if (resultCheck != "") {
-			for (int i = 0; i < 10; i ++) {
-				ImageUtils.saveToJpg(inputImage, new File(folderPath + "\\" + resultCheck + "\\" + System.currentTimeMillis() + ".jpg"));
+			BufferedImage flipImage = ImageUtils.flip(inputImage);
+			for (int i = 1; i <= 3; i ++) {
+				BufferedImage rotateImageLeft = ImageUtils.rotate(inputImage, i);
+				BufferedImage rotateImageRight = ImageUtils.rotate(inputImage, i);
+				ImageUtils.saveToJpg(rotateImageLeft, new File(folderPath + "\\" + resultCheck + "\\" + System.currentTimeMillis() + i + "left.jpg"));
+				ImageUtils.saveToJpg(rotateImageRight, new File(folderPath + "\\" + resultCheck + "\\" + System.currentTimeMillis() + i + "right.jpg"));
+				rotateImageLeft = ImageUtils.rotate(flipImage, i);
+				rotateImageRight = ImageUtils.rotate(flipImage, i);
+				ImageUtils.saveToJpg(rotateImageLeft, new File(folderPath + "\\" + resultCheck + "\\" + System.currentTimeMillis() + i + "flipleft.jpg"));
+				ImageUtils.saveToJpg(rotateImageRight, new File(folderPath + "\\" + resultCheck + "\\" + System.currentTimeMillis() + i + "flipright.jpg"));
 			}
 		}
 		else {
 			arrayName[listNumberFolder.size()] = nameOfImage;
 			String newFolderPath = folderPath + "\\" + listNumberFolder.size() + "_" + nameOfImage;
 			ImageProcess.createFolder(newFolderPath);
-			for (int i = 0; i < 10; i ++) {
-				ImageUtils.saveToJpg(inputImage, new File(newFolderPath + "\\" + System.currentTimeMillis() + ".jpg"));
-				
+			BufferedImage flipImage = ImageUtils.flip(inputImage);
+			for (int i = 1; i <= 3; i ++) {
+				BufferedImage rotateImageLeft = ImageUtils.rotate(inputImage, i);
+				BufferedImage rotateImageRight = ImageUtils.rotate(inputImage, i);
+				ImageUtils.saveToJpg(rotateImageLeft, new File(folderPath + "\\" + resultCheck + "\\" + System.currentTimeMillis() + i + "left.jpg"));
+				ImageUtils.saveToJpg(rotateImageRight, new File(folderPath + "\\" + resultCheck + "\\" + System.currentTimeMillis() + i + "right.jpg"));
+				rotateImageLeft = ImageUtils.rotate(flipImage, i);
+				rotateImageRight = ImageUtils.rotate(flipImage, i);
+				ImageUtils.saveToJpg(rotateImageLeft, new File(folderPath + "\\" + resultCheck + "\\" + System.currentTimeMillis() + i + "flipleft.jpg"));
+				ImageUtils.saveToJpg(rotateImageRight, new File(folderPath + "\\" + resultCheck + "\\" + System.currentTimeMillis() + i + "flipright.jpg"));
 			}
 			listNumberFolder.add(listNumberFolder.size() + "_" + nameOfImage);
 		}
