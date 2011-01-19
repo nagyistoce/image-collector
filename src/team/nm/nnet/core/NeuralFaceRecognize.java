@@ -73,12 +73,12 @@ public class NeuralFaceRecognize implements Runnable{
     /**
      * So luong hoc
      */
-    private final int CintEpochs = 1200;
+    private final int CintEpochs = 300;
 
     /**
      * Nguong sai gioi hang
      */
-    private final float CflErrorThreshold = 0.0002F;
+    private final float CflErrorThreshold = 0.003F;
 
     /**
      * Mang luu gia tri weight

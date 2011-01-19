@@ -64,12 +64,12 @@ public class NeuralNetwork implements Runnable{
     /**
      * So lan hoc
      */
-    private final int CintEpochs = 1200;
+    private final int CintEpochs = 300;
 
     /**
      * Nguong sai cuc tieu
      */
-    private final float CflErrorThreshold = 0.0002F;
+    private final float CflErrorThreshold = 0.002F;
 
     /**
      * Mang luu gia tri weight
