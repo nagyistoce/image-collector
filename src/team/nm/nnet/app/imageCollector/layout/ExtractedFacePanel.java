@@ -1,11 +1,17 @@
 package team.nm.nnet.app.imageCollector.layout;
 
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.io.File;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 
 import org.apache.commons.lang.StringUtils;
@@ -18,6 +24,8 @@ public class ExtractedFacePanel extends javax.swing.JPanel {
 
 	private static final long serialVersionUID = 8434384268590865473L;
 	static ExecutorService executorService = Executors.newCachedThreadPool();
+	private BufferedImage imageLable;
+	private static String currentDirrectory = "";
 	
     public ExtractedFacePanel(JPanel parent, Image faceImage) {
         initComponents();
@@ -27,6 +35,7 @@ public class ExtractedFacePanel extends javax.swing.JPanel {
     
     public void setFaceImage(Image faceImage) {
     	BufferedImage bufferedImage = ImageUtils.toBufferedImage(faceImage);
+    	imageLable = bufferedImage;
     	bufferedImage = ImageUtils.resize(bufferedImage, Const.SHOWING_FACE_WIDTH, Const.SHOWING_FACE_HEIGHT);
         faceImage = ImageUtils.toImage(bufferedImage);
     	lblFaceView.setIcon(new ImageIcon(faceImage));
@@ -63,6 +72,27 @@ public class ExtractedFacePanel extends javax.swing.JPanel {
             }
         });
 
+        /********************Add by Nhat********************/
+        lblFaceView.addMouseListener(new MouseAdapter() {
+        	@Override
+        	public void mouseClicked(MouseEvent e) {
+        		if (e.getButton() == MouseEvent.BUTTON1) {
+        			if (currentDirrectory == "") {
+        				currentDirrectory = "D:\\";
+        			}
+        			JFileChooser fileChooser = new JFileChooser();
+        			fileChooser.setDialogType(JFileChooser.DIRECTORIES_ONLY);
+        			fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        			fileChooser.setCurrentDirectory(new File(currentDirrectory));
+        			int result = fileChooser.showOpenDialog(null); 
+        			if (result == JFileChooser.APPROVE_OPTION) {
+        				String path = fileChooser.getSelectedFile().getAbsolutePath();
+        				ImageUtils.saveToJpg(imageLable, new File(path + "\\" + System.currentTimeMillis() + ".jpg"));
+        				currentDirrectory = path;
+        			}
+        		}
+        	}
+		});
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
