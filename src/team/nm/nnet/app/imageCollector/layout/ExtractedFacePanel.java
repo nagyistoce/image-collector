@@ -81,7 +81,7 @@ public class ExtractedFacePanel extends javax.swing.JPanel {
         				currentDirrectory = "D:\\";
         			}
         			JFileChooser fileChooser = new JFileChooser();
-        			fileChooser.setDialogType(JFileChooser.DIRECTORIES_ONLY);
+        			fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
         			fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         			fileChooser.setCurrentDirectory(new File(currentDirrectory));
         			int result = fileChooser.showOpenDialog(null); 
