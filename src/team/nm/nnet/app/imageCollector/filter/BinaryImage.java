@@ -51,17 +51,21 @@ public class BinaryImage {
     
     /** Constructor taking an image and converting it to a BinaryImage image **/
     
-    protected void initialize(BufferedImage bufferedImage) {
+    protected void initialize(BufferedImage bufferedImage, boolean isRGB) {
         if (bufferedImage != null) {
             width = bufferedImage.getWidth(null);
             height = bufferedImage.getHeight(null);
             size = width * height;
             pixels = new int[width][height];
-            binaryBuffer = ColorSpace.toYCbCr(bufferedImage);
+            int[] array1D = new int[size];
+            if(isRGB) {
+            	binaryBuffer = ColorSpace.toYCbCr(bufferedImage);
+            	array1D = binaryBuffer.getRGB(0, 0, width, height, null, 0, width).clone();
+            } else {
+                array1D = bufferedImage.getRGB(0, 0, width, height, null, 0, width).clone();
+            }
             
             int[][] array2D = new int[width][height];
-            int[] array1D = new int[size];
-            array1D = binaryBuffer.getRGB(0, 0, width, height, null, 0, width).clone();
             for (int i = 0; i < width; i++) {
                 for (int j = 0; j < height; j++) {
                     array2D[i][j] = array1D[(j * width) + i];
@@ -79,15 +83,15 @@ public class BinaryImage {
     public BinaryImage(Image image) {
         if(image != null) {
             BufferedImage bufferedImage = ImageUtils.toBufferedImage(image);
-            initialize(bufferedImage);
+            initialize(bufferedImage, true);
         }
     }
 
     /**
      * Covert image in RGB model to binary image
      */
-    public BinaryImage(BufferedImage bufferedImage) {
-        initialize(bufferedImage);
+    public BinaryImage(BufferedImage bufferedImage, boolean isRGB) {
+        initialize(bufferedImage, isRGB);
     }
     
     /**
@@ -273,6 +277,10 @@ public class BinaryImage {
     }
 
     public void setBufferedImage(BufferedImage bufferedImage) {
-        initialize(bufferedImage);
+        initialize(bufferedImage, true);
     }
+
+	public void setBinaryBuffer(BufferedImage binaryBuffer) {
+		initialize(binaryBuffer, false);
+	}
 }

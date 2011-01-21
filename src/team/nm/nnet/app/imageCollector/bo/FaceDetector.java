@@ -112,9 +112,15 @@ public class FaceDetector {
                 return;
             }
             
+            /*BufferedImage tmp = bufferedImage.getSubimage(segment.getLeft(), segment.getBottom(), segment.getWidth(), segment.getHeight());
+        	DetectedFace faze = new DetectedFace(tmp, filePath);
+			faze.setRegion(new Region(segment.getLeft(), segment.getTop(), segment.getRight(), segment.getBottom()));
+			faceResults.addFace(faze);*/
+			
             if (isCandidate(segment)) {
                 try{
                     List<Region> subSegments = separateRegions(segment);
+//                    List<Region> subSegments = null;
                     if(subSegments == null) {
                         subSegments = new ArrayList<Region>();
                         subSegments.add(segment);

@@ -38,8 +38,6 @@ import org.springframework.beans.factory.annotation.Required;
 import sole.hawking.image.filter.EdgeFilter;
 import team.nm.nnet.app.imageCollector.bo.FaceRecognitor;
 import team.nm.nnet.app.imageCollector.bo.ImageDB;
-import team.nm.nnet.app.imageCollector.filter.BinaryImage;
-import team.nm.nnet.app.imageCollector.filter.OpenFilter;
 import team.nm.nnet.app.imageCollector.om.DetectedFace;
 import team.nm.nnet.app.imageCollector.om.FaceList;
 import team.nm.nnet.app.imageCollector.om.Region;
@@ -105,7 +103,8 @@ public class MainFrame extends FaceList {
 		facePanel.setFaceId(face.getFaceId());
 		facePanel.setFaceName(face.getFaceName());
 		
-		drawPlus(face.getRegion());
+//		drawPlus(face.getRegion());
+		drawRectangle(face.getRegion());
 		pnlFaces.add(facePanel);
 		pnlFaces.updateUI();
 	}
@@ -590,7 +589,6 @@ public class MainFrame extends FaceList {
     
     protected void showBinaryImage() {
     	final BufferedImage bufferedImage = ImageUtils.toBufferedImage(showingImage);
-//		BufferedImage y2CBuff = bufferedImage;
 		final BufferedImage y2CBuff = ColorSpace.toYCbCr(bufferedImage);
 		
     	final JFrame frm = new JFrame("Binary Image - YCbCr Model");
@@ -600,9 +598,7 @@ public class MainFrame extends FaceList {
 			public void mouseClicked(MouseEvent e) {
 				if(e.getButton() == MouseEvent.BUTTON1) {
 					frm.setTitle("Binary Image - Opening processing");
-					BinaryImage binaryImage = new BinaryImage(bufferedImage);
-					binaryImage = OpenFilter.filter(binaryImage, Const.KERNEL, 1);
-					lbl.setIcon(new ImageIcon(ImageUtils.toImage(binaryImage.getBinaryBuffer())));
+					lbl.setIcon(new ImageIcon(ImageUtils.toImage(ColorSpace.getBinaryBuffer(bufferedImage))));
 				} else if(e.getButton() == MouseEvent.BUTTON3) {
 					frm.setTitle("Binary Image - Edge filtering");
 				    EdgeFilter edgeFilter = new EdgeFilter();
@@ -668,6 +664,21 @@ public class MainFrame extends FaceList {
     		}
     	}
     	lblImgView.setIcon(new javax.swing.ImageIcon(showingImage));
+    }
+    
+    protected void drawRectangle(Region region) {
+    	int left = region.getLeft(), right = region.getRight();
+    	int bottom = region.getBottom(), top = region.getTop();
+    	
+    	for(int x = left; x < right; x++) {
+    		showingImage.setRGB(x, bottom, Color.GREEN.getRGB());
+    		showingImage.setRGB(x, top, Color.GREEN.getRGB());
+    	}
+    	for(int y = bottom; y < top; y++) {
+    		showingImage.setRGB(left, y, Color.GREEN.getRGB());
+    		showingImage.setRGB(right, y, Color.GREEN.getRGB());
+    	}
+    	
     }
 
 	private static final String[] extendedLibs = {"civil.dll", "jdshow.dll"};

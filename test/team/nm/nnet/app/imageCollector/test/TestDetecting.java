@@ -4,16 +4,22 @@ import java.awt.image.BufferedImage;
 import java.awt.image.Raster;
 import java.io.File;
 
+import team.nm.nnet.core.Const;
+import team.nm.nnet.core.NeuralNetwork;
 import team.nm.nnet.util.ImageUtils;
 
 public class TestDetecting extends TestBase  {
 
 	public static void main(String[] args) {
-		String filename = "D:/img.jpg";
+		String filename = "D:/Images/change/camera.png";
         BufferedImage bufferedImage = ImageUtils.load(filename);
-        BufferedImage yCbCrBufImage = toYCbCr(bufferedImage);
-        ImageUtils.drawImageToJpgByteStream(yCbCrBufImage, new File("D:/img2.jpg"));
-        System.out.println("Finish!");
+
+        NeuralNetwork nn = new NeuralNetwork(Const.CURRENT_DIRECTORY + "/src/weight.txt");
+        nn.loadWeight(Const.CURRENT_DIRECTORY + "/src/weight.txt");
+        float outVal = nn.gfncGetWinner(bufferedImage);
+        
+        showImage("RGB", bufferedImage);
+        System.out.println(outVal + "\nFinish!");
 	}
 	
 	static BufferedImage toYCbCr(BufferedImage bufferedImage) {
