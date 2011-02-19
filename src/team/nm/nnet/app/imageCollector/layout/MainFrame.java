@@ -105,6 +105,7 @@ public class MainFrame extends FaceList {
 		
 //		drawPlus(face.getRegion());
 		drawRectangle(face.getRegion());
+		lblImgView.updateUI();
 		pnlFaces.add(facePanel);
 		pnlFaces.updateUI();
 	}
