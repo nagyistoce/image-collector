@@ -1,0 +1,1 @@
+Detect and extract human faces from an image. Then recognize and collect images containing the specified face.
